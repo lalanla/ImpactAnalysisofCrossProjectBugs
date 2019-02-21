@@ -1,0 +1,66 @@
+astropy_astropy-1.3.0: 0	
+***************************************************	
+sklearn_sklearn-0.18.0: 2	
+===================================================================	
+test_dbscan_similarity: 23	
+----------------------------	
+
+eps = 0.15
+min_samples = 10
+tempResult = pdist(X)
+	
+===================================================================	
+pairwise_distances: 323	
+----------------------------	
+
+' Compute the distance matrix from a vector array X and optional Y.\n\n    This method takes either a vector array or a distance matrix, and returns\n    a distance matrix. If the input is a vector array, the distances are\n    computed. If the input is a distances matrix, it is returned instead.\n\n    This method provides a safe way to take a distance matrix as input, while\n    preserving compatibility with many other algorithms that take a vector\n    array.\n\n    If Y is given (default is None), then the returned matrix is the pairwise\n    distance between the arrays from both X and Y.\n\n    Valid values for metric are:\n\n    - From scikit-learn: [\'cityblock\', \'cosine\', \'euclidean\', \'l1\', \'l2\',\n      \'manhattan\']. These metrics support sparse matrix inputs.\n\n    - From scipy.spatial.distance: [\'braycurtis\', \'canberra\', \'chebyshev\',\n      \'correlation\', \'dice\', \'hamming\', \'jaccard\', \'kulsinski\', \'mahalanobis\',\n      \'matching\', \'minkowski\', \'rogerstanimoto\', \'russellrao\', \'seuclidean\',\n      \'sokalmichener\', \'sokalsneath\', \'sqeuclidean\', \'yule\']\n      See the documentation for scipy.spatial.distance for details on these\n      metrics. These metrics do not support sparse matrix inputs.\n\n    Note that in the case of \'cityblock\', \'cosine\' and \'euclidean\' (which are\n    valid scipy.spatial.distance metrics), the scikit-learn implementation\n    will be used, which is faster and has support for sparse matrices (except\n    for \'cityblock\'). For a verbose description of the metrics from\n    scikit-learn, see the __doc__ of the sklearn.pairwise.distance_metrics\n    function.\n\n    Read more in the :ref:`User Guide <metrics>`.\n\n    Parameters\n    ----------\n    X : array [n_samples_a, n_samples_a] if metric == "precomputed", or,              [n_samples_a, n_features] otherwise\n        Array of pairwise distances between samples, or a feature array.\n\n    Y : array [n_samples_b, n_features], optional\n        An optional second feature array. Only allowed if metric != "precomputed".\n\n    metric : string, or callable\n        The metric to use when calculating distance between instances in a\n        feature array. If metric is a string, it must be one of the options\n        allowed by scipy.spatial.distance.pdist for its metric parameter, or\n        a metric listed in pairwise.PAIRWISE_DISTANCE_FUNCTIONS.\n        If metric is "precomputed", X is assumed to be a distance matrix.\n        Alternatively, if metric is a callable function, it is called on each\n        pair of instances (rows) and the resulting value recorded. The callable\n        should take two arrays from X as input and return a value indicating\n        the distance between them.\n\n    n_jobs : int\n        The number of jobs to use for the computation. This works by breaking\n        down the pairwise matrix into n_jobs even slices and computing them in\n        parallel.\n\n        If -1 all CPUs are used. If 1 is given, no parallel computing code is\n        used at all, which is useful for debugging. For n_jobs below -1,\n        (n_cpus + 1 + n_jobs) are used. Thus for n_jobs = -2, all CPUs but one\n        are used.\n\n    `**kwds` : optional keyword parameters\n        Any further parameters are passed directly to the distance function.\n        If using a scipy.spatial.distance metric, the parameters are still\n        metric dependent. See the scipy docs for usage examples.\n\n    Returns\n    -------\n    D : array [n_samples_a, n_samples_a] or [n_samples_a, n_samples_b]\n        A distance matrix D such that D_{i, j} is the distance between the\n        ith and jth vectors of the given matrix X, if Y is None.\n        If Y is not None, then D_{i, j} is the distance between the ith array\n        from X and the jth array from Y.\n\n    '
+if ((metric not in _VALID_METRICS) and (not callable(metric)) and (metric != 'precomputed')):
+    raise ValueError(("Unknown metric %s. Valid metrics are %s, or 'precomputed', or a callable" % (metric, _VALID_METRICS)))
+if (metric == 'precomputed'):
+    (X, _) = check_pairwise_arrays(X, Y, precomputed=True)
+    return X
+elif (metric in PAIRWISE_DISTANCE_FUNCTIONS):
+    func = PAIRWISE_DISTANCE_FUNCTIONS[metric]
+elif callable(metric):
+    func = partial(_pairwise_callable, metric=metric, **kwds)
+else:
+    if (issparse(X) or issparse(Y)):
+        raise TypeError('scipy distance metrics do not support sparse matrices.')
+    dtype = (bool if (metric in PAIRWISE_BOOLEAN_FUNCTIONS) else None)
+    (X, Y) = check_pairwise_arrays(X, Y, dtype=dtype)
+    if ((n_jobs == 1) and (X is Y)):
+        tempResult = pdist(X, metric=metric, **kwds)
+	
+***************************************************	
+matplotlib_matplotlib-2.0.0: 0	
+***************************************************	
+ipython_ipython-6.1.0: 0	
+***************************************************	
+pandas_pandas-0.19.2: 0	
+***************************************************	
+dask_dask-0.7.0: 0	
+***************************************************	
+nengo_nengo-2.0.0: 0	
+***************************************************	
+sympy_sympy-1.0.0: 0	
+***************************************************	
+daducci_amico-dev: 0	
+***************************************************	
+aplpy_aplpy-1.1.1: 0	
+***************************************************	
+markovmodel_msmtools-1.0.2: 0	
+***************************************************	
+nilearn_nilearn-0.4.0: 0	
+***************************************************	
+poliastro_poliastro-0.8.0: 0	
+***************************************************	
+skimage_skimage-0.13.0: 0	
+***************************************************	
+sunpy_sunpy-0.8.0: 0	
+***************************************************	
+spacetelescope_synphot-0.1: 0	
+***************************************************	
+librosa_librosa-0.5.1: 0	
+***************************************************	
+mne_python-0.15.0: 0	
+***************************************************	

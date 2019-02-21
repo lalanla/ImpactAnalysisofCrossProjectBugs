@@ -1,0 +1,9 @@
+project, module, line
+scipy_scipy,_pivot_col,56
+scipy_scipy,_pivot_row,69
+scipy_scipy,kurtosis,832
+scipy_scipy,skewtest,894
+scipy_scipy,_betai,151
+scipy_scipy,skew,813
+matplotlib_matplotlib,SymmetricalLogTransform.transform_non_affine,198
+matplotlib_matplotlib,InvertedSymmetricalLogTransform.transform_non_affine,225

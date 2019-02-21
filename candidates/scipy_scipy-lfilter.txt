@@ -1,0 +1,119 @@
+astropy_astropy-1.3.0: 0	
+***************************************************	
+sklearn_sklearn-0.18.0: 0	
+***************************************************	
+matplotlib_matplotlib-2.0.0: 0	
+***************************************************	
+ipython_ipython-6.1.0: 0	
+***************************************************	
+pandas_pandas-0.19.2: 0	
+***************************************************	
+dask_dask-0.7.0: 0	
+***************************************************	
+nengo_nengo-2.0.0: 0	
+***************************************************	
+sympy_sympy-1.0.0: 0	
+***************************************************	
+daducci_amico-dev: 0	
+***************************************************	
+aplpy_aplpy-1.1.1: 0	
+***************************************************	
+markovmodel_msmtools-1.0.2: 0	
+***************************************************	
+nilearn_nilearn-0.4.0: 0	
+***************************************************	
+poliastro_poliastro-0.8.0: 0	
+***************************************************	
+skimage_skimage-0.13.0: 0	
+***************************************************	
+sunpy_sunpy-0.8.0: 0	
+***************************************************	
+spacetelescope_synphot-0.1: 0	
+***************************************************	
+librosa_librosa-0.5.1: 2	
+===================================================================	
+onset_strength_multi: 89	
+----------------------------	
+
+"Compute a spectral flux onset strength envelope across multiple channels.\n\n    Onset strength for channel `i` at time `t` is determined by:\n\n    `mean_{f in channels[i]} max(0, S[f, t+1] - S[f, t])`\n\n\n    Parameters\n    ----------\n    y        : np.ndarray [shape=(n,)]\n        audio time-series\n\n    sr       : number > 0 [scalar]\n        sampling rate of `y`\n\n    S        : np.ndarray [shape=(d, m)]\n        pre-computed (log-power) spectrogram\n\n    lag      : int > 0\n        time lag for computing differences\n\n    max_size : int > 0\n        size (in frequency bins) of the local max filter.\n        set to `1` to disable filtering.\n\n    detrend : bool [scalar]\n        Filter the onset strength to remove the DC component\n\n    center : bool [scalar]\n        Shift the onset function by `n_fft / (2 * hop_length)` frames\n\n    feature : function\n        Function for computing time-series features, eg, scaled spectrograms.\n        By default, uses `librosa.feature.melspectrogram` with `fmax=11025.0`\n\n    aggregate : function\n        Aggregation function to use when combining onsets\n        at different frequency bins.\n\n        Default: `np.mean`\n\n    channels : list or None\n        Array of channel boundaries or slice objects.\n        If `None`, then a single channel is generated to span all bands.\n\n    kwargs : additional keyword arguments\n        Additional parameters to `feature()`, if `S` is not provided.\n\n\n    Returns\n    -------\n    onset_envelope   : np.ndarray [shape=(n_channels, m)]\n        array containing the onset strength envelope for each specified channel\n\n\n    Raises\n    ------\n    ParameterError\n        if neither `(y, sr)` nor `S` are provided\n\n\n    See Also\n    --------\n    onset_strength\n\n    Notes\n    -----\n    This function caches at level 30.\n\n    Examples\n    --------\n    First, load some audio and plot the spectrogram\n\n    >>> import matplotlib.pyplot as plt\n    >>> y, sr = librosa.load(librosa.util.example_audio_file(),\n    ...                      duration=10.0)\n    >>> D = librosa.stft(y)\n    >>> plt.figure()\n    >>> plt.subplot(2, 1, 1)\n    >>> librosa.display.specshow(librosa.amplitude_to_db(D, ref=np.max),\n    ...                          y_axis='log')\n    >>> plt.title('Power spectrogram')\n\n    Construct a standard onset function over four sub-bands\n\n    >>> onset_subbands = librosa.onset.onset_strength_multi(y=y, sr=sr,\n    ...                                                     channels=[0, 32, 64, 96, 128])\n    >>> plt.subplot(2, 1, 2)\n    >>> librosa.display.specshow(onset_subbands, x_axis='time')\n    >>> plt.ylabel('Sub-bands')\n    >>> plt.title('Sub-band onset strength')\n\n    "
+if (feature is None):
+    feature = melspectrogram
+    kwargs.setdefault('fmax', 11025.0)
+if (aggregate is None):
+    aggregate = numpy.mean
+if ((lag < 1) or (not isinstance(lag, int))):
+    raise ParameterError('lag must be a positive integer')
+if ((max_size < 1) or (not isinstance(max_size, int))):
+    raise ParameterError('max_size must be a positive integer')
+if (S is None):
+    S = numpy.abs(feature(y=y, sr=sr, **kwargs))
+    S = core.power_to_db(S)
+n_fft = kwargs.get('n_fft', 2048)
+hop_length = kwargs.get('hop_length', 512)
+S = numpy.atleast_2d(S)
+if (max_size == 1):
+    ref_spec = S
+else:
+    ref_spec = scipy.ndimage.maximum_filter1d(S, max_size, axis=0)
+onset_env = (S[:, lag:] - ref_spec[:, :(- lag)])
+onset_env = numpy.maximum(0.0, onset_env)
+pad = True
+if (channels is None):
+    channels = [slice(None)]
+else:
+    pad = False
+onset_env = util.sync(onset_env, channels, aggregate=aggregate, pad=pad, axis=0)
+pad_width = lag
+if center:
+    pad_width += (n_fft // (2 * hop_length))
+onset_env = numpy.pad(onset_env, ([0, 0], [int(pad_width), 0]), mode='constant')
+if detrend:
+    tempResult = lfilter([1.0, (- 1.0)], [1.0, (- 0.99)], onset_env, axis=(- 1))
+	
+===================================================================	
+delta: 25	
+----------------------------	
+
+"Compute delta features: local estimate of the derivative\n    of the input data along the selected axis.\n\n\n    Parameters\n    ----------\n    data      : np.ndarray\n        the input data matrix (eg, spectrogram)\n\n    width     : int >= 3, odd [scalar]\n        Number of frames over which to compute the delta feature\n\n    order     : int > 0 [scalar]\n        the order of the difference operator.\n        1 for first derivative, 2 for second, etc.\n\n    axis      : int [scalar]\n        the axis along which to compute deltas.\n        Default is -1 (columns).\n\n    trim      : bool\n        set to `True` to trim the output matrix to the original size.\n\n    Returns\n    -------\n    delta_data   : np.ndarray [shape=(d, t) or (d, t + window)]\n        delta matrix of `data`.\n\n    Notes\n    -----\n    This function caches at level 40.\n\n    Examples\n    --------\n    Compute MFCC deltas, delta-deltas\n\n    >>> y, sr = librosa.load(librosa.util.example_audio_file())\n    >>> mfcc = librosa.feature.mfcc(y=y, sr=sr)\n    >>> mfcc_delta = librosa.feature.delta(mfcc)\n    >>> mfcc_delta\n    array([[  2.929e+01,   3.090e+01, ...,   0.000e+00,   0.000e+00],\n           [  2.226e+01,   2.553e+01, ...,   3.944e-31,   3.944e-31],\n           ...,\n           [ -1.192e+00,  -6.099e-01, ...,   9.861e-32,   9.861e-32],\n           [ -5.349e-01,  -2.077e-01, ...,   1.183e-30,   1.183e-30]])\n    >>> mfcc_delta2 = librosa.feature.delta(mfcc, order=2)\n    >>> mfcc_delta2\n    array([[  1.281e+01,   1.020e+01, ...,   0.000e+00,   0.000e+00],\n           [  2.726e+00,   3.558e+00, ...,   0.000e+00,   0.000e+00],\n           ...,\n           [ -1.702e-01,  -1.509e-01, ...,   0.000e+00,   0.000e+00],\n           [ -9.021e-02,  -7.007e-02, ...,  -2.190e-47,  -2.190e-47]])\n\n    >>> import matplotlib.pyplot as plt\n    >>> plt.subplot(3, 1, 1)\n    >>> librosa.display.specshow(mfcc)\n    >>> plt.title('MFCC')\n    >>> plt.colorbar()\n    >>> plt.subplot(3, 1, 2)\n    >>> librosa.display.specshow(mfcc_delta)\n    >>> plt.title(r'MFCC-$\\Delta$')\n    >>> plt.colorbar()\n    >>> plt.subplot(3, 1, 3)\n    >>> librosa.display.specshow(mfcc_delta2, x_axis='time')\n    >>> plt.title(r'MFCC-$\\Delta^2$')\n    >>> plt.colorbar()\n    >>> plt.tight_layout()\n\n    "
+data = numpy.atleast_1d(data)
+if ((width < 3) or (numpy.mod(width, 2) != 1)):
+    raise ParameterError('width must be an odd integer >= 3')
+if ((order <= 0) or (not isinstance(order, int))):
+    raise ParameterError('order must be a positive integer')
+half_length = (1 + int((width // 2)))
+window = numpy.arange((half_length - 1.0), (- half_length), (- 1.0))
+window /= numpy.sum((numpy.abs(window) ** 2))
+padding = ([(0, 0)] * data.ndim)
+width = int(width)
+padding[axis] = (width, width)
+delta_x = numpy.pad(data, padding, mode='edge')
+for _ in range(order):
+    tempResult = lfilter(window, 1, delta_x, axis=axis)
+	
+***************************************************	
+mne_python-0.15.0: 1	
+===================================================================	
+estimate_ringing_samples: 273	
+----------------------------	
+
+'Estimate filter ringing.\n\n    Parameters\n    ----------\n    system : tuple | ndarray\n        A tuple of (b, a) or ndarray of second-order sections coefficients.\n    max_try : int\n        Approximate maximum number of samples to try.\n        This will be changed to a multple of 1000.\n\n    Returns\n    -------\n    n : int\n        The approximate ringing.\n    '
+from scipy import signal
+if isinstance(system, tuple):
+    kind = 'ba'
+    (b, a) = system
+    zi = ([0.0] * (len(a) - 1))
+else:
+    kind = 'sos'
+    sos = system
+    zi = ([([0.0] * 2)] * len(sos))
+n_per_chunk = 1000
+n_chunks_max = int(numpy.ceil((max_try / float(n_per_chunk))))
+x = numpy.zeros(n_per_chunk)
+x[0] = 1
+last_good = n_per_chunk
+thresh_val = 0
+for ii in range(n_chunks_max):
+    if (kind == 'ba'):
+        tempResult = lfilter(b, a, x, zi=zi)
+	
+***************************************************	

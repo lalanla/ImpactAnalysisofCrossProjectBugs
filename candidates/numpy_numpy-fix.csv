@@ -1,0 +1,7 @@
+project, module, line
+pandas_pandas,TestSeriesIndexing.test_getitem_setitem_ellipsis,72
+pandas_pandas,DatetimeIndex.to_julian_date,1145
+skimage_skimage,register_translation,48
+skimage_skimage,register_translation,58
+mne_python,_read_mff_events,40
+mne_python,infomax,91

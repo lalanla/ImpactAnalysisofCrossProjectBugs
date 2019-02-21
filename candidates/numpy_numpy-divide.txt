@@ -1,0 +1,723 @@
+astropy_astropy-1.3.0: 1	
+===================================================================	
+Kernel.normalize: 57	
+----------------------------	
+
+"\n        Normalize the filter kernel.\n\n        Parameters\n        ----------\n        mode : {'integral', 'peak'}\n            One of the following modes:\n                * 'integral' (default)\n                    Kernel is normalized such that its integral = 1.\n                * 'peak'\n                    Kernel is normalized such that its peak = 1.\n        "
+if (mode == 'integral'):
+    normalization = self._array.sum()
+elif (mode == 'peak'):
+    normalization = self._array.max()
+else:
+    raise ValueError("invalid mode, must be 'integral' or 'peak'")
+if (normalization == 0):
+    warnings.warn('The kernel cannot be normalized because it sums to zero.', AstropyUserWarning)
+else:
+    tempResult = divide(self._array, normalization, self._array)
+	
+***************************************************	
+scipy_scipy-0.19.0: 7	
+===================================================================	
+zoom: 178	
+----------------------------	
+
+"\n    Zoom an array.\n\n    The array is zoomed using spline interpolation of the requested order.\n\n    Parameters\n    ----------\n    input : ndarray\n        The input array.\n    zoom : float or sequence, optional\n        The zoom factor along the axes. If a float, `zoom` is the same for each\n        axis. If a sequence, `zoom` should contain one value for each axis.\n    output : ndarray or dtype, optional\n        The array in which to place the output, or the dtype of the returned\n        array.\n    order : int, optional\n        The order of the spline interpolation, default is 3.\n        The order has to be in the range 0-5.\n    mode : str, optional\n        Points outside the boundaries of the input are filled according\n        to the given mode ('constant', 'nearest', 'reflect', 'mirror' or 'wrap').\n        Default is 'constant'.\n    cval : scalar, optional\n        Value used for points outside the boundaries of the input if\n        ``mode='constant'``. Default is 0.0\n    prefilter : bool, optional\n        The parameter prefilter determines if the input is pre-filtered with\n        `spline_filter` before interpolation (necessary for spline\n        interpolation of order > 1).  If False, it is assumed that the input is\n        already filtered. Default is True.\n\n    Returns\n    -------\n    zoom : ndarray or None\n        The zoomed input. If `output` is given as a parameter, None is\n        returned.\n\n    "
+if ((order < 0) or (order > 5)):
+    raise RuntimeError('spline order not supported')
+input = numpy.asarray(input)
+if numpy.iscomplexobj(input):
+    raise TypeError('Complex type not supported')
+if (input.ndim < 1):
+    raise RuntimeError('input and output rank must be > 0')
+mode = _extend_mode_to_code(mode)
+if (prefilter and (order > 1)):
+    filtered = spline_filter(input, order, output=numpy.float64)
+else:
+    filtered = input
+zoom = _ni_support._normalize_sequence(zoom, input.ndim)
+output_shape = tuple([int(round((ii * jj))) for (ii, jj) in zip(input.shape, zoom)])
+output_shape_old = tuple([int((ii * jj)) for (ii, jj) in zip(input.shape, zoom)])
+if (output_shape != output_shape_old):
+    warnings.warn('From scipy 0.13.0, the output shape of zoom() is calculated with round() instead of int() - for these inputs the size of the returned array has changed.', UserWarning)
+zoom_div = (numpy.array(output_shape, float) - 1)
+tempResult = divide((numpy.array(input.shape) - 1), zoom_div, out=numpy.ones_like(input.shape, dtype=numpy.float64), where=(zoom_div != 0))
+	
+===================================================================	
+spmatrix._divide: 271	
+----------------------------	
+
+if isscalarlike(other):
+    if rdivide:
+        if true_divide:
+            return numpy.true_divide(other, self.todense())
+        else:
+            tempResult = divide(other, self.todense())
+	
+===================================================================	
+spmatrix._divide: 286	
+----------------------------	
+
+if isscalarlike(other):
+    if rdivide:
+        if true_divide:
+            return numpy.true_divide(other, self.todense())
+        else:
+            return numpy.divide(other, self.todense())
+    if (true_divide and numpy.can_cast(self.dtype, numpy.float_)):
+        return self.astype(np.float_)._mul_scalar((1.0 / other))
+    else:
+        r = self._mul_scalar((1.0 / other))
+        scalar_dtype = np.asarray(other).dtype
+        if (numpy.issubdtype(self.dtype, numpy.integer) and numpy.issubdtype(scalar_dtype, numpy.integer)):
+            return r.astype(self.dtype)
+        else:
+            return r
+elif isdense(other):
+    if (not rdivide):
+        if true_divide:
+            return numpy.true_divide(self.todense(), other)
+        else:
+            tempResult = divide(self.todense(), other)
+	
+===================================================================	
+spmatrix._divide: 290	
+----------------------------	
+
+if isscalarlike(other):
+    if rdivide:
+        if true_divide:
+            return numpy.true_divide(other, self.todense())
+        else:
+            return numpy.divide(other, self.todense())
+    if (true_divide and numpy.can_cast(self.dtype, numpy.float_)):
+        return self.astype(np.float_)._mul_scalar((1.0 / other))
+    else:
+        r = self._mul_scalar((1.0 / other))
+        scalar_dtype = np.asarray(other).dtype
+        if (numpy.issubdtype(self.dtype, numpy.integer) and numpy.issubdtype(scalar_dtype, numpy.integer)):
+            return r.astype(self.dtype)
+        else:
+            return r
+elif isdense(other):
+    if (not rdivide):
+        if true_divide:
+            return numpy.true_divide(self.todense(), other)
+        else:
+            return numpy.divide(self.todense(), other)
+    elif true_divide:
+        return numpy.true_divide(other, self.todense())
+    else:
+        tempResult = divide(other, self.todense())
+	
+===================================================================	
+_ttest_ind_from_stats: 1014	
+----------------------------	
+
+d = (mean1 - mean2)
+with numpy.errstate(divide='ignore', invalid='ignore'):
+    tempResult = divide(d, denom)
+	
+===================================================================	
+ttest_rel: 1095	
+----------------------------	
+
+"\n    Calculates the T-test on TWO RELATED samples of scores, a and b.\n\n    This is a two-sided test for the null hypothesis that 2 related or\n    repeated samples have identical average (expected) values.\n\n    Parameters\n    ----------\n    a, b : array_like\n        The arrays must have the same shape.\n    axis : int or None, optional\n        Axis along which to compute test. If None, compute over the whole\n        arrays, `a`, and `b`.\n    nan_policy : {'propagate', 'raise', 'omit'}, optional\n        Defines how to handle when input contains nan. 'propagate' returns nan,\n        'raise' throws an error, 'omit' performs the calculations ignoring nan\n        values. Default is 'propagate'.\n\n    Returns\n    -------\n    statistic : float or array\n        t-statistic\n    pvalue : float or array\n        two-tailed p-value\n\n    Notes\n    -----\n    Examples for the use are scores of the same set of student in\n    different exams, or repeated sampling from the same units. The\n    test measures whether the average score differs significantly\n    across samples (e.g. exams). If we observe a large p-value, for\n    example greater than 0.05 or 0.1 then we cannot reject the null\n    hypothesis of identical average scores. If the p-value is smaller\n    than the threshold, e.g. 1%, 5% or 10%, then we reject the null\n    hypothesis of equal averages. Small p-values are associated with\n    large t-statistics.\n\n    References\n    ----------\n    http://en.wikipedia.org/wiki/T-test#Dependent_t-test\n\n    Examples\n    --------\n    >>> from scipy import stats\n    >>> np.random.seed(12345678) # fix random seed to get same numbers\n\n    >>> rvs1 = stats.norm.rvs(loc=5,scale=10,size=500)\n    >>> rvs2 = (stats.norm.rvs(loc=5,scale=10,size=500) +\n    ...         stats.norm.rvs(scale=0.2,size=500))\n    >>> stats.ttest_rel(rvs1,rvs2)\n    (0.24101764965300962, 0.80964043445811562)\n    >>> rvs3 = (stats.norm.rvs(loc=8,scale=10,size=500) +\n    ...         stats.norm.rvs(scale=0.2,size=500))\n    >>> stats.ttest_rel(rvs1,rvs3)\n    (-3.9995108708727933, 7.3082402191726459e-005)\n\n    "
+(a, b, axis) = _chk2_asarray(a, b, axis)
+(cna, npa) = _contains_nan(a, nan_policy)
+(cnb, npb) = _contains_nan(b, nan_policy)
+contains_nan = (cna or cnb)
+if ((npa == 'omit') or (npb == 'omit')):
+    nan_policy = 'omit'
+if (contains_nan and (nan_policy == 'omit')):
+    a = numpy.ma.masked_invalid(a)
+    b = numpy.ma.masked_invalid(b)
+    m = numpy.ma.mask_or(numpy.ma.getmask(a), numpy.ma.getmask(b))
+    aa = numpy.ma.array(a, mask=m, copy=True)
+    bb = numpy.ma.array(b, mask=m, copy=True)
+    return mstats_basic.ttest_rel(aa, bb, axis)
+if (a.shape[axis] != b.shape[axis]):
+    raise ValueError('unequal length arrays')
+if ((a.size == 0) or (b.size == 0)):
+    return (numpy.nan, numpy.nan)
+n = a.shape[axis]
+df = float((n - 1))
+d = (a - b).astype(numpy.float64)
+v = numpy.var(d, axis, ddof=1)
+dm = numpy.mean(d, axis)
+denom = numpy.sqrt((v / float(n)))
+with numpy.errstate(divide='ignore', invalid='ignore'):
+    tempResult = divide(dm, denom)
+	
+===================================================================	
+ttest_1samp: 1000	
+----------------------------	
+
+"\n    Calculates the T-test for the mean of ONE group of scores.\n\n    This is a two-sided test for the null hypothesis that the expected value\n    (mean) of a sample of independent observations `a` is equal to the given\n    population mean, `popmean`.\n\n    Parameters\n    ----------\n    a : array_like\n        sample observation\n    popmean : float or array_like\n        expected value in null hypothesis, if array_like than it must have the\n        same shape as `a` excluding the axis dimension\n    axis : int or None, optional\n        Axis along which to compute test. If None, compute over the whole\n        array `a`.\n    nan_policy : {'propagate', 'raise', 'omit'}, optional\n        Defines how to handle when input contains nan. 'propagate' returns nan,\n        'raise' throws an error, 'omit' performs the calculations ignoring nan\n        values. Default is 'propagate'.\n\n    Returns\n    -------\n    statistic : float or array\n        t-statistic\n    pvalue : float or array\n        two-tailed p-value\n\n    Examples\n    --------\n    >>> from scipy import stats\n\n    >>> np.random.seed(7654567)  # fix seed to get the same result\n    >>> rvs = stats.norm.rvs(loc=5, scale=10, size=(50,2))\n\n    Test if mean of random sample is equal to true mean, and different mean.\n    We reject the null hypothesis in the second case and don't reject it in\n    the first case.\n\n    >>> stats.ttest_1samp(rvs,5.0)\n    (array([-0.68014479, -0.04323899]), array([ 0.49961383,  0.96568674]))\n    >>> stats.ttest_1samp(rvs,0.0)\n    (array([ 2.77025808,  4.11038784]), array([ 0.00789095,  0.00014999]))\n\n    Examples using axis and non-scalar dimension for population mean.\n\n    >>> stats.ttest_1samp(rvs,[5.0,0.0])\n    (array([-0.68014479,  4.11038784]), array([  4.99613833e-01,   1.49986458e-04]))\n    >>> stats.ttest_1samp(rvs.T,[5.0,0.0],axis=1)\n    (array([-0.68014479,  4.11038784]), array([  4.99613833e-01,   1.49986458e-04]))\n    >>> stats.ttest_1samp(rvs,[[5.0],[0.0]])\n    (array([[-0.68014479, -0.04323899],\n           [ 2.77025808,  4.11038784]]), array([[  4.99613833e-01,   9.65686743e-01],\n           [  7.89094663e-03,   1.49986458e-04]]))\n\n    "
+(a, axis) = _chk_asarray(a, axis)
+(contains_nan, nan_policy) = _contains_nan(a, nan_policy)
+if (contains_nan and (nan_policy == 'omit')):
+    a = numpy.ma.masked_invalid(a)
+    return mstats_basic.ttest_1samp(a, popmean, axis)
+n = a.shape[axis]
+df = (n - 1)
+d = (numpy.mean(a, axis) - popmean)
+v = numpy.var(a, axis, ddof=1)
+denom = numpy.sqrt((v / float(n)))
+with numpy.errstate(divide='ignore', invalid='ignore'):
+    tempResult = divide(d, denom)
+	
+***************************************************	
+sklearn_sklearn-0.18.0: 3	
+===================================================================	
+module: 50	
+----------------------------	
+'Compatibility fixes for older version of python, numpy and scipy\n\nIf you add content to this file, please give the version of the package\nat which the fixe is no longer needed.\n'
+import warnings
+import sys
+import functools
+import os
+import errno
+import numpy as np
+import scipy.sparse as sp
+import scipy
+try:
+    from inspect import signature
+except ImportError:
+    from ..externals.funcsigs import signature
+
+def _parse_version(version_string):
+    version = []
+    for x in version_string.split('.'):
+        try:
+            version.append(int(x))
+        except ValueError:
+            version.append(x)
+    return tuple(version)
+np_version = _parse_version(np.__version__)
+sp_version = _parse_version(scipy.__version__)
+try:
+    from scipy.special import expit
+    with np.errstate(invalid='ignore', over='ignore'):
+        if np.isnan(expit(1000)):
+            raise ImportError('no stable expit in scipy.special')
+except ImportError:
+
+    def expit(x, out=None):
+        'Logistic sigmoid function, ``1 / (1 + exp(-x))``.\n\n        See sklearn.utils.extmath.log_logistic for the log of this function.\n        '
+        if (out is None):
+            out = np.empty(np.atleast_1d(x).shape, dtype=np.float64)
+        out[:] = x
+        out *= 0.5
+        np.tanh(out, out)
+        out += 1
+        out *= 0.5
+        return out.reshape(np.shape(x))
+if ('order' in signature(np.copy).parameters):
+
+    def safe_copy(X):
+        return np.copy(X, order='K')
+else:
+    safe_copy = np.copy
+try:
+    tempResult = divide(0.4, 1, casting='unsafe')	
+===================================================================	
+module: 50	
+----------------------------	
+'Compatibility fixes for older version of python, numpy and scipy\n\nIf you add content to this file, please give the version of the package\nat which the fixe is no longer needed.\n'
+import warnings
+import sys
+import functools
+import os
+import errno
+import numpy as np
+import scipy.sparse as sp
+import scipy
+try:
+    from inspect import signature
+except ImportError:
+    from ..externals.funcsigs import signature
+
+def _parse_version(version_string):
+    version = []
+    for x in version_string.split('.'):
+        try:
+            version.append(int(x))
+        except ValueError:
+            version.append(x)
+    return tuple(version)
+np_version = _parse_version(np.__version__)
+sp_version = _parse_version(scipy.__version__)
+try:
+    from scipy.special import expit
+    with np.errstate(invalid='ignore', over='ignore'):
+        if np.isnan(expit(1000)):
+            raise ImportError('no stable expit in scipy.special')
+except ImportError:
+
+    def expit(x, out=None):
+        'Logistic sigmoid function, ``1 / (1 + exp(-x))``.\n\n        See sklearn.utils.extmath.log_logistic for the log of this function.\n        '
+        if (out is None):
+            out = np.empty(np.atleast_1d(x).shape, dtype=np.float64)
+        out[:] = x
+        out *= 0.5
+        np.tanh(out, out)
+        out += 1
+        out *= 0.5
+        return out.reshape(np.shape(x))
+if ('order' in signature(np.copy).parameters):
+
+    def safe_copy(X):
+        return np.copy(X, order='K')
+else:
+    safe_copy = np.copy
+try:
+    tempResult = divide(0.4, 1, casting='unsafe', dtype=np.float64)	
+===================================================================	
+module: 50	
+----------------------------	
+'Compatibility fixes for older version of python, numpy and scipy\n\nIf you add content to this file, please give the version of the package\nat which the fixe is no longer needed.\n'
+import warnings
+import sys
+import functools
+import os
+import errno
+import numpy as np
+import scipy.sparse as sp
+import scipy
+try:
+    from inspect import signature
+except ImportError:
+    from ..externals.funcsigs import signature
+
+def _parse_version(version_string):
+    version = []
+    for x in version_string.split('.'):
+        try:
+            version.append(int(x))
+        except ValueError:
+            version.append(x)
+    return tuple(version)
+np_version = _parse_version(np.__version__)
+sp_version = _parse_version(scipy.__version__)
+try:
+    from scipy.special import expit
+    with np.errstate(invalid='ignore', over='ignore'):
+        if np.isnan(expit(1000)):
+            raise ImportError('no stable expit in scipy.special')
+except ImportError:
+
+    def expit(x, out=None):
+        'Logistic sigmoid function, ``1 / (1 + exp(-x))``.\n\n        See sklearn.utils.extmath.log_logistic for the log of this function.\n        '
+        if (out is None):
+            out = np.empty(np.atleast_1d(x).shape, dtype=np.float64)
+        out[:] = x
+        out *= 0.5
+        np.tanh(out, out)
+        out += 1
+        out *= 0.5
+        return out.reshape(np.shape(x))
+if ('order' in signature(np.copy).parameters):
+
+    def safe_copy(X):
+        return np.copy(X, order='K')
+else:
+    safe_copy = np.copy
+try:
+    tempResult = divide(0.4, 1)	
+***************************************************	
+matplotlib_matplotlib-2.0.0: 5	
+===================================================================	
+entropy: 426	
+----------------------------	
+
+'\n    Return the entropy of the data in *y* in units of nat.\n\n    .. math::\n\n      -\\sum p_i \\ln(p_i)\n\n    where :math:`p_i` is the probability of observing *y* in the\n    :math:`i^{th}` bin of *bins*.  *bins* can be a number of bins or a\n    range of bins; see :func:`numpy.histogram`.\n\n    Compare *S* with analytic calculation for a Gaussian::\n\n      x = mu + sigma * randn(200000)\n      Sanalytic = 0.5 * ( 1.0 + log(2*pi*sigma**2.0) )\n    '
+(n, bins) = numpy.histogram(y, bins)
+n = n.astype(numpy.float_)
+n = numpy.take(n, numpy.nonzero(n)[0])
+tempResult = divide(n, len(y))
+	
+===================================================================	
+cohere_pairs: 396	
+----------------------------	
+
+'\n    Compute the coherence and phase for all pairs *ij*, in *X*.\n\n    *X* is a *numSamples* * *numCols* array\n\n    *ij* is a list of tuples.  Each tuple is a pair of indexes into\n    the columns of X for which you want to compute coherence.  For\n    example, if *X* has 64 columns, and you want to compute all\n    nonredundant pairs, define *ij* as::\n\n      ij = []\n      for i in range(64):\n          for j in range(i+1,64):\n              ij.append( (i,j) )\n\n    *preferSpeedOverMemory* is an optional bool. Defaults to true. If\n    False, limits the caching by only making one, rather than two,\n    complex cache arrays. This is useful if memory becomes critical.\n    Even when *preferSpeedOverMemory* is False, :func:`cohere_pairs`\n    will still give significant performace gains over calling\n    :func:`cohere` for each pair, and will use subtantially less\n    memory than if *preferSpeedOverMemory* is True.  In my tests with\n    a 43000,64 array over all nonredundant pairs,\n    *preferSpeedOverMemory* = True delivered a 33% performance boost\n    on a 1.7GHZ Athlon with 512MB RAM compared with\n    *preferSpeedOverMemory* = False.  But both solutions were more\n    than 10x faster than naively crunching all possible pairs through\n    :func:`cohere`.\n\n    Returns\n    -------\n    Cxy : dictionary of (*i*, *j*) tuples -> coherence vector for\n        that pair.  i.e., ``Cxy[(i,j) = cohere(X[:,i], X[:,j])``.\n        Number of dictionary keys is ``len(ij)``.\n\n    Phase : dictionary of phases of the cross spectral density at\n        each frequency for each pair.  Keys are (*i*, *j*).\n\n    freqs : vector of frequencies, equal in length to either the\n         coherence or phase vectors for any (*i*, *j*) key.\n\n    e.g., to make a coherence Bode plot::\n\n          subplot(211)\n          plot( freqs, Cxy[(12,19)])\n          subplot(212)\n          plot( freqs, Phase[(12,19)])\n\n    For a large number of pairs, :func:`cohere_pairs` can be much more\n    efficient than just calling :func:`cohere` for each pair, because\n    it caches most of the intensive computations.  If :math:`N` is the\n    number of pairs, this function is :math:`O(N)` for most of the\n    heavy lifting, whereas calling cohere for each pair is\n    :math:`O(N^2)`.  However, because of the caching, it is also more\n    memory intensive, making 2 additional complex arrays with\n    approximately the same number of elements as *X*.\n\n    See :file:`test/cohere_pairs_test.py` in the src tree for an\n    example script that shows that this :func:`cohere_pairs` and\n    :func:`cohere` give the same results for a given pair.\n\n    See Also\n    --------\n    :func:`psd`\n        For information about the methods used to compute :math:`P_{xy}`,\n        :math:`P_{xx}` and :math:`P_{yy}`.\n    '
+(numRows, numCols) = X.shape
+if (numRows < NFFT):
+    tmp = X
+    X = numpy.zeros((NFFT, numCols), X.dtype)
+    X[:numRows, :] = tmp
+    del tmp
+(numRows, numCols) = X.shape
+allColumns = set()
+for (i, j) in ij:
+    allColumns.add(i)
+    allColumns.add(j)
+Ncols = len(allColumns)
+if numpy.iscomplexobj(X):
+    numFreqs = NFFT
+else:
+    numFreqs = ((NFFT // 2) + 1)
+if matplotlib.cbook.iterable(window):
+    if (len(window) != NFFT):
+        raise ValueError('The length of the window must be equal to NFFT')
+    windowVals = window
+else:
+    windowVals = window(numpy.ones(NFFT, X.dtype))
+ind = list(xrange(0, ((numRows - NFFT) + 1), (NFFT - noverlap)))
+numSlices = len(ind)
+FFTSlices = {}
+FFTConjSlices = {}
+Pxx = {}
+slices = range(numSlices)
+normVal = (numpy.linalg.norm(windowVals) ** 2)
+for iCol in allColumns:
+    progressCallback((i / Ncols), 'Cacheing FFTs')
+    Slices = numpy.zeros((numSlices, numFreqs), dtype=numpy.complex_)
+    for iSlice in slices:
+        thisSlice = X[ind[iSlice]:(ind[iSlice] + NFFT), iCol]
+        thisSlice = (windowVals * detrend(thisSlice))
+        Slices[iSlice, :] = numpy.fft.fft(thisSlice)[:numFreqs]
+    FFTSlices[iCol] = Slices
+    if preferSpeedOverMemory:
+        FFTConjSlices[iCol] = numpy.conjugate(Slices)
+    tempResult = divide(numpy.mean((abs(Slices) ** 2), axis=0), normVal)
+	
+===================================================================	
+cohere: 348	
+----------------------------	
+
+'\n    The coherence between *x* and *y*.  Coherence is the normalized\n    cross spectral density:\n\n    .. math::\n\n        C_{xy} = \\frac{|P_{xy}|^2}{P_{xx}P_{yy}}\n\n    Parameters\n    ----------\n    x, y\n        Array or sequence containing the data\n\n    %(Spectral)s\n\n    %(PSD)s\n\n    noverlap : integer\n        The number of points of overlap between blocks.  The default value\n        is 0 (no overlap).\n\n    Returns\n    -------\n    The return value is the tuple (*Cxy*, *f*), where *f* are the\n    frequencies of the coherence vector. For cohere, scaling the\n    individual densities by the sampling frequency has no effect,\n    since the factors cancel out.\n\n    See Also\n    --------\n    :func:`psd`, :func:`csd` :\n        For information about the methods used to compute :math:`P_{xy}`,\n        :math:`P_{xx}` and :math:`P_{yy}`.\n    '
+if (len(x) < (2 * NFFT)):
+    raise ValueError(_coh_error)
+(Pxx, f) = psd(x, NFFT, Fs, detrend, window, noverlap, pad_to, sides, scale_by_freq)
+(Pyy, f) = psd(y, NFFT, Fs, detrend, window, noverlap, pad_to, sides, scale_by_freq)
+(Pxy, f) = csd(x, y, NFFT, Fs, detrend, window, noverlap, pad_to, sides, scale_by_freq)
+tempResult = divide((numpy.absolute(Pxy) ** 2), (Pxx * Pyy))
+	
+===================================================================	
+LogTransformBase.transform_non_affine: 61	
+----------------------------	
+
+with numpy.errstate(invalid='ignore'):
+    a = numpy.where((a <= 0), self._fill_value, a)
+tempResult = divide(numpy.log(a, out=a), numpy.log(self.base), out=a)
+	
+===================================================================	
+Axes.pie: 795	
+----------------------------	
+
+"\n        Plot a pie chart.\n\n        Make a pie chart of array *x*.  The fractional area of each\n        wedge is given by x/sum(x).  If sum(x) <= 1, then the values\n        of x give the fractional area directly and the array will not\n        be normalized.  The wedges are plotted counterclockwise,\n        by default starting from the x-axis.\n\n        Keyword arguments:\n\n          *explode*: [ *None* | len(x) sequence ]\n            If not *None*, is a ``len(x)`` array which specifies the\n            fraction of the radius with which to offset each wedge.\n\n          *colors*: [ *None* | color sequence ]\n            A sequence of matplotlib color args through which the pie chart\n            will cycle.  If `None`, will use the colors in the currently\n            active cycle.\n\n          *labels*: [ *None* | len(x) sequence of strings ]\n            A sequence of strings providing the labels for each wedge\n\n          *autopct*: [ *None* | format string | format function ]\n            If not *None*, is a string or function used to label the wedges\n            with their numeric value.  The label will be placed inside the\n            wedge.  If it is a format string, the label will be ``fmt%pct``.\n            If it is a function, it will be called.\n\n          *pctdistance*: scalar\n            The ratio between the center of each pie slice and the\n            start of the text generated by *autopct*.  Ignored if\n            *autopct* is *None*; default is 0.6.\n\n          *labeldistance*: scalar\n            The radial distance at which the pie labels are drawn\n\n          *shadow*: [ *False* | *True* ]\n            Draw a shadow beneath the pie.\n\n          *startangle*: [ *None* | Offset angle ]\n            If not *None*, rotates the start of the pie chart by *angle*\n            degrees counterclockwise from the x-axis.\n\n          *radius*: [ *None* | scalar ]\n          The radius of the pie, if *radius* is *None* it will be set to 1.\n\n          *counterclock*: [ *False* | *True* ]\n            Specify fractions direction, clockwise or counterclockwise.\n\n          *wedgeprops*: [ *None* | dict of key value pairs ]\n            Dict of arguments passed to the wedge objects making the pie.\n            For example, you can pass in wedgeprops = { 'linewidth' : 3 }\n            to set the width of the wedge border lines equal to 3.\n            For more details, look at the doc/arguments of the wedge object.\n            By default `clip_on=False`.\n\n          *textprops*: [ *None* | dict of key value pairs ]\n            Dict of arguments to pass to the text objects.\n\n          *center*: [ (0,0) | sequence of 2 scalars ]\n          Center position of the chart.\n\n          *frame*: [ *False* | *True* ]\n            Plot axes frame with the chart.\n\n        The pie chart will probably look best if the figure and axes are\n        square, or the Axes aspect is equal.  e.g.::\n\n          figure(figsize=(8,8))\n          ax = axes([0.1, 0.1, 0.8, 0.8])\n\n        or::\n\n          axes(aspect=1)\n\n        Return value:\n          If *autopct* is *None*, return the tuple (*patches*, *texts*):\n\n            - *patches* is a sequence of\n              :class:`matplotlib.patches.Wedge` instances\n\n            - *texts* is a list of the label\n              :class:`matplotlib.text.Text` instances.\n\n          If *autopct* is not *None*, return the tuple (*patches*,\n          *texts*, *autotexts*), where *patches* and *texts* are as\n          above, and *autotexts* is a list of\n          :class:`~matplotlib.text.Text` instances for the numeric\n          labels.\n        "
+x = np.asarray(x).astype(numpy.float32)
+sx = float(x.sum())
+if (sx > 1):
+    tempResult = divide(x, sx)
+	
+***************************************************	
+ipython_ipython-6.1.0: 0	
+***************************************************	
+pandas_pandas-0.19.2: 2	
+===================================================================	
+TestTimedeltaIndex.test_ufunc_coercions: 738	
+----------------------------	
+
+idx = TimedeltaIndex(['2H', '4H', '6H', '8H', '10H'], freq='2H', name='x')
+for result in [(idx * 2), numpy.multiply(idx, 2)]:
+    pandas.util.testing.assertIsInstance(result, TimedeltaIndex)
+    exp = TimedeltaIndex(['4H', '8H', '12H', '16H', '20H'], freq='4H', name='x')
+    pandas.util.testing.assert_index_equal(result, exp)
+    self.assertEqual(result.freq, '4H')
+tempResult = divide(idx, 2)
+	
+===================================================================	
+TestInt64Index.test_ufunc_coercions: 699	
+----------------------------	
+
+idx = Int64Index([1, 2, 3, 4, 5], name='x')
+result = numpy.sqrt(idx)
+pandas.util.testing.assertIsInstance(result, Float64Index)
+exp = Float64Index(numpy.sqrt(numpy.array([1, 2, 3, 4, 5])), name='x')
+pandas.util.testing.assert_index_equal(result, exp)
+tempResult = divide(idx, 2.0)
+	
+***************************************************	
+dask_dask-0.7.0: 4	
+===================================================================	
+module: 19	
+----------------------------	
+import numpy as np
+try:
+    isclose = np.isclose
+except AttributeError:
+
+    def isclose(*args, **kwargs):
+        raise RuntimeError('You need numpy version 1.7 or greater to use isclose.')
+try:
+    full = np.full
+except AttributeError:
+
+    def full(shape, fill_value, dtype=None, order=None):
+        'Our implementation of numpy.full because your numpy is old.'
+        if (order is not None):
+            raise NotImplementedError('`order` kwarg is not supported upgrade to Numpy 1.8 or greater for support.')
+        return np.multiply(fill_value, np.ones(shape, dtype=dtype), dtype=dtype)
+try:
+    tempResult = divide(0.4, 1, casting='unsafe')	
+===================================================================	
+module: 19	
+----------------------------	
+import numpy as np
+try:
+    isclose = np.isclose
+except AttributeError:
+
+    def isclose(*args, **kwargs):
+        raise RuntimeError('You need numpy version 1.7 or greater to use isclose.')
+try:
+    full = np.full
+except AttributeError:
+
+    def full(shape, fill_value, dtype=None, order=None):
+        'Our implementation of numpy.full because your numpy is old.'
+        if (order is not None):
+            raise NotImplementedError('`order` kwarg is not supported upgrade to Numpy 1.8 or greater for support.')
+        return np.multiply(fill_value, np.ones(shape, dtype=dtype), dtype=dtype)
+try:
+    tempResult = divide(0.4, 1, casting='unsafe', dtype=np.float)	
+===================================================================	
+module: 19	
+----------------------------	
+import numpy as np
+try:
+    isclose = np.isclose
+except AttributeError:
+
+    def isclose(*args, **kwargs):
+        raise RuntimeError('You need numpy version 1.7 or greater to use isclose.')
+try:
+    full = np.full
+except AttributeError:
+
+    def full(shape, fill_value, dtype=None, order=None):
+        'Our implementation of numpy.full because your numpy is old.'
+        if (order is not None):
+            raise NotImplementedError('`order` kwarg is not supported upgrade to Numpy 1.8 or greater for support.')
+        return np.multiply(fill_value, np.ones(shape, dtype=dtype), dtype=dtype)
+try:
+    tempResult = divide(0.4, 1)	
+===================================================================	
+divide: 26	
+----------------------------	
+
+"Implementation of numpy.divide that works with dtype kwarg.\n\n        Temporary compatibility fix for a bug in numpy's version. See\n        https://github.com/numpy/numpy/issues/3484 for the relevant issue."
+tempResult = divide(x1, x2, out)
+	
+***************************************************	
+nengo_nengo-2.0.0: 0	
+***************************************************	
+sympy_sympy-1.0.0: 0	
+***************************************************	
+daducci_amico-dev: 0	
+***************************************************	
+aplpy_aplpy-1.1.1: 0	
+***************************************************	
+markovmodel_msmtools-1.0.2: 4	
+===================================================================	
+transition_matrix_non_reversible: 14	
+----------------------------	
+
+'\n    Estimates a nonreversible transition matrix from count matrix C\n    \n    T_ij = c_ij / c_i where c_i = sum_j c_ij\n     \n    Parameters\n    ----------\n    C: ndarray, shape (n,n)\n        count matrix\n    \n    Returns\n    -------\n    T: Estimated transition matrix\n    \n    '
+rowsums = (1.0 * numpy.sum(C, axis=1))
+if (numpy.min(rowsums) <= 0):
+    raise ValueError((('Transition matrix has row sum of ' + str(numpy.min(rowsums))) + '. Must have strictly positive row sums.'))
+tempResult = divide(C, rowsums[:, numpy.newaxis])
+	
+===================================================================	
+transition_matrix_reversible_fixpi: 101	
+----------------------------	
+
+'\n    maximum likelihood transition matrix with fixed stationary distribution\n    \n    developed by Fabian Paul and Frank Noe\n    \n    Parameters\n    ----------\n    Z: ndarray, shape (n,n)\n        count matrix\n    mu: ndarray, shape (n)\n        stationary distribution\n    maxerr: float\n        Will exit (as converged) when the 2-norm of the Langrange multiplier vector changes less than maxerr\n        in one iteration\n    maxiter: int\n        Will exit when reaching maxiter iterations without reaching convergence.\n    return_iterations: bool (False)\n        set true in order to return (T, it), where T is the transition matrix and it is the number of iterations needed\n        \n    Returns\n    -------\n    T, the transition matrix. When return_iterations=True, (T,it) is returned with it the number of iterations needed\n    \n    '
+it = 0
+n = len(mu)
+B = (Z + Z.transpose())
+csum = numpy.sum(Z, axis=1)
+if (numpy.min(csum) <= 0):
+    raise ValueError('Count matrix has rowsum(s) of zero. Require a count matrix with positive rowsums.')
+if (numpy.min(mu) <= 0):
+    raise ValueError('Stationary distribution has zero elements. Require a positive stationary distribution.')
+if (numpy.min(numpy.diag(Z)) == 0):
+    raise ValueError('Count matrix has diagonals with 0. Cannot guarantee convergence of algorithm. Suggestion: add a small prior (e.g. 1e-10) to the diagonal')
+l = (1.0 * csum)
+lnew = (1.0 * csum)
+q = numpy.zeros(n)
+A = numpy.zeros((n, n))
+D = numpy.zeros((n, n))
+converged = False
+while ((not converged) and (it < maxiter)):
+    tempResult = divide(mu, l, q)
+	
+===================================================================	
+transition_matrix_reversible_fixpi: 105	
+----------------------------	
+
+'\n    maximum likelihood transition matrix with fixed stationary distribution\n    \n    developed by Fabian Paul and Frank Noe\n    \n    Parameters\n    ----------\n    Z: ndarray, shape (n,n)\n        count matrix\n    mu: ndarray, shape (n)\n        stationary distribution\n    maxerr: float\n        Will exit (as converged) when the 2-norm of the Langrange multiplier vector changes less than maxerr\n        in one iteration\n    maxiter: int\n        Will exit when reaching maxiter iterations without reaching convergence.\n    return_iterations: bool (False)\n        set true in order to return (T, it), where T is the transition matrix and it is the number of iterations needed\n        \n    Returns\n    -------\n    T, the transition matrix. When return_iterations=True, (T,it) is returned with it the number of iterations needed\n    \n    '
+it = 0
+n = len(mu)
+B = (Z + Z.transpose())
+csum = numpy.sum(Z, axis=1)
+if (numpy.min(csum) <= 0):
+    raise ValueError('Count matrix has rowsum(s) of zero. Require a count matrix with positive rowsums.')
+if (numpy.min(mu) <= 0):
+    raise ValueError('Stationary distribution has zero elements. Require a positive stationary distribution.')
+if (numpy.min(numpy.diag(Z)) == 0):
+    raise ValueError('Count matrix has diagonals with 0. Cannot guarantee convergence of algorithm. Suggestion: add a small prior (e.g. 1e-10) to the diagonal')
+l = (1.0 * csum)
+lnew = (1.0 * csum)
+q = numpy.zeros(n)
+A = numpy.zeros((n, n))
+D = numpy.zeros((n, n))
+converged = False
+while ((not converged) and (it < maxiter)):
+    numpy.divide(mu, l, q)
+    D[:] = q[:, numpy.newaxis]
+    D /= q
+    D += 1
+    tempResult = divide(B, D, A)
+	
+===================================================================	
+transition_matrix_reversible_fixpi: 113	
+----------------------------	
+
+'\n    maximum likelihood transition matrix with fixed stationary distribution\n    \n    developed by Fabian Paul and Frank Noe\n    \n    Parameters\n    ----------\n    Z: ndarray, shape (n,n)\n        count matrix\n    mu: ndarray, shape (n)\n        stationary distribution\n    maxerr: float\n        Will exit (as converged) when the 2-norm of the Langrange multiplier vector changes less than maxerr\n        in one iteration\n    maxiter: int\n        Will exit when reaching maxiter iterations without reaching convergence.\n    return_iterations: bool (False)\n        set true in order to return (T, it), where T is the transition matrix and it is the number of iterations needed\n        \n    Returns\n    -------\n    T, the transition matrix. When return_iterations=True, (T,it) is returned with it the number of iterations needed\n    \n    '
+it = 0
+n = len(mu)
+B = (Z + Z.transpose())
+csum = numpy.sum(Z, axis=1)
+if (numpy.min(csum) <= 0):
+    raise ValueError('Count matrix has rowsum(s) of zero. Require a count matrix with positive rowsums.')
+if (numpy.min(mu) <= 0):
+    raise ValueError('Stationary distribution has zero elements. Require a positive stationary distribution.')
+if (numpy.min(numpy.diag(Z)) == 0):
+    raise ValueError('Count matrix has diagonals with 0. Cannot guarantee convergence of algorithm. Suggestion: add a small prior (e.g. 1e-10) to the diagonal')
+l = (1.0 * csum)
+lnew = (1.0 * csum)
+q = numpy.zeros(n)
+A = numpy.zeros((n, n))
+D = numpy.zeros((n, n))
+converged = False
+while ((not converged) and (it < maxiter)):
+    numpy.divide(mu, l, q)
+    D[:] = q[:, numpy.newaxis]
+    D /= q
+    D += 1
+    numpy.divide(B, D, A)
+    numpy.sum(A, axis=1, out=lnew)
+    err = numpy.linalg.norm((l - lnew), 2)
+    converged = (err <= maxerr)
+    l[:] = lnew[:]
+    it += 1
+if ((not converged) and (it >= maxiter)):
+    warnings.warn((((((('NOT CONVERGED: 2-norm of Langrange multiplier vector is still ' + str(err)) + ' > ') + str(maxerr)) + ' after ') + str(it)) + ' iterations. Increase maxiter or decrease maxerr'), msmtools.util.exceptions.NotConvergedWarning)
+tempResult = divide(A, l[:, numpy.newaxis])
+	
+***************************************************	
+nilearn_nilearn-0.4.0: 0	
+***************************************************	
+poliastro_poliastro-0.8.0: 3	
+===================================================================	
+_tof_equation: 96	
+----------------------------	
+
+'Time of flight equation.\n\n    '
+if ((M == 0) and (numpy.sqrt(0.6) < x < numpy.sqrt(1.4))):
+    eta = (y - (ll * x))
+    S_1 = (((1 - ll) - (x * eta)) * 0.5)
+    Q = ((4 / 3) * hyp2f1b(S_1))
+    T_ = ((((eta ** 3) * Q) + ((4 * ll) * eta)) * 0.5)
+else:
+    psi = _compute_psi(x, y, ll)
+    tempResult = divide(((numpy.divide((psi + (M * pi)), numpy.sqrt(numpy.abs((1 - (x ** 2))))) - x) + (ll * y)), (1 - (x ** 2)))
+	
+===================================================================	
+_tof_equation: 96	
+----------------------------	
+
+'Time of flight equation.\n\n    '
+if ((M == 0) and (numpy.sqrt(0.6) < x < numpy.sqrt(1.4))):
+    eta = (y - (ll * x))
+    S_1 = (((1 - ll) - (x * eta)) * 0.5)
+    Q = ((4 / 3) * hyp2f1b(S_1))
+    T_ = ((((eta ** 3) * Q) + ((4 * ll) * eta)) * 0.5)
+else:
+    psi = _compute_psi(x, y, ll)
+    tempResult = divide((psi + (M * pi)), numpy.sqrt(numpy.abs((1 - (x ** 2)))))
+	
+===================================================================	
+_kepler: 69	
+----------------------------	
+
+dot_r0v0 = numpy.dot(r0, v0)
+norm_r0 = (numpy.dot(r0, r0) ** 0.5)
+sqrt_mu = (k ** 0.5)
+alpha = (((- numpy.dot(v0, v0)) / k) + (2 / norm_r0))
+if (alpha > 0):
+    xi_new = ((sqrt_mu * tof) * alpha)
+elif (alpha < 0):
+    xi_new = ((numpy.sign(tof) * (((- 1) / alpha) ** 0.5)) * numpy.log((((((- 2) * k) * alpha) * tof) / (dot_r0v0 + ((numpy.sign(tof) * numpy.sqrt(((- k) / alpha))) * (1 - (norm_r0 * alpha)))))))
+else:
+    xi_new = ((sqrt_mu * tof) / norm_r0)
+count = 0
+while (count < numiter):
+    xi = xi_new
+    psi = ((xi * xi) * alpha)
+    c2_psi = c2(psi)
+    c3_psi = c3(psi)
+    norm_r = ((((xi * xi) * c2_psi) + (((dot_r0v0 / sqrt_mu) * xi) * (1 - (psi * c3_psi)))) + (norm_r0 * (1 - (psi * c2_psi))))
+    xi_new = (xi + (((((sqrt_mu * tof) - (((xi * xi) * xi) * c3_psi)) - ((((dot_r0v0 / sqrt_mu) * xi) * xi) * c2_psi)) - ((norm_r0 * xi) * (1 - (psi * c3_psi)))) / norm_r))
+    tempResult = divide((xi_new - xi), xi_new)
+	
+***************************************************	
+skimage_skimage-0.13.0: 1	
+===================================================================	
+match_template: 50	
+----------------------------	
+
+'Match a template to a 2-D or 3-D image using normalized correlation.\n\n    The output is an array with values between -1.0 and 1.0. The value at a\n    given position corresponds to the correlation coefficient between the image\n    and the template.\n\n    For `pad_input=True` matches correspond to the center and otherwise to the\n    top-left corner of the template. To find the best match you must search for\n    peaks in the response (output) image.\n\n    Parameters\n    ----------\n    image : (M, N[, D]) array\n        2-D or 3-D input image.\n    template : (m, n[, d]) array\n        Template to locate. It must be `(m <= M, n <= N[, d <= D])`.\n    pad_input : bool\n        If True, pad `image` so that output is the same size as the image, and\n        output values correspond to the template center. Otherwise, the output\n        is an array with shape `(M - m + 1, N - n + 1)` for an `(M, N)` image\n        and an `(m, n)` template, and matches correspond to origin\n        (top-left corner) of the template.\n    mode : see `numpy.pad`, optional\n        Padding mode.\n    constant_values : see `numpy.pad`, optional\n        Constant values used in conjunction with ``mode=\'constant\'``.\n\n    Returns\n    -------\n    output : array\n        Response image with correlation coefficients.\n\n    Notes\n    -----\n    Details on the cross-correlation are presented in [1]_. This implementation\n    uses FFT convolutions of the image and the template. Reference [2]_\n    presents similar derivations but the approximation presented in this\n    reference is not used in our implementation.\n\n    References\n    ----------\n    .. [1] J. P. Lewis, "Fast Normalized Cross-Correlation", Industrial Light\n           and Magic.\n    .. [2] Briechle and Hanebeck, "Template Matching using Fast Normalized\n           Cross Correlation", Proceedings of the SPIE (2001).\n           DOI:10.1117/12.421129\n\n    Examples\n    --------\n    >>> template = np.zeros((3, 3))\n    >>> template[1, 1] = 1\n    >>> template\n    array([[ 0.,  0.,  0.],\n           [ 0.,  1.,  0.],\n           [ 0.,  0.,  0.]])\n    >>> image = np.zeros((6, 6))\n    >>> image[1, 1] = 1\n    >>> image[4, 4] = -1\n    >>> image\n    array([[ 0.,  0.,  0.,  0.,  0.,  0.],\n           [ 0.,  1.,  0.,  0.,  0.,  0.],\n           [ 0.,  0.,  0.,  0.,  0.,  0.],\n           [ 0.,  0.,  0.,  0.,  0.,  0.],\n           [ 0.,  0.,  0.,  0., -1.,  0.],\n           [ 0.,  0.,  0.,  0.,  0.,  0.]])\n    >>> result = match_template(image, template)\n    >>> np.round(result, 3)\n    array([[ 1.   , -0.125,  0.   ,  0.   ],\n           [-0.125, -0.125,  0.   ,  0.   ],\n           [ 0.   ,  0.   ,  0.125,  0.125],\n           [ 0.   ,  0.   ,  0.125, -1.   ]])\n    >>> result = match_template(image, template, pad_input=True)\n    >>> np.round(result, 3)\n    array([[-0.125, -0.125, -0.125,  0.   ,  0.   ,  0.   ],\n           [-0.125,  1.   , -0.125,  0.   ,  0.   ,  0.   ],\n           [-0.125, -0.125, -0.125,  0.   ,  0.   ,  0.   ],\n           [ 0.   ,  0.   ,  0.   ,  0.125,  0.125,  0.125],\n           [ 0.   ,  0.   ,  0.   ,  0.125, -1.   ,  0.125],\n           [ 0.   ,  0.   ,  0.   ,  0.125,  0.125,  0.125]])\n    '
+assert_nD(image, (2, 3))
+if (image.ndim < template.ndim):
+    raise ValueError('Dimensionality of template must be less than or equal to the dimensionality of image.')
+if numpy.any(numpy.less(image.shape, template.shape)):
+    raise ValueError('Image must be larger than template.')
+image_shape = image.shape
+image = numpy.array(image, dtype=numpy.float64, copy=False)
+pad_width = tuple(((width, width) for width in template.shape))
+if (mode == 'constant'):
+    image = numpy.pad(image, pad_width=pad_width, mode=mode, constant_values=constant_values)
+else:
+    image = numpy.pad(image, pad_width=pad_width, mode=mode)
+if (image.ndim == 2):
+    image_window_sum = _window_sum_2d(image, template.shape)
+    image_window_sum2 = _window_sum_2d((image ** 2), template.shape)
+elif (image.ndim == 3):
+    image_window_sum = _window_sum_3d(image, template.shape)
+    image_window_sum2 = _window_sum_3d((image ** 2), template.shape)
+template_mean = template.mean()
+template_volume = numpy.prod(template.shape)
+template_ssd = numpy.sum(((template - template_mean) ** 2))
+if (image.ndim == 2):
+    xcorr = fftconvolve(image, template[::(- 1), ::(- 1)], mode='valid')[1:(- 1), 1:(- 1)]
+elif (image.ndim == 3):
+    xcorr = fftconvolve(image, template[::(- 1), ::(- 1), ::(- 1)], mode='valid')[1:(- 1), 1:(- 1), 1:(- 1)]
+numerator = (xcorr - (image_window_sum * template_mean))
+denominator = image_window_sum2
+numpy.multiply(image_window_sum, image_window_sum, out=image_window_sum)
+tempResult = divide(image_window_sum, template_volume, out=image_window_sum)
+	
+***************************************************	
+sunpy_sunpy-0.8.0: 0	
+***************************************************	
+spacetelescope_synphot-0.1: 0	
+***************************************************	
+librosa_librosa-0.5.1: 0	
+***************************************************	
+mne_python-0.15.0: 0	
+***************************************************	

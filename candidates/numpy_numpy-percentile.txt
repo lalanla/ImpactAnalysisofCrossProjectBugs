@@ -1,0 +1,2132 @@
+astropy_astropy-1.3.0: 3	
+===================================================================	
+freedman_bin_width: 53	
+----------------------------	
+
+'Return the optimal histogram bin width using the Freedman-Diaconis rule\n\n    The Freedman-Diaconis rule is a normal reference rule like Scott\'s\n    rule, but uses rank-based statistics for results which are more robust\n    to deviations from a normal distribution.\n\n    Parameters\n    ----------\n    data : array-like, ndim=1\n        observed (one-dimensional) data\n    return_bins : bool (optional)\n        if True, then return the bin edges\n\n    Returns\n    -------\n    width : float\n        optimal bin width using the Freedman-Diaconis rule\n    bins : ndarray\n        bin edges: returned if ``return_bins`` is True\n\n    Notes\n    -----\n    The optimal bin width is\n\n    .. math::\n        \\Delta_b = \\frac{2(q_{75} - q_{25})}{n^{1/3}}\n\n    where :math:`q_{N}` is the :math:`N` percent quartile of the data, and\n    :math:`n` is the number of data points [1]_.\n\n    References\n    ----------\n    .. [1] D. Freedman & P. Diaconis (1981)\n       "On the histogram as a density estimator: L2 theory".\n       Probability Theory and Related Fields 57 (4): 453-476\n\n    See Also\n    --------\n    knuth_bin_width\n    scott_bin_width\n    bayesian_blocks\n    histogram\n    '
+data = numpy.asarray(data)
+if (data.ndim != 1):
+    raise ValueError('data should be one-dimensional')
+n = data.size
+if (n < 4):
+    raise ValueError('data should have more than three entries')
+tempResult = percentile(data, [25, 75])
+	
+===================================================================	
+test_freedman_bin_width: 27	
+----------------------------	
+
+rng = numpy.random.RandomState(rseed)
+X = rng.randn(N)
+tempResult = percentile(X, [25, 75])
+	
+===================================================================	
+AsymmetricPercentileInterval.get_limits: 65	
+----------------------------	
+
+values = np.asarray(values).ravel()
+if ((self.n_samples is not None) and (values.size > self.n_samples)):
+    values = numpy.random.choice(values, self.n_samples)
+values = values[numpy.isfinite(values)]
+tempResult = percentile(values, (self.lower_percentile, self.upper_percentile))
+	
+***************************************************	
+scipy_scipy-0.19.0: 3	
+===================================================================	
+_iqr_percentile: 612	
+----------------------------	
+'\n    Private wrapper that works around older versions of `numpy`.\n\n    While this function is pretty much necessary for the moment, it\n    should be removed as soon as the minimum supported numpy version\n    allows.\n    '
+if (contains_nan and (NumpyVersion(np.__version__) < '1.10.0a')):
+    msg = "Keyword nan_policy='propagate' not correctly supported for numpy versions < 1.10.x. The default behavior of `numpy.percentile` will be used."
+    warnings.warn(msg, RuntimeWarning)
+try:
+    tempResult = percentile(x, q, axis=axis, keepdims=keepdims, interpolation=interpolation)	
+===================================================================	
+_iqr_percentile: 633	
+----------------------------	
+
+'\n    Private wrapper that works around older versions of `numpy`.\n\n    While this function is pretty much necessary for the moment, it\n    should be removed as soon as the minimum supported numpy version\n    allows.\n    '
+if (contains_nan and (NumpyVersion(numpy.__version__) < '1.10.0a')):
+    msg = "Keyword nan_policy='propagate' not correctly supported for numpy versions < 1.10.x. The default behavior of `numpy.percentile` will be used."
+    warnings.warn(msg, RuntimeWarning)
+try:
+    result = numpy.percentile(x, q, axis=axis, keepdims=keepdims, interpolation=interpolation)
+except TypeError:
+    if ((interpolation != 'linear') or keepdims):
+        warnings.warn('Keywords interpolation and keepdims not supported for your version of numpy', RuntimeWarning)
+    try:
+        original_size = len(axis)
+    except TypeError:
+        pass
+    else:
+        axis = numpy.unique((numpy.asarray(axis) % x.ndim))
+        if (original_size > axis.size):
+            raise ValueError('duplicate value in axis')
+        if (axis.size == x.ndim):
+            axis = None
+        elif (axis.size == 1):
+            axis = axis[0]
+        else:
+            for ax in axis[::(- 1)]:
+                x = numpy.rollaxis(x, ax, x.ndim)
+            x = x.reshape((x.shape[:(- axis.size)] + (numpy.prod(x.shape[(- axis.size):]),)))
+            axis = (- 1)
+    tempResult = percentile(x, q, axis=axis)
+	
+===================================================================	
+cauchy_gen._fitstart: 444	
+----------------------------	
+
+tempResult = percentile(data, [25, 50, 75])
+	
+***************************************************	
+sklearn_sklearn-0.18.0: 7	
+===================================================================	
+DummyRegressor.fit: 174	
+----------------------------	
+
+'Fit the random regressor.\n\n        Parameters\n        ----------\n        X : {array-like, sparse matrix}, shape = [n_samples, n_features]\n            Training vectors, where n_samples is the number of samples\n            and n_features is the number of features.\n\n        y : array-like, shape = [n_samples] or [n_samples, n_outputs]\n            Target values.\n\n        sample_weight : array-like of shape = [n_samples], optional\n            Sample weights.\n\n        Returns\n        -------\n        self : object\n            Returns self.\n        '
+if (self.strategy not in ('mean', 'median', 'quantile', 'constant')):
+    raise ValueError(("Unknown strategy type: %s, expected 'mean', 'median', 'quantile' or 'constant'" % self.strategy))
+y = check_array(y, ensure_2d=False)
+if (len(y) == 0):
+    raise ValueError('y must not be empty.')
+self.output_2d_ = (y.ndim == 2)
+if (y.ndim == 1):
+    y = numpy.reshape(y, ((- 1), 1))
+self.n_outputs_ = y.shape[1]
+check_consistent_length(X, y, sample_weight)
+if (self.strategy == 'mean'):
+    self.constant_ = numpy.average(y, axis=0, weights=sample_weight)
+elif (self.strategy == 'median'):
+    if (sample_weight is None):
+        self.constant_ = numpy.median(y, axis=0)
+    else:
+        self.constant_ = [_weighted_percentile(y[:, k], sample_weight, percentile=50.0) for k in range(self.n_outputs_)]
+elif (self.strategy == 'quantile'):
+    if ((self.quantile is None) or (not numpy.isscalar(self.quantile))):
+        raise ValueError(('Quantile must be a scalar in the range [0.0, 1.0], but got %s.' % self.quantile))
+    percentile = (self.quantile * 100.0)
+    if (sample_weight is None):
+        tempResult = percentile(y, axis=0, q=percentile)
+	
+===================================================================	
+RobustScaler.fit: 373	
+----------------------------	
+
+'Compute the median and quantiles to be used for scaling.\n\n        Parameters\n        ----------\n        X : array-like, shape [n_samples, n_features]\n            The data used to compute the median and quantiles\n            used for later scaling along the features axis.\n        '
+if scipy.sparse.issparse(X):
+    raise TypeError('RobustScaler cannot be fitted on sparse inputs')
+X = self._check_array(X, self.copy)
+if (X.ndim == 1):
+    warnings.warn(DEPRECATION_MSG_1D, DeprecationWarning)
+if self.with_centering:
+    self.center_ = numpy.median(X, axis=0)
+if self.with_scaling:
+    (q_min, q_max) = self.quantile_range
+    if (not (0 <= q_min <= q_max <= 100)):
+        raise ValueError(('Invalid quantile range: %s' % str(self.quantile_range)))
+    tempResult = percentile(X, self.quantile_range, axis=0)
+	
+===================================================================	
+test_robust_scale_axis1: 624	
+----------------------------	
+
+X = iris.data
+X_trans = robust_scale(X, axis=1)
+assert_array_almost_equal(numpy.median(X_trans, axis=1), 0)
+tempResult = percentile(X_trans, q=(25, 75), axis=1)
+	
+===================================================================	
+test_robust_scaler_iris_quantiles: 590	
+----------------------------	
+
+X = iris.data
+scaler = RobustScaler(quantile_range=(10, 90))
+X_trans = scaler.fit_transform(X)
+assert_array_almost_equal(numpy.median(X_trans, axis=0), 0)
+X_trans_inv = scaler.inverse_transform(X_trans)
+assert_array_almost_equal(X, X_trans_inv)
+tempResult = percentile(X_trans, q=(10, 90), axis=0)
+	
+===================================================================	
+test_robust_scaler_iris: 579	
+----------------------------	
+
+X = iris.data
+scaler = RobustScaler()
+X_trans = scaler.fit_transform(X)
+assert_array_almost_equal(numpy.median(X_trans, axis=0), 0)
+X_trans_inv = scaler.inverse_transform(X_trans)
+assert_array_almost_equal(X, X_trans_inv)
+tempResult = percentile(X_trans, q=(25, 75), axis=0)
+	
+===================================================================	
+test_quantile_strategy_regressor: 212	
+----------------------------	
+
+random_state = numpy.random.RandomState(seed=1)
+X = ([[0]] * 5)
+y = random_state.randn(5)
+reg = DummyRegressor(strategy='quantile', quantile=0.5)
+reg.fit(X, y)
+assert_array_equal(reg.predict(X), ([numpy.median(y)] * len(X)))
+reg = DummyRegressor(strategy='quantile', quantile=0)
+reg.fit(X, y)
+assert_array_equal(reg.predict(X), ([numpy.min(y)] * len(X)))
+reg = DummyRegressor(strategy='quantile', quantile=1)
+reg.fit(X, y)
+assert_array_equal(reg.predict(X), ([numpy.max(y)] * len(X)))
+reg = DummyRegressor(strategy='quantile', quantile=0.3)
+reg.fit(X, y)
+tempResult = percentile(y, q=30)
+	
+===================================================================	
+test_quantile_strategy_multioutput_regressor: 219	
+----------------------------	
+
+random_state = numpy.random.RandomState(seed=1)
+X_learn = random_state.randn(10, 10)
+y_learn = random_state.randn(10, 5)
+median = np.median(y_learn, axis=0).reshape((1, (- 1)))
+tempResult = percentile(y_learn, axis=0, q=80)
+	
+***************************************************	
+matplotlib_matplotlib-2.0.0: 5	
+===================================================================	
+module: 32	
+----------------------------	
+
+'\n=================================\nDemo of violin plot customization\n=================================\n\nThis example demonstrates how to fully customize violin plots.\nThe first plot shows the default style by providing only\nthe data. The second plot first limits what matplotlib draws\nwith additional kwargs. Then a simplified representation of\na box plot is drawn on top. Lastly, the styles of the artists\nof the violins are modified.\n\nFor more information on violin plots, the scikit-learn docs have a great\nsection: http://scikit-learn.org/stable/modules/density.html\n'
+import matplotlib.pyplot as plt
+import numpy as np
+
+def adjacent_values(vals, q1, q3):
+    upper_adjacent_value = (q3 + ((q3 - q1) * 1.5))
+    upper_adjacent_value = numpy.clip(upper_adjacent_value, q3, vals[(- 1)])
+    lower_adjacent_value = (q1 - ((q3 - q1) * 1.5))
+    lower_adjacent_value = numpy.clip(lower_adjacent_value, vals[0], q1)
+    return (lower_adjacent_value, upper_adjacent_value)
+
+def set_axis_style(ax, labels):
+    ax.get_xaxis().set_tick_params(direction='out')
+    ax.xaxis.set_ticks_position('bottom')
+    ax.set_xticks(numpy.arange(1, (len(labels) + 1)))
+    ax.set_xticklabels(labels)
+    ax.set_xlim(0.25, (len(labels) + 0.75))
+    ax.set_xlabel('Sample name')
+numpy.random.seed(123)
+data = [sorted(numpy.random.normal(0, std, 100)) for std in range(1, 5)]
+(fig, (ax1, ax2)) = matplotlib.pyplot.subplots(nrows=1, ncols=2, figsize=(9, 4), sharey=True)
+ax1.set_title('Default violin plot')
+ax1.set_ylabel('Observed values')
+ax1.violinplot(data)
+ax2.set_title('Customized violin plot')
+parts = ax2.violinplot(data, showmeans=False, showmedians=False, showextrema=False)
+for pc in parts['bodies']:
+    pc.set_facecolor('#D43F3A')
+    pc.set_edgecolor('black')
+    pc.set_alpha(1)
+tempResult = percentile(data, [25, 50, 75], axis=1)
+	
+===================================================================	
+_bootstrap_median: 1218	
+----------------------------	
+
+M = len(data)
+percentiles = [2.5, 97.5]
+ii = numpy.random.randint(M, size=(N, M))
+bsData = x[ii]
+estimate = numpy.median(bsData, axis=1, overwrite_input=True)
+tempResult = percentile(estimate, percentiles)
+	
+===================================================================	
+boxplot_stats: 1259	
+----------------------------	
+
+'\n    Returns list of dictionaries of statistics used to draw a series\n    of box and whisker plots. The `Returns` section enumerates the\n    required keys of the dictionary. Users can skip this function and\n    pass a user-defined set of dictionaries to the new `axes.bxp` method\n    instead of relying on MPL to do the calculations.\n\n    Parameters\n    ----------\n    X : array-like\n        Data that will be represented in the boxplots. Should have 2 or\n        fewer dimensions.\n\n    whis : float, string, or sequence (default = 1.5)\n        As a float, determines the reach of the whiskers past the first\n        and third quartiles (e.g., Q3 + whis*IQR, QR = interquartile\n        range, Q3-Q1). Beyond the whiskers, data are considered outliers\n        and are plotted as individual points. This can be set this to an\n        ascending sequence of percentile (e.g., [5, 95]) to set the\n        whiskers at specific percentiles of the data. Finally, `whis`\n        can be the string ``\'range\'`` to force the whiskers to the\n        minimum and maximum of the data. In the edge case that the 25th\n        and 75th percentiles are equivalent, `whis` can be automatically\n        set to ``\'range\'`` via the `autorange` option.\n\n    bootstrap : int, optional\n        Number of times the confidence intervals around the median\n        should be bootstrapped (percentile method).\n\n    labels : array-like, optional\n        Labels for each dataset. Length must be compatible with\n        dimensions of `X`.\n\n    autorange : bool, optional (False)\n        When `True` and the data are distributed such that the  25th and\n        75th percentiles are equal, ``whis`` is set to ``\'range\'`` such\n        that the whisker ends are at the minimum and maximum of the\n        data.\n\n    Returns\n    -------\n    bxpstats : list of dict\n        A list of dictionaries containing the results for each column\n        of data. Keys of each dictionary are the following:\n\n        ========   ===================================\n        Key        Value Description\n        ========   ===================================\n        label      tick label for the boxplot\n        mean       arithemetic mean value\n        med        50th percentile\n        q1         first quartile (25th percentile)\n        q3         third quartile (75th percentile)\n        cilo       lower notch around the median\n        cihi       upper notch around the median\n        whislo     end of the lower whisker\n        whishi     end of the upper whisker\n        fliers     outliers\n        ========   ===================================\n\n    Notes\n    -----\n    Non-bootstrapping approach to confidence interval uses Gaussian-\n    based asymptotic approximation:\n\n    .. math::\n\n        \\mathrm{med} \\pm 1.57 \\times \\frac{\\mathrm{iqr}}{\\sqrt{N}}\n\n    General approach from:\n    McGill, R., Tukey, J.W., and Larsen, W.A. (1978) "Variations of\n    Boxplots", The American Statistician, 32:12-16.\n\n    '
+
+def _bootstrap_median(data, N=5000):
+    M = len(data)
+    percentiles = [2.5, 97.5]
+    ii = numpy.random.randint(M, size=(N, M))
+    bsData = x[ii]
+    estimate = numpy.median(bsData, axis=1, overwrite_input=True)
+    CI = numpy.percentile(estimate, percentiles)
+    return CI
+
+def _compute_conf_interval(data, med, iqr, bootstrap):
+    if (bootstrap is not None):
+        CI = _bootstrap_median(data, N=bootstrap)
+        notch_min = CI[0]
+        notch_max = CI[1]
+    else:
+        N = len(data)
+        notch_min = (med - ((1.57 * iqr) / numpy.sqrt(N)))
+        notch_max = (med + ((1.57 * iqr) / numpy.sqrt(N)))
+    return (notch_min, notch_max)
+bxpstats = []
+X = _reshape_2D(X)
+ncols = len(X)
+if (labels is None):
+    labels = repeat(None)
+elif (len(labels) != ncols):
+    raise ValueError('Dimensions of labels and X must be compatible')
+input_whis = whis
+for (ii, (x, label)) in enumerate(zip(X, labels), start=0):
+    stats = {}
+    if (label is not None):
+        stats['label'] = label
+    whis = input_whis
+    bxpstats.append(stats)
+    if (len(x) == 0):
+        stats['fliers'] = numpy.array([])
+        stats['mean'] = numpy.nan
+        stats['med'] = numpy.nan
+        stats['q1'] = numpy.nan
+        stats['q3'] = numpy.nan
+        stats['cilo'] = numpy.nan
+        stats['cihi'] = numpy.nan
+        stats['whislo'] = numpy.nan
+        stats['whishi'] = numpy.nan
+        stats['med'] = numpy.nan
+        continue
+    x = numpy.asarray(x)
+    stats['mean'] = numpy.mean(x)
+    tempResult = percentile(x, [25, 50, 75])
+	
+===================================================================	
+boxplot_stats: 1275	
+----------------------------	
+
+'\n    Returns list of dictionaries of statistics used to draw a series\n    of box and whisker plots. The `Returns` section enumerates the\n    required keys of the dictionary. Users can skip this function and\n    pass a user-defined set of dictionaries to the new `axes.bxp` method\n    instead of relying on MPL to do the calculations.\n\n    Parameters\n    ----------\n    X : array-like\n        Data that will be represented in the boxplots. Should have 2 or\n        fewer dimensions.\n\n    whis : float, string, or sequence (default = 1.5)\n        As a float, determines the reach of the whiskers past the first\n        and third quartiles (e.g., Q3 + whis*IQR, QR = interquartile\n        range, Q3-Q1). Beyond the whiskers, data are considered outliers\n        and are plotted as individual points. This can be set this to an\n        ascending sequence of percentile (e.g., [5, 95]) to set the\n        whiskers at specific percentiles of the data. Finally, `whis`\n        can be the string ``\'range\'`` to force the whiskers to the\n        minimum and maximum of the data. In the edge case that the 25th\n        and 75th percentiles are equivalent, `whis` can be automatically\n        set to ``\'range\'`` via the `autorange` option.\n\n    bootstrap : int, optional\n        Number of times the confidence intervals around the median\n        should be bootstrapped (percentile method).\n\n    labels : array-like, optional\n        Labels for each dataset. Length must be compatible with\n        dimensions of `X`.\n\n    autorange : bool, optional (False)\n        When `True` and the data are distributed such that the  25th and\n        75th percentiles are equal, ``whis`` is set to ``\'range\'`` such\n        that the whisker ends are at the minimum and maximum of the\n        data.\n\n    Returns\n    -------\n    bxpstats : list of dict\n        A list of dictionaries containing the results for each column\n        of data. Keys of each dictionary are the following:\n\n        ========   ===================================\n        Key        Value Description\n        ========   ===================================\n        label      tick label for the boxplot\n        mean       arithemetic mean value\n        med        50th percentile\n        q1         first quartile (25th percentile)\n        q3         third quartile (75th percentile)\n        cilo       lower notch around the median\n        cihi       upper notch around the median\n        whislo     end of the lower whisker\n        whishi     end of the upper whisker\n        fliers     outliers\n        ========   ===================================\n\n    Notes\n    -----\n    Non-bootstrapping approach to confidence interval uses Gaussian-\n    based asymptotic approximation:\n\n    .. math::\n\n        \\mathrm{med} \\pm 1.57 \\times \\frac{\\mathrm{iqr}}{\\sqrt{N}}\n\n    General approach from:\n    McGill, R., Tukey, J.W., and Larsen, W.A. (1978) "Variations of\n    Boxplots", The American Statistician, 32:12-16.\n\n    '
+
+def _bootstrap_median(data, N=5000):
+    M = len(data)
+    percentiles = [2.5, 97.5]
+    ii = numpy.random.randint(M, size=(N, M))
+    bsData = x[ii]
+    estimate = numpy.median(bsData, axis=1, overwrite_input=True)
+    CI = numpy.percentile(estimate, percentiles)
+    return CI
+
+def _compute_conf_interval(data, med, iqr, bootstrap):
+    if (bootstrap is not None):
+        CI = _bootstrap_median(data, N=bootstrap)
+        notch_min = CI[0]
+        notch_max = CI[1]
+    else:
+        N = len(data)
+        notch_min = (med - ((1.57 * iqr) / numpy.sqrt(N)))
+        notch_max = (med + ((1.57 * iqr) / numpy.sqrt(N)))
+    return (notch_min, notch_max)
+bxpstats = []
+X = _reshape_2D(X)
+ncols = len(X)
+if (labels is None):
+    labels = repeat(None)
+elif (len(labels) != ncols):
+    raise ValueError('Dimensions of labels and X must be compatible')
+input_whis = whis
+for (ii, (x, label)) in enumerate(zip(X, labels), start=0):
+    stats = {}
+    if (label is not None):
+        stats['label'] = label
+    whis = input_whis
+    bxpstats.append(stats)
+    if (len(x) == 0):
+        stats['fliers'] = numpy.array([])
+        stats['mean'] = numpy.nan
+        stats['med'] = numpy.nan
+        stats['q1'] = numpy.nan
+        stats['q3'] = numpy.nan
+        stats['cilo'] = numpy.nan
+        stats['cihi'] = numpy.nan
+        stats['whislo'] = numpy.nan
+        stats['whishi'] = numpy.nan
+        stats['med'] = numpy.nan
+        continue
+    x = numpy.asarray(x)
+    stats['mean'] = numpy.mean(x)
+    (q1, med, q3) = numpy.percentile(x, [25, 50, 75])
+    stats['iqr'] = (q3 - q1)
+    if ((stats['iqr'] == 0) and autorange):
+        whis = 'range'
+    (stats['cilo'], stats['cihi']) = _compute_conf_interval(x, med, stats['iqr'], bootstrap)
+    if numpy.isscalar(whis):
+        if numpy.isreal(whis):
+            loval = (q1 - (whis * stats['iqr']))
+            hival = (q3 + (whis * stats['iqr']))
+        elif (whis in ['range', 'limit', 'limits', 'min/max']):
+            loval = numpy.min(x)
+            hival = numpy.max(x)
+        else:
+            whismsg = 'whis must be a float, valid string, or list of percentiles'
+            raise ValueError(whismsg)
+    else:
+        tempResult = percentile(x, whis[0])
+	
+===================================================================	
+boxplot_stats: 1276	
+----------------------------	
+
+'\n    Returns list of dictionaries of statistics used to draw a series\n    of box and whisker plots. The `Returns` section enumerates the\n    required keys of the dictionary. Users can skip this function and\n    pass a user-defined set of dictionaries to the new `axes.bxp` method\n    instead of relying on MPL to do the calculations.\n\n    Parameters\n    ----------\n    X : array-like\n        Data that will be represented in the boxplots. Should have 2 or\n        fewer dimensions.\n\n    whis : float, string, or sequence (default = 1.5)\n        As a float, determines the reach of the whiskers past the first\n        and third quartiles (e.g., Q3 + whis*IQR, QR = interquartile\n        range, Q3-Q1). Beyond the whiskers, data are considered outliers\n        and are plotted as individual points. This can be set this to an\n        ascending sequence of percentile (e.g., [5, 95]) to set the\n        whiskers at specific percentiles of the data. Finally, `whis`\n        can be the string ``\'range\'`` to force the whiskers to the\n        minimum and maximum of the data. In the edge case that the 25th\n        and 75th percentiles are equivalent, `whis` can be automatically\n        set to ``\'range\'`` via the `autorange` option.\n\n    bootstrap : int, optional\n        Number of times the confidence intervals around the median\n        should be bootstrapped (percentile method).\n\n    labels : array-like, optional\n        Labels for each dataset. Length must be compatible with\n        dimensions of `X`.\n\n    autorange : bool, optional (False)\n        When `True` and the data are distributed such that the  25th and\n        75th percentiles are equal, ``whis`` is set to ``\'range\'`` such\n        that the whisker ends are at the minimum and maximum of the\n        data.\n\n    Returns\n    -------\n    bxpstats : list of dict\n        A list of dictionaries containing the results for each column\n        of data. Keys of each dictionary are the following:\n\n        ========   ===================================\n        Key        Value Description\n        ========   ===================================\n        label      tick label for the boxplot\n        mean       arithemetic mean value\n        med        50th percentile\n        q1         first quartile (25th percentile)\n        q3         third quartile (75th percentile)\n        cilo       lower notch around the median\n        cihi       upper notch around the median\n        whislo     end of the lower whisker\n        whishi     end of the upper whisker\n        fliers     outliers\n        ========   ===================================\n\n    Notes\n    -----\n    Non-bootstrapping approach to confidence interval uses Gaussian-\n    based asymptotic approximation:\n\n    .. math::\n\n        \\mathrm{med} \\pm 1.57 \\times \\frac{\\mathrm{iqr}}{\\sqrt{N}}\n\n    General approach from:\n    McGill, R., Tukey, J.W., and Larsen, W.A. (1978) "Variations of\n    Boxplots", The American Statistician, 32:12-16.\n\n    '
+
+def _bootstrap_median(data, N=5000):
+    M = len(data)
+    percentiles = [2.5, 97.5]
+    ii = numpy.random.randint(M, size=(N, M))
+    bsData = x[ii]
+    estimate = numpy.median(bsData, axis=1, overwrite_input=True)
+    CI = numpy.percentile(estimate, percentiles)
+    return CI
+
+def _compute_conf_interval(data, med, iqr, bootstrap):
+    if (bootstrap is not None):
+        CI = _bootstrap_median(data, N=bootstrap)
+        notch_min = CI[0]
+        notch_max = CI[1]
+    else:
+        N = len(data)
+        notch_min = (med - ((1.57 * iqr) / numpy.sqrt(N)))
+        notch_max = (med + ((1.57 * iqr) / numpy.sqrt(N)))
+    return (notch_min, notch_max)
+bxpstats = []
+X = _reshape_2D(X)
+ncols = len(X)
+if (labels is None):
+    labels = repeat(None)
+elif (len(labels) != ncols):
+    raise ValueError('Dimensions of labels and X must be compatible')
+input_whis = whis
+for (ii, (x, label)) in enumerate(zip(X, labels), start=0):
+    stats = {}
+    if (label is not None):
+        stats['label'] = label
+    whis = input_whis
+    bxpstats.append(stats)
+    if (len(x) == 0):
+        stats['fliers'] = numpy.array([])
+        stats['mean'] = numpy.nan
+        stats['med'] = numpy.nan
+        stats['q1'] = numpy.nan
+        stats['q3'] = numpy.nan
+        stats['cilo'] = numpy.nan
+        stats['cihi'] = numpy.nan
+        stats['whislo'] = numpy.nan
+        stats['whishi'] = numpy.nan
+        stats['med'] = numpy.nan
+        continue
+    x = numpy.asarray(x)
+    stats['mean'] = numpy.mean(x)
+    (q1, med, q3) = numpy.percentile(x, [25, 50, 75])
+    stats['iqr'] = (q3 - q1)
+    if ((stats['iqr'] == 0) and autorange):
+        whis = 'range'
+    (stats['cilo'], stats['cihi']) = _compute_conf_interval(x, med, stats['iqr'], bootstrap)
+    if numpy.isscalar(whis):
+        if numpy.isreal(whis):
+            loval = (q1 - (whis * stats['iqr']))
+            hival = (q3 + (whis * stats['iqr']))
+        elif (whis in ['range', 'limit', 'limits', 'min/max']):
+            loval = numpy.min(x)
+            hival = numpy.max(x)
+        else:
+            whismsg = 'whis must be a float, valid string, or list of percentiles'
+            raise ValueError(whismsg)
+    else:
+        loval = numpy.percentile(x, whis[0])
+        tempResult = percentile(x, whis[1])
+	
+***************************************************	
+ipython_ipython-6.1.0: 0	
+***************************************************	
+pandas_pandas-0.19.2: 6	
+===================================================================	
+Block._nanpercentile1D: 810	
+----------------------------	
+
+values = values[(~ mask)]
+if (len(values) == 0):
+    if is_scalar(q):
+        return self._na_value
+    else:
+        return numpy.array(([self._na_value] * len(q)), dtype=values.dtype)
+tempResult = percentile(values, q, **kw)
+	
+===================================================================	
+Block._nanpercentile: 827	
+----------------------------	
+
+mask = isnull(self.values)
+if ((not is_scalar(mask)) and mask.any()):
+    if (self.ndim == 1):
+        return _nanpercentile1D(values, mask, q, **kw)
+    else:
+        if (mask.ndim < values.ndim):
+            mask = mask.reshape(values.shape)
+        if (axis == 0):
+            values = values.T
+            mask = mask.T
+        result = [_nanpercentile1D(val, m, q, **kw) for (val, m) in zip(list(values), list(mask))]
+        result = np.array(result, dtype=values.dtype, copy=False).T
+        return result
+else:
+    tempResult = percentile(values, q, axis=axis, **kw)
+	
+===================================================================	
+TestDataFrameQuantile.test_quantile_interpolation: 75	
+----------------------------	
+
+if _np_version_under1p9:
+    raise nose.SkipTest('Numpy version under 1.9')
+from numpy import percentile
+q = self.tsframe.quantile(0.1, axis=0, interpolation='linear')
+self.assertEqual(q['A'], percentile(self.tsframe['A'], 10))
+q = self.intframe.quantile(0.1)
+self.assertEqual(q['A'], percentile(self.intframe['A'], 10))
+q1 = self.intframe.quantile(0.1)
+tempResult = percentile(self.intframe['A'], 10)
+	
+===================================================================	
+TestDataFrameQuantile.test_quantile_interpolation: 81	
+----------------------------	
+
+if _np_version_under1p9:
+    raise nose.SkipTest('Numpy version under 1.9')
+from numpy import percentile
+q = self.tsframe.quantile(0.1, axis=0, interpolation='linear')
+self.assertEqual(q['A'], percentile(self.tsframe['A'], 10))
+q = self.intframe.quantile(0.1)
+self.assertEqual(q['A'], percentile(self.intframe['A'], 10))
+q1 = self.intframe.quantile(0.1)
+self.assertEqual(q1['A'], numpy.percentile(self.intframe['A'], 10))
+assert_series_equal(q, q1)
+df = DataFrame({'A': [1, 2, 3], 'B': [2, 3, 4]}, index=[1, 2, 3])
+result = df.quantile(0.5, axis=1, interpolation='nearest')
+expected = Series([1, 2, 3], index=[1, 2, 3], name=0.5)
+assert_series_equal(result, expected)
+tempResult = percentile(numpy.array([[1, 2, 3], [2, 3, 4]]), 0.5, axis=0, interpolation='nearest')
+	
+===================================================================	
+TestDataFrameQuantile.test_quantile_interpolation: 88	
+----------------------------	
+
+if _np_version_under1p9:
+    raise nose.SkipTest('Numpy version under 1.9')
+from numpy import percentile
+q = self.tsframe.quantile(0.1, axis=0, interpolation='linear')
+self.assertEqual(q['A'], percentile(self.tsframe['A'], 10))
+q = self.intframe.quantile(0.1)
+self.assertEqual(q['A'], percentile(self.intframe['A'], 10))
+q1 = self.intframe.quantile(0.1)
+self.assertEqual(q1['A'], numpy.percentile(self.intframe['A'], 10))
+assert_series_equal(q, q1)
+df = DataFrame({'A': [1, 2, 3], 'B': [2, 3, 4]}, index=[1, 2, 3])
+result = df.quantile(0.5, axis=1, interpolation='nearest')
+expected = Series([1, 2, 3], index=[1, 2, 3], name=0.5)
+assert_series_equal(result, expected)
+exp = numpy.percentile(numpy.array([[1, 2, 3], [2, 3, 4]]), 0.5, axis=0, interpolation='nearest')
+expected = Series(exp, index=[1, 2, 3], name=0.5, dtype='int64')
+assert_series_equal(result, expected)
+df = DataFrame({'A': [1.0, 2.0, 3.0], 'B': [2.0, 3.0, 4.0]}, index=[1, 2, 3])
+result = df.quantile(0.5, axis=1, interpolation='nearest')
+expected = Series([1.0, 2.0, 3.0], index=[1, 2, 3], name=0.5)
+assert_series_equal(result, expected)
+tempResult = percentile(numpy.array([[1.0, 2.0, 3.0], [2.0, 3.0, 4.0]]), 0.5, axis=0, interpolation='nearest')
+	
+===================================================================	
+TestDataFrameQuantile.test_quantile_interpolation_np_lt_1p9: 114	
+----------------------------	
+
+if (not _np_version_under1p9):
+    raise nose.SkipTest('Numpy version is greater than 1.9')
+from numpy import percentile
+q = self.tsframe.quantile(0.1, axis=0, interpolation='linear')
+self.assertEqual(q['A'], percentile(self.tsframe['A'], 10))
+q = self.intframe.quantile(0.1)
+self.assertEqual(q['A'], percentile(self.intframe['A'], 10))
+q1 = self.intframe.quantile(0.1)
+tempResult = percentile(self.intframe['A'], 10)
+	
+***************************************************	
+dask_dask-0.7.0: 3	
+===================================================================	
+_percentile: 17	
+----------------------------	
+
+if (not len(a)):
+    return None
+if isinstance(q, Iterator):
+    q = list(q)
+if (str(a.dtype) == 'category'):
+    tempResult = percentile(a.codes, q, interpolation=interpolation)
+	
+===================================================================	
+_percentile: 22	
+----------------------------	
+
+if (not len(a)):
+    return None
+if isinstance(q, Iterator):
+    q = list(q)
+if (str(a.dtype) == 'category'):
+    result = numpy.percentile(a.codes, q, interpolation=interpolation)
+    import pandas as pd
+    return pandas.Categorical.from_codes(result, a.categories, a.ordered)
+if numpy.issubdtype(a.dtype, numpy.datetime64):
+    a2 = a.astype('i8')
+    tempResult = percentile(a2, q, interpolation=interpolation)
+	
+===================================================================	
+_percentile: 26	
+----------------------------	
+
+if (not len(a)):
+    return None
+if isinstance(q, Iterator):
+    q = list(q)
+if (str(a.dtype) == 'category'):
+    result = numpy.percentile(a.codes, q, interpolation=interpolation)
+    import pandas as pd
+    return pandas.Categorical.from_codes(result, a.categories, a.ordered)
+if numpy.issubdtype(a.dtype, numpy.datetime64):
+    a2 = a.astype('i8')
+    result = numpy.percentile(a2, q, interpolation=interpolation)
+    return result.astype(a.dtype)
+if (not numpy.issubdtype(a.dtype, numpy.number)):
+    interpolation = 'nearest'
+tempResult = percentile(a, q, interpolation=interpolation)
+	
+***************************************************	
+nengo_nengo-2.0.0: 0	
+***************************************************	
+sympy_sympy-1.0.0: 0	
+***************************************************	
+daducci_amico-dev: 0	
+***************************************************	
+aplpy_aplpy-1.1.1: 0	
+***************************************************	
+markovmodel_msmtools-1.0.2: 0	
+***************************************************	
+nilearn_nilearn-0.4.0: 0	
+***************************************************	
+poliastro_poliastro-0.8.0: 0	
+***************************************************	
+skimage_skimage-0.13.0: 4	
+===================================================================	
+binary_blobs: 14	
+----------------------------	
+
+'\n    Generate synthetic binary image with several rounded blob-like objects.\n\n    Parameters\n    ----------\n    length : int, optional\n        Linear size of output image.\n    blob_size_fraction : float, optional\n        Typical linear size of blob, as a fraction of ``length``, should be\n        smaller than 1.\n    n_dim : int, optional\n        Number of dimensions of output image.\n    volume_fraction : float, default 0.5\n        Fraction of image pixels covered by the blobs (where the output is 1).\n        Should be in [0, 1].\n    seed : int, optional\n        Seed to initialize the random number generator.\n        If `None`, a random seed from the operating system is used.\n\n    Returns\n    -------\n    blobs : ndarray of bools\n        Output binary image\n\n    Examples\n    --------\n    >>> from skimage import data\n    >>> data.binary_blobs(length=5, blob_size_fraction=0.2, seed=1)\n    array([[ True, False,  True,  True,  True],\n           [ True,  True,  True, False,  True],\n           [False,  True, False,  True,  True],\n           [ True, False, False,  True,  True],\n           [ True, False, False, False,  True]], dtype=bool)\n    >>> blobs = data.binary_blobs(length=256, blob_size_fraction=0.1)\n    >>> # Finer structures\n    >>> blobs = data.binary_blobs(length=256, blob_size_fraction=0.05)\n    >>> # Blobs cover a smaller volume fraction of the image\n    >>> blobs = data.binary_blobs(length=256, volume_fraction=0.3)\n    '
+rs = numpy.random.RandomState(seed)
+shape = tuple(([length] * n_dim))
+mask = numpy.zeros(shape)
+n_pts = max((int((1.0 / blob_size_fraction)) ** n_dim), 1)
+points = (length * rs.rand(n_dim, n_pts)).astype(numpy.int)
+mask[[indices for indices in points]] = 1
+mask = gaussian(mask, sigma=((0.25 * length) * blob_size_fraction))
+tempResult = percentile(mask, (100 * (1 - volume_fraction)))
+	
+===================================================================	
+is_low_contrast: 119	
+----------------------------	
+
+'Detemine if an image is low contrast.\n\n    Parameters\n    ----------\n    image : array-like\n        The image under test.\n    fraction_threshold : float, optional\n        The low contrast fraction threshold. An image is considered low-\n        contrast when its range of brightness spans less than this\n        fraction of its data type\'s full range. [1]_\n    lower_bound : float, optional\n        Disregard values below this percentile when computing image contrast.\n    upper_bound : float, optional\n        Disregard values above this percentile when computing image contrast.\n    method : str, optional\n        The contrast determination method.  Right now the only available\n        option is "linear".\n\n    Returns\n    -------\n    out : bool\n        True when the image is determined to be low contrast.\n\n    References\n    ----------\n    .. [1] http://scikit-image.org/docs/dev/user_guide/data_types.html\n\n    Examples\n    --------\n    >>> image = np.linspace(0, 0.04, 100)\n    >>> is_low_contrast(image)\n    True\n    >>> image[-1] = 1\n    >>> is_low_contrast(image)\n    True\n    >>> is_low_contrast(image, upper_percentile=100)\n    False\n    '
+image = numpy.asanyarray(image)
+if ((image.ndim == 3) and (image.shape[2] in [3, 4])):
+    image = rgb2gray(image)
+dlimits = dtype_limits(image, clip_negative=False)
+tempResult = percentile(image, [lower_percentile, upper_percentile])
+	
+===================================================================	
+canny: 97	
+----------------------------	
+
+"Edge filter an image using the Canny algorithm.\n\n    Parameters\n    -----------\n    image : 2D array\n        Greyscale input image to detect edges on; can be of any dtype.\n    sigma : float\n        Standard deviation of the Gaussian filter.\n    low_threshold : float\n        Lower bound for hysteresis thresholding (linking edges).\n        If None, low_threshold is set to 10% of dtype's max.\n    high_threshold : float\n        Upper bound for hysteresis thresholding (linking edges).\n        If None, high_threshold is set to 20% of dtype's max.\n    mask : array, dtype=bool, optional\n        Mask to limit the application of Canny to a certain area.\n    use_quantiles : bool, optional\n        If True then treat low_threshold and high_threshold as quantiles of the\n        edge magnitude image, rather than absolute edge magnitude values. If True\n        then the thresholds must be in the range [0, 1].\n\n    Returns\n    -------\n    output : 2D array (image)\n        The binary edge map.\n\n    See also\n    --------\n    skimage.sobel\n\n    Notes\n    -----\n    The steps of the algorithm are as follows:\n\n    * Smooth the image using a Gaussian with ``sigma`` width.\n\n    * Apply the horizontal and vertical Sobel operators to get the gradients\n      within the image. The edge strength is the norm of the gradient.\n\n    * Thin potential edges to 1-pixel wide curves. First, find the normal\n      to the edge at each point. This is done by looking at the\n      signs and the relative magnitude of the X-Sobel and Y-Sobel\n      to sort the points into 4 categories: horizontal, vertical,\n      diagonal and antidiagonal. Then look in the normal and reverse\n      directions to see if the values in either of those directions are\n      greater than the point in question. Use interpolation to get a mix of\n      points instead of picking the one that's the closest to the normal.\n\n    * Perform a hysteresis thresholding: first label all points above the\n      high threshold as edges. Then recursively label any point above the\n      low threshold that is 8-connected to a labeled point as an edge.\n\n    References\n    -----------\n    .. [1] Canny, J., A Computational Approach To Edge Detection, IEEE Trans.\n           Pattern Analysis and Machine Intelligence, 8:679-714, 1986\n    .. [2] William Green's Canny tutorial\n           http://dasl.mem.drexel.edu/alumni/bGreen/www.pages.drexel.edu/_weg22/can_tut.html\n\n    Examples\n    --------\n    >>> from skimage import feature\n    >>> # Generate noisy image of a square\n    >>> im = np.zeros((256, 256))\n    >>> im[64:-64, 64:-64] = 1\n    >>> im += 0.2 * np.random.rand(*im.shape)\n    >>> # First trial with the Canny filter, with the default smoothing\n    >>> edges1 = feature.canny(im)\n    >>> # Increase the smoothing for better results\n    >>> edges2 = feature.canny(im, sigma=3)\n    "
+assert_nD(image, 2)
+if (low_threshold is None):
+    low_threshold = (0.1 * dtype_limits(image, clip_negative=False)[1])
+if (high_threshold is None):
+    high_threshold = (0.2 * dtype_limits(image, clip_negative=False)[1])
+if (mask is None):
+    mask = numpy.ones(image.shape, dtype=bool)
+
+def fsmooth(x):
+    return gaussian_filter(x, sigma, mode='constant')
+smoothed = smooth_with_function_and_mask(image, fsmooth, mask)
+jsobel = scipy.ndimage.sobel(smoothed, axis=1)
+isobel = scipy.ndimage.sobel(smoothed, axis=0)
+abs_isobel = numpy.abs(isobel)
+abs_jsobel = numpy.abs(jsobel)
+magnitude = numpy.hypot(isobel, jsobel)
+s = generate_binary_structure(2, 2)
+eroded_mask = binary_erosion(mask, s, border_value=0)
+eroded_mask = (eroded_mask & (magnitude > 0))
+local_maxima = numpy.zeros(image.shape, bool)
+pts_plus = (((isobel >= 0) & (jsobel >= 0)) & (abs_isobel >= abs_jsobel))
+pts_minus = (((isobel <= 0) & (jsobel <= 0)) & (abs_isobel >= abs_jsobel))
+pts = (pts_plus | pts_minus)
+pts = (eroded_mask & pts)
+c1 = magnitude[1:, :][pts[:(- 1), :]]
+c2 = magnitude[1:, 1:][pts[:(- 1), :(- 1)]]
+m = magnitude[pts]
+w = (abs_jsobel[pts] / abs_isobel[pts])
+c_plus = (((c2 * w) + (c1 * (1 - w))) <= m)
+c1 = magnitude[:(- 1), :][pts[1:, :]]
+c2 = magnitude[:(- 1), :(- 1)][pts[1:, 1:]]
+c_minus = (((c2 * w) + (c1 * (1 - w))) <= m)
+local_maxima[pts] = (c_plus & c_minus)
+pts_plus = (((isobel >= 0) & (jsobel >= 0)) & (abs_isobel <= abs_jsobel))
+pts_minus = (((isobel <= 0) & (jsobel <= 0)) & (abs_isobel <= abs_jsobel))
+pts = (pts_plus | pts_minus)
+pts = (eroded_mask & pts)
+c1 = magnitude[:, 1:][pts[:, :(- 1)]]
+c2 = magnitude[1:, 1:][pts[:(- 1), :(- 1)]]
+m = magnitude[pts]
+w = (abs_isobel[pts] / abs_jsobel[pts])
+c_plus = (((c2 * w) + (c1 * (1 - w))) <= m)
+c1 = magnitude[:, :(- 1)][pts[:, 1:]]
+c2 = magnitude[:(- 1), :(- 1)][pts[1:, 1:]]
+c_minus = (((c2 * w) + (c1 * (1 - w))) <= m)
+local_maxima[pts] = (c_plus & c_minus)
+pts_plus = (((isobel <= 0) & (jsobel >= 0)) & (abs_isobel <= abs_jsobel))
+pts_minus = (((isobel >= 0) & (jsobel <= 0)) & (abs_isobel <= abs_jsobel))
+pts = (pts_plus | pts_minus)
+pts = (eroded_mask & pts)
+c1a = magnitude[:, 1:][pts[:, :(- 1)]]
+c2a = magnitude[:(- 1), 1:][pts[1:, :(- 1)]]
+m = magnitude[pts]
+w = (abs_isobel[pts] / abs_jsobel[pts])
+c_plus = (((c2a * w) + (c1a * (1.0 - w))) <= m)
+c1 = magnitude[:, :(- 1)][pts[:, 1:]]
+c2 = magnitude[1:, :(- 1)][pts[:(- 1), 1:]]
+c_minus = (((c2 * w) + (c1 * (1.0 - w))) <= m)
+local_maxima[pts] = (c_plus & c_minus)
+pts_plus = (((isobel <= 0) & (jsobel >= 0)) & (abs_isobel >= abs_jsobel))
+pts_minus = (((isobel >= 0) & (jsobel <= 0)) & (abs_isobel >= abs_jsobel))
+pts = (pts_plus | pts_minus)
+pts = (eroded_mask & pts)
+c1 = magnitude[:(- 1), :][pts[1:, :]]
+c2 = magnitude[:(- 1), 1:][pts[1:, :(- 1)]]
+m = magnitude[pts]
+w = (abs_jsobel[pts] / abs_isobel[pts])
+c_plus = (((c2 * w) + (c1 * (1 - w))) <= m)
+c1 = magnitude[1:, :][pts[:(- 1), :]]
+c2 = magnitude[1:, :(- 1)][pts[:(- 1), 1:]]
+c_minus = (((c2 * w) + (c1 * (1 - w))) <= m)
+local_maxima[pts] = (c_plus & c_minus)
+if use_quantiles:
+    if ((high_threshold > 1.0) or (low_threshold > 1.0)):
+        raise ValueError('Quantile thresholds must not be > 1.0')
+    if ((high_threshold < 0.0) or (low_threshold < 0.0)):
+        raise ValueError('Quantile thresholds must not be < 0.0')
+    tempResult = percentile(magnitude, (100.0 * high_threshold))
+	
+===================================================================	
+canny: 98	
+----------------------------	
+
+"Edge filter an image using the Canny algorithm.\n\n    Parameters\n    -----------\n    image : 2D array\n        Greyscale input image to detect edges on; can be of any dtype.\n    sigma : float\n        Standard deviation of the Gaussian filter.\n    low_threshold : float\n        Lower bound for hysteresis thresholding (linking edges).\n        If None, low_threshold is set to 10% of dtype's max.\n    high_threshold : float\n        Upper bound for hysteresis thresholding (linking edges).\n        If None, high_threshold is set to 20% of dtype's max.\n    mask : array, dtype=bool, optional\n        Mask to limit the application of Canny to a certain area.\n    use_quantiles : bool, optional\n        If True then treat low_threshold and high_threshold as quantiles of the\n        edge magnitude image, rather than absolute edge magnitude values. If True\n        then the thresholds must be in the range [0, 1].\n\n    Returns\n    -------\n    output : 2D array (image)\n        The binary edge map.\n\n    See also\n    --------\n    skimage.sobel\n\n    Notes\n    -----\n    The steps of the algorithm are as follows:\n\n    * Smooth the image using a Gaussian with ``sigma`` width.\n\n    * Apply the horizontal and vertical Sobel operators to get the gradients\n      within the image. The edge strength is the norm of the gradient.\n\n    * Thin potential edges to 1-pixel wide curves. First, find the normal\n      to the edge at each point. This is done by looking at the\n      signs and the relative magnitude of the X-Sobel and Y-Sobel\n      to sort the points into 4 categories: horizontal, vertical,\n      diagonal and antidiagonal. Then look in the normal and reverse\n      directions to see if the values in either of those directions are\n      greater than the point in question. Use interpolation to get a mix of\n      points instead of picking the one that's the closest to the normal.\n\n    * Perform a hysteresis thresholding: first label all points above the\n      high threshold as edges. Then recursively label any point above the\n      low threshold that is 8-connected to a labeled point as an edge.\n\n    References\n    -----------\n    .. [1] Canny, J., A Computational Approach To Edge Detection, IEEE Trans.\n           Pattern Analysis and Machine Intelligence, 8:679-714, 1986\n    .. [2] William Green's Canny tutorial\n           http://dasl.mem.drexel.edu/alumni/bGreen/www.pages.drexel.edu/_weg22/can_tut.html\n\n    Examples\n    --------\n    >>> from skimage import feature\n    >>> # Generate noisy image of a square\n    >>> im = np.zeros((256, 256))\n    >>> im[64:-64, 64:-64] = 1\n    >>> im += 0.2 * np.random.rand(*im.shape)\n    >>> # First trial with the Canny filter, with the default smoothing\n    >>> edges1 = feature.canny(im)\n    >>> # Increase the smoothing for better results\n    >>> edges2 = feature.canny(im, sigma=3)\n    "
+assert_nD(image, 2)
+if (low_threshold is None):
+    low_threshold = (0.1 * dtype_limits(image, clip_negative=False)[1])
+if (high_threshold is None):
+    high_threshold = (0.2 * dtype_limits(image, clip_negative=False)[1])
+if (mask is None):
+    mask = numpy.ones(image.shape, dtype=bool)
+
+def fsmooth(x):
+    return gaussian_filter(x, sigma, mode='constant')
+smoothed = smooth_with_function_and_mask(image, fsmooth, mask)
+jsobel = scipy.ndimage.sobel(smoothed, axis=1)
+isobel = scipy.ndimage.sobel(smoothed, axis=0)
+abs_isobel = numpy.abs(isobel)
+abs_jsobel = numpy.abs(jsobel)
+magnitude = numpy.hypot(isobel, jsobel)
+s = generate_binary_structure(2, 2)
+eroded_mask = binary_erosion(mask, s, border_value=0)
+eroded_mask = (eroded_mask & (magnitude > 0))
+local_maxima = numpy.zeros(image.shape, bool)
+pts_plus = (((isobel >= 0) & (jsobel >= 0)) & (abs_isobel >= abs_jsobel))
+pts_minus = (((isobel <= 0) & (jsobel <= 0)) & (abs_isobel >= abs_jsobel))
+pts = (pts_plus | pts_minus)
+pts = (eroded_mask & pts)
+c1 = magnitude[1:, :][pts[:(- 1), :]]
+c2 = magnitude[1:, 1:][pts[:(- 1), :(- 1)]]
+m = magnitude[pts]
+w = (abs_jsobel[pts] / abs_isobel[pts])
+c_plus = (((c2 * w) + (c1 * (1 - w))) <= m)
+c1 = magnitude[:(- 1), :][pts[1:, :]]
+c2 = magnitude[:(- 1), :(- 1)][pts[1:, 1:]]
+c_minus = (((c2 * w) + (c1 * (1 - w))) <= m)
+local_maxima[pts] = (c_plus & c_minus)
+pts_plus = (((isobel >= 0) & (jsobel >= 0)) & (abs_isobel <= abs_jsobel))
+pts_minus = (((isobel <= 0) & (jsobel <= 0)) & (abs_isobel <= abs_jsobel))
+pts = (pts_plus | pts_minus)
+pts = (eroded_mask & pts)
+c1 = magnitude[:, 1:][pts[:, :(- 1)]]
+c2 = magnitude[1:, 1:][pts[:(- 1), :(- 1)]]
+m = magnitude[pts]
+w = (abs_isobel[pts] / abs_jsobel[pts])
+c_plus = (((c2 * w) + (c1 * (1 - w))) <= m)
+c1 = magnitude[:, :(- 1)][pts[:, 1:]]
+c2 = magnitude[:(- 1), :(- 1)][pts[1:, 1:]]
+c_minus = (((c2 * w) + (c1 * (1 - w))) <= m)
+local_maxima[pts] = (c_plus & c_minus)
+pts_plus = (((isobel <= 0) & (jsobel >= 0)) & (abs_isobel <= abs_jsobel))
+pts_minus = (((isobel >= 0) & (jsobel <= 0)) & (abs_isobel <= abs_jsobel))
+pts = (pts_plus | pts_minus)
+pts = (eroded_mask & pts)
+c1a = magnitude[:, 1:][pts[:, :(- 1)]]
+c2a = magnitude[:(- 1), 1:][pts[1:, :(- 1)]]
+m = magnitude[pts]
+w = (abs_isobel[pts] / abs_jsobel[pts])
+c_plus = (((c2a * w) + (c1a * (1.0 - w))) <= m)
+c1 = magnitude[:, :(- 1)][pts[:, 1:]]
+c2 = magnitude[1:, :(- 1)][pts[:(- 1), 1:]]
+c_minus = (((c2 * w) + (c1 * (1.0 - w))) <= m)
+local_maxima[pts] = (c_plus & c_minus)
+pts_plus = (((isobel <= 0) & (jsobel >= 0)) & (abs_isobel >= abs_jsobel))
+pts_minus = (((isobel >= 0) & (jsobel <= 0)) & (abs_isobel >= abs_jsobel))
+pts = (pts_plus | pts_minus)
+pts = (eroded_mask & pts)
+c1 = magnitude[:(- 1), :][pts[1:, :]]
+c2 = magnitude[:(- 1), 1:][pts[1:, :(- 1)]]
+m = magnitude[pts]
+w = (abs_jsobel[pts] / abs_isobel[pts])
+c_plus = (((c2 * w) + (c1 * (1 - w))) <= m)
+c1 = magnitude[1:, :][pts[:(- 1), :]]
+c2 = magnitude[1:, :(- 1)][pts[:(- 1), 1:]]
+c_minus = (((c2 * w) + (c1 * (1 - w))) <= m)
+local_maxima[pts] = (c_plus & c_minus)
+if use_quantiles:
+    if ((high_threshold > 1.0) or (low_threshold > 1.0)):
+        raise ValueError('Quantile thresholds must not be > 1.0')
+    if ((high_threshold < 0.0) or (low_threshold < 0.0)):
+        raise ValueError('Quantile thresholds must not be < 0.0')
+    high_threshold = numpy.percentile(magnitude, (100.0 * high_threshold))
+    tempResult = percentile(magnitude, (100.0 * low_threshold))
+	
+***************************************************	
+sunpy_sunpy-0.8.0: 0	
+***************************************************	
+spacetelescope_synphot-0.1: 0	
+***************************************************	
+librosa_librosa-0.5.1: 5	
+===================================================================	
+cmap: 94	
+----------------------------	
+
+'Get a default colormap from the given data.\n\n    If the data is boolean, use a black and white colormap.\n\n    If the data has both positive and negative values,\n    use a diverging colormap.\n\n    Otherwise, use a sequential colormap.\n\n    Parameters\n    ----------\n    data : np.ndarray\n        Input data\n\n    robust : bool\n        If True, discard the top and bottom 2% of data when calculating\n        range.\n\n    cmap_seq : str\n        The sequential colormap name\n\n    cmap_bool : str\n        The boolean colormap name\n\n    cmap_div : str\n        The diverging colormap name\n\n    Returns\n    -------\n    cmap : matplotlib.colors.Colormap\n        The colormap to use for `data`\n\n    See Also\n    --------\n    matplotlib.pyplot.colormaps\n    '
+data = numpy.atleast_1d(data)
+if (data.dtype == 'bool'):
+    return matplotlib.pyplot.get_cmap(cmap_bool)
+data = data[numpy.isfinite(data)]
+if robust:
+    (min_p, max_p) = (2, 98)
+else:
+    (min_p, max_p) = (0, 100)
+tempResult = percentile(data, max_p)
+	
+===================================================================	
+cmap: 95	
+----------------------------	
+
+'Get a default colormap from the given data.\n\n    If the data is boolean, use a black and white colormap.\n\n    If the data has both positive and negative values,\n    use a diverging colormap.\n\n    Otherwise, use a sequential colormap.\n\n    Parameters\n    ----------\n    data : np.ndarray\n        Input data\n\n    robust : bool\n        If True, discard the top and bottom 2% of data when calculating\n        range.\n\n    cmap_seq : str\n        The sequential colormap name\n\n    cmap_bool : str\n        The boolean colormap name\n\n    cmap_div : str\n        The diverging colormap name\n\n    Returns\n    -------\n    cmap : matplotlib.colors.Colormap\n        The colormap to use for `data`\n\n    See Also\n    --------\n    matplotlib.pyplot.colormaps\n    '
+data = numpy.atleast_1d(data)
+if (data.dtype == 'bool'):
+    return matplotlib.pyplot.get_cmap(cmap_bool)
+data = data[numpy.isfinite(data)]
+if robust:
+    (min_p, max_p) = (2, 98)
+else:
+    (min_p, max_p) = (0, 100)
+max_val = numpy.percentile(data, max_p)
+tempResult = percentile(data, min_p)
+	
+===================================================================	
+__test: 64	
+----------------------------	
+
+C2 = librosa.hybrid_cqt(y, sr=sr, hop_length=hop_length, fmin=fmin, n_bins=n_bins, bins_per_octave=bins_per_octave, tuning=tuning, filter_scale=resolution, norm=norm, sparsity=sparsity)
+C1 = numpy.abs(librosa.cqt(y, sr=sr, hop_length=hop_length, fmin=fmin, n_bins=n_bins, bins_per_octave=bins_per_octave, tuning=tuning, filter_scale=resolution, norm=norm, sparsity=sparsity))
+eq_(C1.shape, C2.shape)
+idx1 = (C1 > (0.0001 * C1.max()))
+idx2 = (C2 > (0.0001 * C2.max()))
+perc = 0.99
+thresh = 0.001
+idx = (idx1 | idx2)
+tempResult = percentile(numpy.abs((C1[idx] - C2[idx])), perc)
+	
+===================================================================	
+test_hpss: 73	
+----------------------------	
+
+(y, sr) = librosa.load(__EXAMPLE_FILE)
+(y_harm, y_perc) = librosa.effects.hpss(y)
+y_residual = ((y - y_harm) - y_perc)
+rms_orig = librosa.feature.rmse(y=y)
+rms_res = librosa.feature.rmse(y=y_residual)
+tempResult = percentile(rms_orig, 0.01)
+	
+===================================================================	
+test_hpss: 73	
+----------------------------	
+
+(y, sr) = librosa.load(__EXAMPLE_FILE)
+(y_harm, y_perc) = librosa.effects.hpss(y)
+y_residual = ((y - y_harm) - y_perc)
+rms_orig = librosa.feature.rmse(y=y)
+rms_res = librosa.feature.rmse(y=y_residual)
+tempResult = percentile(rms_res, 0.99)
+	
+***************************************************	
+mne_python-0.15.0: 6	
+===================================================================	
+test_scaler: 52	
+----------------------------	
+
+'Test methods of Scaler.'
+raw = mne.io.read_raw_fif(raw_fname)
+events = read_events(event_name)
+picks = pick_types(raw.info, meg=True, stim=False, ecg=False, eog=False, exclude='bads')
+picks = picks[1:13:3]
+epochs = Epochs(raw, events, event_id, tmin, tmax, picks=picks, baseline=(None, 0), preload=True)
+epochs_data = epochs.get_data()
+y = epochs.events[:, (- 1)]
+methods = (None, dict(mag=5, grad=10, eeg=20), 'mean', 'median')
+infos = (epochs.info, epochs.info, None, None)
+epochs_data_t = epochs_data.transpose([1, 0, 2])
+for (method, info) in zip(methods, infos):
+    if ((method == 'median') and (not check_version('sklearn', '0.17'))):
+        assert_raises(ValueError, Scaler, info, method)
+        continue
+    if ((method == 'mean') and (not check_version('sklearn', ''))):
+        assert_raises(ImportError, Scaler, info, method)
+        continue
+    scaler = Scaler(info, method)
+    X = scaler.fit_transform(epochs_data, y)
+    assert_equal(X.shape, epochs_data.shape)
+    if ((method is None) or isinstance(method, dict)):
+        sd = (DEFAULTS['scalings'] if (method is None) else method)
+        stds = numpy.zeros(len(picks))
+        for key in ('mag', 'grad'):
+            stds[pick_types(epochs.info, meg=key)] = (1.0 / sd[key])
+        stds[pick_types(epochs.info, meg=False, eeg=True)] = (1.0 / sd['eeg'])
+        means = numpy.zeros(len(epochs.ch_names))
+    elif (method == 'mean'):
+        stds = numpy.array([numpy.std(ch_data) for ch_data in epochs_data_t])
+        means = numpy.array([numpy.mean(ch_data) for ch_data in epochs_data_t])
+    else:
+        tempResult = percentile(ch_data, [25, 50, 75])
+	
+===================================================================	
+_bootstrap_ci: 77	
+----------------------------	
+
+'Get confidence intervals from non-parametric bootstrap.'
+if (stat_fun == 'mean'):
+
+    def stat_fun(x):
+        return x.mean(axis=0)
+elif (stat_fun == 'median'):
+
+    def stat_fun(x):
+        return numpy.median(x, axis=0)
+elif (not callable(stat_fun)):
+    raise ValueError("stat_fun must be 'mean', 'median' or callable.")
+n_trials = arr.shape[0]
+indices = numpy.arange(n_trials, dtype=int)
+rng = check_random_state(random_state)
+boot_indices = rng.choice(indices, replace=True, size=(n_bootstraps, len(indices)))
+stat = numpy.array([stat_fun(arr[inds]) for inds in boot_indices])
+ci = ((((1 - ci) / 2) * 100), ((1 - ((1 - ci) / 2)) * 100))
+tempResult = percentile(stat, ci, axis=0)
+	
+===================================================================	
+test_accuracy: 249	
+----------------------------	
+
+'Test dipole fitting to sub-mm accuracy.'
+evoked = read_evokeds(fname_evo)[0].crop(0.0, 0.0)
+evoked.pick_types(meg=True, eeg=False)
+evoked.pick_channels([c for c in evoked.ch_names[::4]])
+for (rad, perc_90) in zip((0.09, None), (0.002, 0.004)):
+    bem = make_sphere_model('auto', rad, evoked.info, relative_radii=(0.999, 0.998, 0.997, 0.995))
+    src = read_source_spaces(fname_src)
+    fwd = make_forward_solution(evoked.info, None, src, bem)
+    fwd = convert_forward_solution(fwd, force_fixed=True, use_cps=True)
+    vertices = [src[0]['vertno'], src[1]['vertno']]
+    n_vertices = sum((len(v) for v in vertices))
+    amp = 1e-08
+    data = numpy.eye((n_vertices + 1))[:n_vertices]
+    data[((- 1), (- 1))] = 1.0
+    data *= amp
+    stc = SourceEstimate(data, vertices, 0.0, 0.001, 'sample')
+    evoked.info.normalize_proj()
+    sim = simulate_evoked(fwd, stc, evoked.info, cov=None, nave=numpy.inf)
+    cov = make_ad_hoc_cov(evoked.info)
+    dip = fit_dipole(sim, cov, bem, min_dist=0.001)[0]
+    ds = []
+    for vi in range(n_vertices):
+        if (vi < len(vertices[0])):
+            hi = 0
+            vertno = vi
+        else:
+            hi = 1
+            vertno = (vi - len(vertices[0]))
+        vertno = src[hi]['vertno'][vertno]
+        rr = src[hi]['rr'][vertno]
+        d = numpy.sqrt(numpy.sum(((rr - dip.pos[vi]) ** 2)))
+        ds.append(d)
+    tempResult = percentile(ds, [50, 90])
+	
+===================================================================	
+_compute_scalings: 1102	
+----------------------------	
+
+"Compute scalings for each channel type automatically.\n\n    Parameters\n    ----------\n    scalings : dict\n        The scalings for each channel type. If any values are\n        'auto', this will automatically compute a reasonable\n        scaling for that channel type. Any values that aren't\n        'auto' will not be changed.\n    inst : instance of Raw or Epochs\n        The data for which you want to compute scalings. If data\n        is not preloaded, this will read a subset of times / epochs\n        up to 100mb in size in order to compute scalings.\n\n    Returns\n    -------\n    scalings : dict\n        A scalings dictionary with updated values\n    "
+from ..io.base import BaseRaw
+from ..epochs import BaseEpochs
+if (not isinstance(inst, (BaseRaw, BaseEpochs))):
+    raise ValueError('Must supply either Raw or Epochs')
+if (scalings is None):
+    return scalings
+ch_types = channel_indices_by_type(inst.info)
+ch_types = dict([(i_type, i_ixs) for (i_type, i_ixs) in ch_types.items() if (len(i_ixs) != 0)])
+if (scalings == 'auto'):
+    scalings = dict(((i_type, 'auto') for i_type in ch_types.keys()))
+if (not isinstance(scalings, dict)):
+    raise ValueError(('scalings must be a dictionary of ch_type: val pairs, not type %s ' % type(scalings)))
+scalings = deepcopy(scalings)
+if (inst.preload is False):
+    if isinstance(inst, BaseRaw):
+        n_times = (100000000.0 // (len(inst.ch_names) * 8))
+        n_times = numpy.clip(n_times, 1, inst.n_times)
+        n_secs = (n_times / float(inst.info['sfreq']))
+        time_middle = numpy.mean(inst.times)
+        tmin = numpy.clip((time_middle - (n_secs / 2.0)), inst.times.min(), None)
+        tmax = numpy.clip((time_middle + (n_secs / 2.0)), None, inst.times.max())
+        data = inst._read_segment(tmin, tmax)
+    elif isinstance(inst, BaseEpochs):
+        n_epochs = (100000000.0 // ((len(inst.ch_names) * len(inst.times)) * 8))
+        n_epochs = int(numpy.clip(n_epochs, 1, len(inst)))
+        ixs_epochs = numpy.random.choice(range(len(inst)), n_epochs, False)
+        inst = inst.copy()[ixs_epochs].load_data()
+else:
+    data = inst._data
+if isinstance(inst, BaseEpochs):
+    data = inst._data.reshape([len(inst.ch_names), (- 1)])
+for (key, value) in scalings.items():
+    if (value != 'auto'):
+        continue
+    if (key not in ch_types.keys()):
+        raise ValueError("Sensor {0} doesn't exist in data".format(key))
+    this_data = data[ch_types[key]]
+    tempResult = percentile(this_data.ravel(), [0.5, 99.5])
+	
+===================================================================	
+_limits_to_control_points: 904	
+----------------------------	
+
+"Convert limits (values or percentiles) to control points.\n\n    Note: If using 'mne', generate cmap control points for a directly\n    mirrored cmap for simplicity (i.e., no normalization is computed to account\n    for a 2-tailed mne cmap).\n\n    Parameters\n    ----------\n    clim : str | dict\n        Desired limits use to set cmap control points.\n\n    Returns\n    -------\n    ctrl_pts : list (length 3)\n        Array of floats corresponding to values to use as cmap control points.\n    colormap : str\n        The colormap.\n    "
+if (colormap == 'auto'):
+    if (clim == 'auto'):
+        colormap = ('mne' if (stc_data < 0).any() else 'hot')
+    elif ('lims' in clim):
+        colormap = 'hot'
+    else:
+        colormap = 'mne'
+if (clim == 'auto'):
+    tempResult = percentile(numpy.abs(stc_data), [96, 97.5, 99.95])
+	
+===================================================================	
+_limits_to_control_points: 911	
+----------------------------	
+
+"Convert limits (values or percentiles) to control points.\n\n    Note: If using 'mne', generate cmap control points for a directly\n    mirrored cmap for simplicity (i.e., no normalization is computed to account\n    for a 2-tailed mne cmap).\n\n    Parameters\n    ----------\n    clim : str | dict\n        Desired limits use to set cmap control points.\n\n    Returns\n    -------\n    ctrl_pts : list (length 3)\n        Array of floats corresponding to values to use as cmap control points.\n    colormap : str\n        The colormap.\n    "
+if (colormap == 'auto'):
+    if (clim == 'auto'):
+        colormap = ('mne' if (stc_data < 0).any() else 'hot')
+    elif ('lims' in clim):
+        colormap = 'hot'
+    else:
+        colormap = 'mne'
+if (clim == 'auto'):
+    ctrl_pts = numpy.percentile(numpy.abs(stc_data), [96, 97.5, 99.95])
+elif isinstance(clim, dict):
+    limit_key = ['lims', 'pos_lims'][(colormap in ('mne', 'mne_analyze'))]
+    if ((colormap != 'auto') and (limit_key not in clim.keys())):
+        raise KeyError('"pos_lims" must be used with "mne" colormap')
+    clim['kind'] = clim.get('kind', 'percent')
+    if (clim['kind'] == 'percent'):
+        tempResult = percentile(numpy.abs(stc_data), list(numpy.abs(clim[limit_key])))
+	
+***************************************************	
+astropy_astropy-1.3.0: 3	
+===================================================================	
+freedman_bin_width: 53	
+----------------------------	
+
+'Return the optimal histogram bin width using the Freedman-Diaconis rule\n\n    The Freedman-Diaconis rule is a normal reference rule like Scott\'s\n    rule, but uses rank-based statistics for results which are more robust\n    to deviations from a normal distribution.\n\n    Parameters\n    ----------\n    data : array-like, ndim=1\n        observed (one-dimensional) data\n    return_bins : bool (optional)\n        if True, then return the bin edges\n\n    Returns\n    -------\n    width : float\n        optimal bin width using the Freedman-Diaconis rule\n    bins : ndarray\n        bin edges: returned if ``return_bins`` is True\n\n    Notes\n    -----\n    The optimal bin width is\n\n    .. math::\n        \\Delta_b = \\frac{2(q_{75} - q_{25})}{n^{1/3}}\n\n    where :math:`q_{N}` is the :math:`N` percent quartile of the data, and\n    :math:`n` is the number of data points [1]_.\n\n    References\n    ----------\n    .. [1] D. Freedman & P. Diaconis (1981)\n       "On the histogram as a density estimator: L2 theory".\n       Probability Theory and Related Fields 57 (4): 453-476\n\n    See Also\n    --------\n    knuth_bin_width\n    scott_bin_width\n    bayesian_blocks\n    histogram\n    '
+data = numpy.asarray(data)
+if (data.ndim != 1):
+    raise ValueError('data should be one-dimensional')
+n = data.size
+if (n < 4):
+    raise ValueError('data should have more than three entries')
+tempResult = percentile(data, [25, 75])
+	
+===================================================================	
+test_freedman_bin_width: 27	
+----------------------------	
+
+rng = numpy.random.RandomState(rseed)
+X = rng.randn(N)
+tempResult = percentile(X, [25, 75])
+	
+===================================================================	
+AsymmetricPercentileInterval.get_limits: 65	
+----------------------------	
+
+values = np.asarray(values).ravel()
+if ((self.n_samples is not None) and (values.size > self.n_samples)):
+    values = numpy.random.choice(values, self.n_samples)
+values = values[numpy.isfinite(values)]
+tempResult = percentile(values, (self.lower_percentile, self.upper_percentile))
+	
+***************************************************	
+scipy_scipy-0.19.0: 3	
+===================================================================	
+_iqr_percentile: 612	
+----------------------------	
+'\n    Private wrapper that works around older versions of `numpy`.\n\n    While this function is pretty much necessary for the moment, it\n    should be removed as soon as the minimum supported numpy version\n    allows.\n    '
+if (contains_nan and (NumpyVersion(np.__version__) < '1.10.0a')):
+    msg = "Keyword nan_policy='propagate' not correctly supported for numpy versions < 1.10.x. The default behavior of `numpy.percentile` will be used."
+    warnings.warn(msg, RuntimeWarning)
+try:
+    tempResult = percentile(x, q, axis=axis, keepdims=keepdims, interpolation=interpolation)	
+===================================================================	
+_iqr_percentile: 633	
+----------------------------	
+
+'\n    Private wrapper that works around older versions of `numpy`.\n\n    While this function is pretty much necessary for the moment, it\n    should be removed as soon as the minimum supported numpy version\n    allows.\n    '
+if (contains_nan and (NumpyVersion(numpy.__version__) < '1.10.0a')):
+    msg = "Keyword nan_policy='propagate' not correctly supported for numpy versions < 1.10.x. The default behavior of `numpy.percentile` will be used."
+    warnings.warn(msg, RuntimeWarning)
+try:
+    result = numpy.percentile(x, q, axis=axis, keepdims=keepdims, interpolation=interpolation)
+except TypeError:
+    if ((interpolation != 'linear') or keepdims):
+        warnings.warn('Keywords interpolation and keepdims not supported for your version of numpy', RuntimeWarning)
+    try:
+        original_size = len(axis)
+    except TypeError:
+        pass
+    else:
+        axis = numpy.unique((numpy.asarray(axis) % x.ndim))
+        if (original_size > axis.size):
+            raise ValueError('duplicate value in axis')
+        if (axis.size == x.ndim):
+            axis = None
+        elif (axis.size == 1):
+            axis = axis[0]
+        else:
+            for ax in axis[::(- 1)]:
+                x = numpy.rollaxis(x, ax, x.ndim)
+            x = x.reshape((x.shape[:(- axis.size)] + (numpy.prod(x.shape[(- axis.size):]),)))
+            axis = (- 1)
+    tempResult = percentile(x, q, axis=axis)
+	
+===================================================================	
+cauchy_gen._fitstart: 444	
+----------------------------	
+
+tempResult = percentile(data, [25, 50, 75])
+	
+***************************************************	
+sklearn_sklearn-0.18.0: 7	
+===================================================================	
+DummyRegressor.fit: 174	
+----------------------------	
+
+'Fit the random regressor.\n\n        Parameters\n        ----------\n        X : {array-like, sparse matrix}, shape = [n_samples, n_features]\n            Training vectors, where n_samples is the number of samples\n            and n_features is the number of features.\n\n        y : array-like, shape = [n_samples] or [n_samples, n_outputs]\n            Target values.\n\n        sample_weight : array-like of shape = [n_samples], optional\n            Sample weights.\n\n        Returns\n        -------\n        self : object\n            Returns self.\n        '
+if (self.strategy not in ('mean', 'median', 'quantile', 'constant')):
+    raise ValueError(("Unknown strategy type: %s, expected 'mean', 'median', 'quantile' or 'constant'" % self.strategy))
+y = check_array(y, ensure_2d=False)
+if (len(y) == 0):
+    raise ValueError('y must not be empty.')
+self.output_2d_ = (y.ndim == 2)
+if (y.ndim == 1):
+    y = numpy.reshape(y, ((- 1), 1))
+self.n_outputs_ = y.shape[1]
+check_consistent_length(X, y, sample_weight)
+if (self.strategy == 'mean'):
+    self.constant_ = numpy.average(y, axis=0, weights=sample_weight)
+elif (self.strategy == 'median'):
+    if (sample_weight is None):
+        self.constant_ = numpy.median(y, axis=0)
+    else:
+        self.constant_ = [_weighted_percentile(y[:, k], sample_weight, percentile=50.0) for k in range(self.n_outputs_)]
+elif (self.strategy == 'quantile'):
+    if ((self.quantile is None) or (not numpy.isscalar(self.quantile))):
+        raise ValueError(('Quantile must be a scalar in the range [0.0, 1.0], but got %s.' % self.quantile))
+    percentile = (self.quantile * 100.0)
+    if (sample_weight is None):
+        tempResult = percentile(y, axis=0, q=percentile)
+	
+===================================================================	
+RobustScaler.fit: 373	
+----------------------------	
+
+'Compute the median and quantiles to be used for scaling.\n\n        Parameters\n        ----------\n        X : array-like, shape [n_samples, n_features]\n            The data used to compute the median and quantiles\n            used for later scaling along the features axis.\n        '
+if scipy.sparse.issparse(X):
+    raise TypeError('RobustScaler cannot be fitted on sparse inputs')
+X = self._check_array(X, self.copy)
+if (X.ndim == 1):
+    warnings.warn(DEPRECATION_MSG_1D, DeprecationWarning)
+if self.with_centering:
+    self.center_ = numpy.median(X, axis=0)
+if self.with_scaling:
+    (q_min, q_max) = self.quantile_range
+    if (not (0 <= q_min <= q_max <= 100)):
+        raise ValueError(('Invalid quantile range: %s' % str(self.quantile_range)))
+    tempResult = percentile(X, self.quantile_range, axis=0)
+	
+===================================================================	
+test_robust_scale_axis1: 624	
+----------------------------	
+
+X = iris.data
+X_trans = robust_scale(X, axis=1)
+assert_array_almost_equal(numpy.median(X_trans, axis=1), 0)
+tempResult = percentile(X_trans, q=(25, 75), axis=1)
+	
+===================================================================	
+test_robust_scaler_iris_quantiles: 590	
+----------------------------	
+
+X = iris.data
+scaler = RobustScaler(quantile_range=(10, 90))
+X_trans = scaler.fit_transform(X)
+assert_array_almost_equal(numpy.median(X_trans, axis=0), 0)
+X_trans_inv = scaler.inverse_transform(X_trans)
+assert_array_almost_equal(X, X_trans_inv)
+tempResult = percentile(X_trans, q=(10, 90), axis=0)
+	
+===================================================================	
+test_robust_scaler_iris: 579	
+----------------------------	
+
+X = iris.data
+scaler = RobustScaler()
+X_trans = scaler.fit_transform(X)
+assert_array_almost_equal(numpy.median(X_trans, axis=0), 0)
+X_trans_inv = scaler.inverse_transform(X_trans)
+assert_array_almost_equal(X, X_trans_inv)
+tempResult = percentile(X_trans, q=(25, 75), axis=0)
+	
+===================================================================	
+test_quantile_strategy_regressor: 212	
+----------------------------	
+
+random_state = numpy.random.RandomState(seed=1)
+X = ([[0]] * 5)
+y = random_state.randn(5)
+reg = DummyRegressor(strategy='quantile', quantile=0.5)
+reg.fit(X, y)
+assert_array_equal(reg.predict(X), ([numpy.median(y)] * len(X)))
+reg = DummyRegressor(strategy='quantile', quantile=0)
+reg.fit(X, y)
+assert_array_equal(reg.predict(X), ([numpy.min(y)] * len(X)))
+reg = DummyRegressor(strategy='quantile', quantile=1)
+reg.fit(X, y)
+assert_array_equal(reg.predict(X), ([numpy.max(y)] * len(X)))
+reg = DummyRegressor(strategy='quantile', quantile=0.3)
+reg.fit(X, y)
+tempResult = percentile(y, q=30)
+	
+===================================================================	
+test_quantile_strategy_multioutput_regressor: 219	
+----------------------------	
+
+random_state = numpy.random.RandomState(seed=1)
+X_learn = random_state.randn(10, 10)
+y_learn = random_state.randn(10, 5)
+median = np.median(y_learn, axis=0).reshape((1, (- 1)))
+tempResult = percentile(y_learn, axis=0, q=80)
+	
+***************************************************	
+matplotlib_matplotlib-2.0.0: 5	
+===================================================================	
+module: 32	
+----------------------------	
+
+'\n=================================\nDemo of violin plot customization\n=================================\n\nThis example demonstrates how to fully customize violin plots.\nThe first plot shows the default style by providing only\nthe data. The second plot first limits what matplotlib draws\nwith additional kwargs. Then a simplified representation of\na box plot is drawn on top. Lastly, the styles of the artists\nof the violins are modified.\n\nFor more information on violin plots, the scikit-learn docs have a great\nsection: http://scikit-learn.org/stable/modules/density.html\n'
+import matplotlib.pyplot as plt
+import numpy as np
+
+def adjacent_values(vals, q1, q3):
+    upper_adjacent_value = (q3 + ((q3 - q1) * 1.5))
+    upper_adjacent_value = numpy.clip(upper_adjacent_value, q3, vals[(- 1)])
+    lower_adjacent_value = (q1 - ((q3 - q1) * 1.5))
+    lower_adjacent_value = numpy.clip(lower_adjacent_value, vals[0], q1)
+    return (lower_adjacent_value, upper_adjacent_value)
+
+def set_axis_style(ax, labels):
+    ax.get_xaxis().set_tick_params(direction='out')
+    ax.xaxis.set_ticks_position('bottom')
+    ax.set_xticks(numpy.arange(1, (len(labels) + 1)))
+    ax.set_xticklabels(labels)
+    ax.set_xlim(0.25, (len(labels) + 0.75))
+    ax.set_xlabel('Sample name')
+numpy.random.seed(123)
+data = [sorted(numpy.random.normal(0, std, 100)) for std in range(1, 5)]
+(fig, (ax1, ax2)) = matplotlib.pyplot.subplots(nrows=1, ncols=2, figsize=(9, 4), sharey=True)
+ax1.set_title('Default violin plot')
+ax1.set_ylabel('Observed values')
+ax1.violinplot(data)
+ax2.set_title('Customized violin plot')
+parts = ax2.violinplot(data, showmeans=False, showmedians=False, showextrema=False)
+for pc in parts['bodies']:
+    pc.set_facecolor('#D43F3A')
+    pc.set_edgecolor('black')
+    pc.set_alpha(1)
+tempResult = percentile(data, [25, 50, 75], axis=1)
+	
+===================================================================	
+_bootstrap_median: 1218	
+----------------------------	
+
+M = len(data)
+percentiles = [2.5, 97.5]
+ii = numpy.random.randint(M, size=(N, M))
+bsData = x[ii]
+estimate = numpy.median(bsData, axis=1, overwrite_input=True)
+tempResult = percentile(estimate, percentiles)
+	
+===================================================================	
+boxplot_stats: 1259	
+----------------------------	
+
+'\n    Returns list of dictionaries of statistics used to draw a series\n    of box and whisker plots. The `Returns` section enumerates the\n    required keys of the dictionary. Users can skip this function and\n    pass a user-defined set of dictionaries to the new `axes.bxp` method\n    instead of relying on MPL to do the calculations.\n\n    Parameters\n    ----------\n    X : array-like\n        Data that will be represented in the boxplots. Should have 2 or\n        fewer dimensions.\n\n    whis : float, string, or sequence (default = 1.5)\n        As a float, determines the reach of the whiskers past the first\n        and third quartiles (e.g., Q3 + whis*IQR, QR = interquartile\n        range, Q3-Q1). Beyond the whiskers, data are considered outliers\n        and are plotted as individual points. This can be set this to an\n        ascending sequence of percentile (e.g., [5, 95]) to set the\n        whiskers at specific percentiles of the data. Finally, `whis`\n        can be the string ``\'range\'`` to force the whiskers to the\n        minimum and maximum of the data. In the edge case that the 25th\n        and 75th percentiles are equivalent, `whis` can be automatically\n        set to ``\'range\'`` via the `autorange` option.\n\n    bootstrap : int, optional\n        Number of times the confidence intervals around the median\n        should be bootstrapped (percentile method).\n\n    labels : array-like, optional\n        Labels for each dataset. Length must be compatible with\n        dimensions of `X`.\n\n    autorange : bool, optional (False)\n        When `True` and the data are distributed such that the  25th and\n        75th percentiles are equal, ``whis`` is set to ``\'range\'`` such\n        that the whisker ends are at the minimum and maximum of the\n        data.\n\n    Returns\n    -------\n    bxpstats : list of dict\n        A list of dictionaries containing the results for each column\n        of data. Keys of each dictionary are the following:\n\n        ========   ===================================\n        Key        Value Description\n        ========   ===================================\n        label      tick label for the boxplot\n        mean       arithemetic mean value\n        med        50th percentile\n        q1         first quartile (25th percentile)\n        q3         third quartile (75th percentile)\n        cilo       lower notch around the median\n        cihi       upper notch around the median\n        whislo     end of the lower whisker\n        whishi     end of the upper whisker\n        fliers     outliers\n        ========   ===================================\n\n    Notes\n    -----\n    Non-bootstrapping approach to confidence interval uses Gaussian-\n    based asymptotic approximation:\n\n    .. math::\n\n        \\mathrm{med} \\pm 1.57 \\times \\frac{\\mathrm{iqr}}{\\sqrt{N}}\n\n    General approach from:\n    McGill, R., Tukey, J.W., and Larsen, W.A. (1978) "Variations of\n    Boxplots", The American Statistician, 32:12-16.\n\n    '
+
+def _bootstrap_median(data, N=5000):
+    M = len(data)
+    percentiles = [2.5, 97.5]
+    ii = numpy.random.randint(M, size=(N, M))
+    bsData = x[ii]
+    estimate = numpy.median(bsData, axis=1, overwrite_input=True)
+    CI = numpy.percentile(estimate, percentiles)
+    return CI
+
+def _compute_conf_interval(data, med, iqr, bootstrap):
+    if (bootstrap is not None):
+        CI = _bootstrap_median(data, N=bootstrap)
+        notch_min = CI[0]
+        notch_max = CI[1]
+    else:
+        N = len(data)
+        notch_min = (med - ((1.57 * iqr) / numpy.sqrt(N)))
+        notch_max = (med + ((1.57 * iqr) / numpy.sqrt(N)))
+    return (notch_min, notch_max)
+bxpstats = []
+X = _reshape_2D(X)
+ncols = len(X)
+if (labels is None):
+    labels = repeat(None)
+elif (len(labels) != ncols):
+    raise ValueError('Dimensions of labels and X must be compatible')
+input_whis = whis
+for (ii, (x, label)) in enumerate(zip(X, labels), start=0):
+    stats = {}
+    if (label is not None):
+        stats['label'] = label
+    whis = input_whis
+    bxpstats.append(stats)
+    if (len(x) == 0):
+        stats['fliers'] = numpy.array([])
+        stats['mean'] = numpy.nan
+        stats['med'] = numpy.nan
+        stats['q1'] = numpy.nan
+        stats['q3'] = numpy.nan
+        stats['cilo'] = numpy.nan
+        stats['cihi'] = numpy.nan
+        stats['whislo'] = numpy.nan
+        stats['whishi'] = numpy.nan
+        stats['med'] = numpy.nan
+        continue
+    x = numpy.asarray(x)
+    stats['mean'] = numpy.mean(x)
+    tempResult = percentile(x, [25, 50, 75])
+	
+===================================================================	
+boxplot_stats: 1275	
+----------------------------	
+
+'\n    Returns list of dictionaries of statistics used to draw a series\n    of box and whisker plots. The `Returns` section enumerates the\n    required keys of the dictionary. Users can skip this function and\n    pass a user-defined set of dictionaries to the new `axes.bxp` method\n    instead of relying on MPL to do the calculations.\n\n    Parameters\n    ----------\n    X : array-like\n        Data that will be represented in the boxplots. Should have 2 or\n        fewer dimensions.\n\n    whis : float, string, or sequence (default = 1.5)\n        As a float, determines the reach of the whiskers past the first\n        and third quartiles (e.g., Q3 + whis*IQR, QR = interquartile\n        range, Q3-Q1). Beyond the whiskers, data are considered outliers\n        and are plotted as individual points. This can be set this to an\n        ascending sequence of percentile (e.g., [5, 95]) to set the\n        whiskers at specific percentiles of the data. Finally, `whis`\n        can be the string ``\'range\'`` to force the whiskers to the\n        minimum and maximum of the data. In the edge case that the 25th\n        and 75th percentiles are equivalent, `whis` can be automatically\n        set to ``\'range\'`` via the `autorange` option.\n\n    bootstrap : int, optional\n        Number of times the confidence intervals around the median\n        should be bootstrapped (percentile method).\n\n    labels : array-like, optional\n        Labels for each dataset. Length must be compatible with\n        dimensions of `X`.\n\n    autorange : bool, optional (False)\n        When `True` and the data are distributed such that the  25th and\n        75th percentiles are equal, ``whis`` is set to ``\'range\'`` such\n        that the whisker ends are at the minimum and maximum of the\n        data.\n\n    Returns\n    -------\n    bxpstats : list of dict\n        A list of dictionaries containing the results for each column\n        of data. Keys of each dictionary are the following:\n\n        ========   ===================================\n        Key        Value Description\n        ========   ===================================\n        label      tick label for the boxplot\n        mean       arithemetic mean value\n        med        50th percentile\n        q1         first quartile (25th percentile)\n        q3         third quartile (75th percentile)\n        cilo       lower notch around the median\n        cihi       upper notch around the median\n        whislo     end of the lower whisker\n        whishi     end of the upper whisker\n        fliers     outliers\n        ========   ===================================\n\n    Notes\n    -----\n    Non-bootstrapping approach to confidence interval uses Gaussian-\n    based asymptotic approximation:\n\n    .. math::\n\n        \\mathrm{med} \\pm 1.57 \\times \\frac{\\mathrm{iqr}}{\\sqrt{N}}\n\n    General approach from:\n    McGill, R., Tukey, J.W., and Larsen, W.A. (1978) "Variations of\n    Boxplots", The American Statistician, 32:12-16.\n\n    '
+
+def _bootstrap_median(data, N=5000):
+    M = len(data)
+    percentiles = [2.5, 97.5]
+    ii = numpy.random.randint(M, size=(N, M))
+    bsData = x[ii]
+    estimate = numpy.median(bsData, axis=1, overwrite_input=True)
+    CI = numpy.percentile(estimate, percentiles)
+    return CI
+
+def _compute_conf_interval(data, med, iqr, bootstrap):
+    if (bootstrap is not None):
+        CI = _bootstrap_median(data, N=bootstrap)
+        notch_min = CI[0]
+        notch_max = CI[1]
+    else:
+        N = len(data)
+        notch_min = (med - ((1.57 * iqr) / numpy.sqrt(N)))
+        notch_max = (med + ((1.57 * iqr) / numpy.sqrt(N)))
+    return (notch_min, notch_max)
+bxpstats = []
+X = _reshape_2D(X)
+ncols = len(X)
+if (labels is None):
+    labels = repeat(None)
+elif (len(labels) != ncols):
+    raise ValueError('Dimensions of labels and X must be compatible')
+input_whis = whis
+for (ii, (x, label)) in enumerate(zip(X, labels), start=0):
+    stats = {}
+    if (label is not None):
+        stats['label'] = label
+    whis = input_whis
+    bxpstats.append(stats)
+    if (len(x) == 0):
+        stats['fliers'] = numpy.array([])
+        stats['mean'] = numpy.nan
+        stats['med'] = numpy.nan
+        stats['q1'] = numpy.nan
+        stats['q3'] = numpy.nan
+        stats['cilo'] = numpy.nan
+        stats['cihi'] = numpy.nan
+        stats['whislo'] = numpy.nan
+        stats['whishi'] = numpy.nan
+        stats['med'] = numpy.nan
+        continue
+    x = numpy.asarray(x)
+    stats['mean'] = numpy.mean(x)
+    (q1, med, q3) = numpy.percentile(x, [25, 50, 75])
+    stats['iqr'] = (q3 - q1)
+    if ((stats['iqr'] == 0) and autorange):
+        whis = 'range'
+    (stats['cilo'], stats['cihi']) = _compute_conf_interval(x, med, stats['iqr'], bootstrap)
+    if numpy.isscalar(whis):
+        if numpy.isreal(whis):
+            loval = (q1 - (whis * stats['iqr']))
+            hival = (q3 + (whis * stats['iqr']))
+        elif (whis in ['range', 'limit', 'limits', 'min/max']):
+            loval = numpy.min(x)
+            hival = numpy.max(x)
+        else:
+            whismsg = 'whis must be a float, valid string, or list of percentiles'
+            raise ValueError(whismsg)
+    else:
+        tempResult = percentile(x, whis[0])
+	
+===================================================================	
+boxplot_stats: 1276	
+----------------------------	
+
+'\n    Returns list of dictionaries of statistics used to draw a series\n    of box and whisker plots. The `Returns` section enumerates the\n    required keys of the dictionary. Users can skip this function and\n    pass a user-defined set of dictionaries to the new `axes.bxp` method\n    instead of relying on MPL to do the calculations.\n\n    Parameters\n    ----------\n    X : array-like\n        Data that will be represented in the boxplots. Should have 2 or\n        fewer dimensions.\n\n    whis : float, string, or sequence (default = 1.5)\n        As a float, determines the reach of the whiskers past the first\n        and third quartiles (e.g., Q3 + whis*IQR, QR = interquartile\n        range, Q3-Q1). Beyond the whiskers, data are considered outliers\n        and are plotted as individual points. This can be set this to an\n        ascending sequence of percentile (e.g., [5, 95]) to set the\n        whiskers at specific percentiles of the data. Finally, `whis`\n        can be the string ``\'range\'`` to force the whiskers to the\n        minimum and maximum of the data. In the edge case that the 25th\n        and 75th percentiles are equivalent, `whis` can be automatically\n        set to ``\'range\'`` via the `autorange` option.\n\n    bootstrap : int, optional\n        Number of times the confidence intervals around the median\n        should be bootstrapped (percentile method).\n\n    labels : array-like, optional\n        Labels for each dataset. Length must be compatible with\n        dimensions of `X`.\n\n    autorange : bool, optional (False)\n        When `True` and the data are distributed such that the  25th and\n        75th percentiles are equal, ``whis`` is set to ``\'range\'`` such\n        that the whisker ends are at the minimum and maximum of the\n        data.\n\n    Returns\n    -------\n    bxpstats : list of dict\n        A list of dictionaries containing the results for each column\n        of data. Keys of each dictionary are the following:\n\n        ========   ===================================\n        Key        Value Description\n        ========   ===================================\n        label      tick label for the boxplot\n        mean       arithemetic mean value\n        med        50th percentile\n        q1         first quartile (25th percentile)\n        q3         third quartile (75th percentile)\n        cilo       lower notch around the median\n        cihi       upper notch around the median\n        whislo     end of the lower whisker\n        whishi     end of the upper whisker\n        fliers     outliers\n        ========   ===================================\n\n    Notes\n    -----\n    Non-bootstrapping approach to confidence interval uses Gaussian-\n    based asymptotic approximation:\n\n    .. math::\n\n        \\mathrm{med} \\pm 1.57 \\times \\frac{\\mathrm{iqr}}{\\sqrt{N}}\n\n    General approach from:\n    McGill, R., Tukey, J.W., and Larsen, W.A. (1978) "Variations of\n    Boxplots", The American Statistician, 32:12-16.\n\n    '
+
+def _bootstrap_median(data, N=5000):
+    M = len(data)
+    percentiles = [2.5, 97.5]
+    ii = numpy.random.randint(M, size=(N, M))
+    bsData = x[ii]
+    estimate = numpy.median(bsData, axis=1, overwrite_input=True)
+    CI = numpy.percentile(estimate, percentiles)
+    return CI
+
+def _compute_conf_interval(data, med, iqr, bootstrap):
+    if (bootstrap is not None):
+        CI = _bootstrap_median(data, N=bootstrap)
+        notch_min = CI[0]
+        notch_max = CI[1]
+    else:
+        N = len(data)
+        notch_min = (med - ((1.57 * iqr) / numpy.sqrt(N)))
+        notch_max = (med + ((1.57 * iqr) / numpy.sqrt(N)))
+    return (notch_min, notch_max)
+bxpstats = []
+X = _reshape_2D(X)
+ncols = len(X)
+if (labels is None):
+    labels = repeat(None)
+elif (len(labels) != ncols):
+    raise ValueError('Dimensions of labels and X must be compatible')
+input_whis = whis
+for (ii, (x, label)) in enumerate(zip(X, labels), start=0):
+    stats = {}
+    if (label is not None):
+        stats['label'] = label
+    whis = input_whis
+    bxpstats.append(stats)
+    if (len(x) == 0):
+        stats['fliers'] = numpy.array([])
+        stats['mean'] = numpy.nan
+        stats['med'] = numpy.nan
+        stats['q1'] = numpy.nan
+        stats['q3'] = numpy.nan
+        stats['cilo'] = numpy.nan
+        stats['cihi'] = numpy.nan
+        stats['whislo'] = numpy.nan
+        stats['whishi'] = numpy.nan
+        stats['med'] = numpy.nan
+        continue
+    x = numpy.asarray(x)
+    stats['mean'] = numpy.mean(x)
+    (q1, med, q3) = numpy.percentile(x, [25, 50, 75])
+    stats['iqr'] = (q3 - q1)
+    if ((stats['iqr'] == 0) and autorange):
+        whis = 'range'
+    (stats['cilo'], stats['cihi']) = _compute_conf_interval(x, med, stats['iqr'], bootstrap)
+    if numpy.isscalar(whis):
+        if numpy.isreal(whis):
+            loval = (q1 - (whis * stats['iqr']))
+            hival = (q3 + (whis * stats['iqr']))
+        elif (whis in ['range', 'limit', 'limits', 'min/max']):
+            loval = numpy.min(x)
+            hival = numpy.max(x)
+        else:
+            whismsg = 'whis must be a float, valid string, or list of percentiles'
+            raise ValueError(whismsg)
+    else:
+        loval = numpy.percentile(x, whis[0])
+        tempResult = percentile(x, whis[1])
+	
+***************************************************	
+ipython_ipython-6.1.0: 0	
+***************************************************	
+pandas_pandas-0.19.2: 6	
+===================================================================	
+Block._nanpercentile1D: 810	
+----------------------------	
+
+values = values[(~ mask)]
+if (len(values) == 0):
+    if is_scalar(q):
+        return self._na_value
+    else:
+        return numpy.array(([self._na_value] * len(q)), dtype=values.dtype)
+tempResult = percentile(values, q, **kw)
+	
+===================================================================	
+Block._nanpercentile: 827	
+----------------------------	
+
+mask = isnull(self.values)
+if ((not is_scalar(mask)) and mask.any()):
+    if (self.ndim == 1):
+        return _nanpercentile1D(values, mask, q, **kw)
+    else:
+        if (mask.ndim < values.ndim):
+            mask = mask.reshape(values.shape)
+        if (axis == 0):
+            values = values.T
+            mask = mask.T
+        result = [_nanpercentile1D(val, m, q, **kw) for (val, m) in zip(list(values), list(mask))]
+        result = np.array(result, dtype=values.dtype, copy=False).T
+        return result
+else:
+    tempResult = percentile(values, q, axis=axis, **kw)
+	
+===================================================================	
+TestDataFrameQuantile.test_quantile_interpolation: 75	
+----------------------------	
+
+if _np_version_under1p9:
+    raise nose.SkipTest('Numpy version under 1.9')
+from numpy import percentile
+q = self.tsframe.quantile(0.1, axis=0, interpolation='linear')
+self.assertEqual(q['A'], percentile(self.tsframe['A'], 10))
+q = self.intframe.quantile(0.1)
+self.assertEqual(q['A'], percentile(self.intframe['A'], 10))
+q1 = self.intframe.quantile(0.1)
+tempResult = percentile(self.intframe['A'], 10)
+	
+===================================================================	
+TestDataFrameQuantile.test_quantile_interpolation: 81	
+----------------------------	
+
+if _np_version_under1p9:
+    raise nose.SkipTest('Numpy version under 1.9')
+from numpy import percentile
+q = self.tsframe.quantile(0.1, axis=0, interpolation='linear')
+self.assertEqual(q['A'], percentile(self.tsframe['A'], 10))
+q = self.intframe.quantile(0.1)
+self.assertEqual(q['A'], percentile(self.intframe['A'], 10))
+q1 = self.intframe.quantile(0.1)
+self.assertEqual(q1['A'], numpy.percentile(self.intframe['A'], 10))
+assert_series_equal(q, q1)
+df = DataFrame({'A': [1, 2, 3], 'B': [2, 3, 4]}, index=[1, 2, 3])
+result = df.quantile(0.5, axis=1, interpolation='nearest')
+expected = Series([1, 2, 3], index=[1, 2, 3], name=0.5)
+assert_series_equal(result, expected)
+tempResult = percentile(numpy.array([[1, 2, 3], [2, 3, 4]]), 0.5, axis=0, interpolation='nearest')
+	
+===================================================================	
+TestDataFrameQuantile.test_quantile_interpolation: 88	
+----------------------------	
+
+if _np_version_under1p9:
+    raise nose.SkipTest('Numpy version under 1.9')
+from numpy import percentile
+q = self.tsframe.quantile(0.1, axis=0, interpolation='linear')
+self.assertEqual(q['A'], percentile(self.tsframe['A'], 10))
+q = self.intframe.quantile(0.1)
+self.assertEqual(q['A'], percentile(self.intframe['A'], 10))
+q1 = self.intframe.quantile(0.1)
+self.assertEqual(q1['A'], numpy.percentile(self.intframe['A'], 10))
+assert_series_equal(q, q1)
+df = DataFrame({'A': [1, 2, 3], 'B': [2, 3, 4]}, index=[1, 2, 3])
+result = df.quantile(0.5, axis=1, interpolation='nearest')
+expected = Series([1, 2, 3], index=[1, 2, 3], name=0.5)
+assert_series_equal(result, expected)
+exp = numpy.percentile(numpy.array([[1, 2, 3], [2, 3, 4]]), 0.5, axis=0, interpolation='nearest')
+expected = Series(exp, index=[1, 2, 3], name=0.5, dtype='int64')
+assert_series_equal(result, expected)
+df = DataFrame({'A': [1.0, 2.0, 3.0], 'B': [2.0, 3.0, 4.0]}, index=[1, 2, 3])
+result = df.quantile(0.5, axis=1, interpolation='nearest')
+expected = Series([1.0, 2.0, 3.0], index=[1, 2, 3], name=0.5)
+assert_series_equal(result, expected)
+tempResult = percentile(numpy.array([[1.0, 2.0, 3.0], [2.0, 3.0, 4.0]]), 0.5, axis=0, interpolation='nearest')
+	
+===================================================================	
+TestDataFrameQuantile.test_quantile_interpolation_np_lt_1p9: 114	
+----------------------------	
+
+if (not _np_version_under1p9):
+    raise nose.SkipTest('Numpy version is greater than 1.9')
+from numpy import percentile
+q = self.tsframe.quantile(0.1, axis=0, interpolation='linear')
+self.assertEqual(q['A'], percentile(self.tsframe['A'], 10))
+q = self.intframe.quantile(0.1)
+self.assertEqual(q['A'], percentile(self.intframe['A'], 10))
+q1 = self.intframe.quantile(0.1)
+tempResult = percentile(self.intframe['A'], 10)
+	
+***************************************************	
+dask_dask-0.7.0: 3	
+===================================================================	
+_percentile: 17	
+----------------------------	
+
+if (not len(a)):
+    return None
+if isinstance(q, Iterator):
+    q = list(q)
+if (str(a.dtype) == 'category'):
+    tempResult = percentile(a.codes, q, interpolation=interpolation)
+	
+===================================================================	
+_percentile: 22	
+----------------------------	
+
+if (not len(a)):
+    return None
+if isinstance(q, Iterator):
+    q = list(q)
+if (str(a.dtype) == 'category'):
+    result = numpy.percentile(a.codes, q, interpolation=interpolation)
+    import pandas as pd
+    return pandas.Categorical.from_codes(result, a.categories, a.ordered)
+if numpy.issubdtype(a.dtype, numpy.datetime64):
+    a2 = a.astype('i8')
+    tempResult = percentile(a2, q, interpolation=interpolation)
+	
+===================================================================	
+_percentile: 26	
+----------------------------	
+
+if (not len(a)):
+    return None
+if isinstance(q, Iterator):
+    q = list(q)
+if (str(a.dtype) == 'category'):
+    result = numpy.percentile(a.codes, q, interpolation=interpolation)
+    import pandas as pd
+    return pandas.Categorical.from_codes(result, a.categories, a.ordered)
+if numpy.issubdtype(a.dtype, numpy.datetime64):
+    a2 = a.astype('i8')
+    result = numpy.percentile(a2, q, interpolation=interpolation)
+    return result.astype(a.dtype)
+if (not numpy.issubdtype(a.dtype, numpy.number)):
+    interpolation = 'nearest'
+tempResult = percentile(a, q, interpolation=interpolation)
+	
+***************************************************	
+nengo_nengo-2.0.0: 0	
+***************************************************	
+sympy_sympy-1.0.0: 0	
+***************************************************	
+daducci_amico-dev: 0	
+***************************************************	
+aplpy_aplpy-1.1.1: 0	
+***************************************************	
+markovmodel_msmtools-1.0.2: 0	
+***************************************************	
+nilearn_nilearn-0.4.0: 0	
+***************************************************	
+poliastro_poliastro-0.8.0: 0	
+***************************************************	
+skimage_skimage-0.13.0: 4	
+===================================================================	
+binary_blobs: 14	
+----------------------------	
+
+'\n    Generate synthetic binary image with several rounded blob-like objects.\n\n    Parameters\n    ----------\n    length : int, optional\n        Linear size of output image.\n    blob_size_fraction : float, optional\n        Typical linear size of blob, as a fraction of ``length``, should be\n        smaller than 1.\n    n_dim : int, optional\n        Number of dimensions of output image.\n    volume_fraction : float, default 0.5\n        Fraction of image pixels covered by the blobs (where the output is 1).\n        Should be in [0, 1].\n    seed : int, optional\n        Seed to initialize the random number generator.\n        If `None`, a random seed from the operating system is used.\n\n    Returns\n    -------\n    blobs : ndarray of bools\n        Output binary image\n\n    Examples\n    --------\n    >>> from skimage import data\n    >>> data.binary_blobs(length=5, blob_size_fraction=0.2, seed=1)\n    array([[ True, False,  True,  True,  True],\n           [ True,  True,  True, False,  True],\n           [False,  True, False,  True,  True],\n           [ True, False, False,  True,  True],\n           [ True, False, False, False,  True]], dtype=bool)\n    >>> blobs = data.binary_blobs(length=256, blob_size_fraction=0.1)\n    >>> # Finer structures\n    >>> blobs = data.binary_blobs(length=256, blob_size_fraction=0.05)\n    >>> # Blobs cover a smaller volume fraction of the image\n    >>> blobs = data.binary_blobs(length=256, volume_fraction=0.3)\n    '
+rs = numpy.random.RandomState(seed)
+shape = tuple(([length] * n_dim))
+mask = numpy.zeros(shape)
+n_pts = max((int((1.0 / blob_size_fraction)) ** n_dim), 1)
+points = (length * rs.rand(n_dim, n_pts)).astype(numpy.int)
+mask[[indices for indices in points]] = 1
+mask = gaussian(mask, sigma=((0.25 * length) * blob_size_fraction))
+tempResult = percentile(mask, (100 * (1 - volume_fraction)))
+	
+===================================================================	
+is_low_contrast: 119	
+----------------------------	
+
+'Detemine if an image is low contrast.\n\n    Parameters\n    ----------\n    image : array-like\n        The image under test.\n    fraction_threshold : float, optional\n        The low contrast fraction threshold. An image is considered low-\n        contrast when its range of brightness spans less than this\n        fraction of its data type\'s full range. [1]_\n    lower_bound : float, optional\n        Disregard values below this percentile when computing image contrast.\n    upper_bound : float, optional\n        Disregard values above this percentile when computing image contrast.\n    method : str, optional\n        The contrast determination method.  Right now the only available\n        option is "linear".\n\n    Returns\n    -------\n    out : bool\n        True when the image is determined to be low contrast.\n\n    References\n    ----------\n    .. [1] http://scikit-image.org/docs/dev/user_guide/data_types.html\n\n    Examples\n    --------\n    >>> image = np.linspace(0, 0.04, 100)\n    >>> is_low_contrast(image)\n    True\n    >>> image[-1] = 1\n    >>> is_low_contrast(image)\n    True\n    >>> is_low_contrast(image, upper_percentile=100)\n    False\n    '
+image = numpy.asanyarray(image)
+if ((image.ndim == 3) and (image.shape[2] in [3, 4])):
+    image = rgb2gray(image)
+dlimits = dtype_limits(image, clip_negative=False)
+tempResult = percentile(image, [lower_percentile, upper_percentile])
+	
+===================================================================	
+canny: 97	
+----------------------------	
+
+"Edge filter an image using the Canny algorithm.\n\n    Parameters\n    -----------\n    image : 2D array\n        Greyscale input image to detect edges on; can be of any dtype.\n    sigma : float\n        Standard deviation of the Gaussian filter.\n    low_threshold : float\n        Lower bound for hysteresis thresholding (linking edges).\n        If None, low_threshold is set to 10% of dtype's max.\n    high_threshold : float\n        Upper bound for hysteresis thresholding (linking edges).\n        If None, high_threshold is set to 20% of dtype's max.\n    mask : array, dtype=bool, optional\n        Mask to limit the application of Canny to a certain area.\n    use_quantiles : bool, optional\n        If True then treat low_threshold and high_threshold as quantiles of the\n        edge magnitude image, rather than absolute edge magnitude values. If True\n        then the thresholds must be in the range [0, 1].\n\n    Returns\n    -------\n    output : 2D array (image)\n        The binary edge map.\n\n    See also\n    --------\n    skimage.sobel\n\n    Notes\n    -----\n    The steps of the algorithm are as follows:\n\n    * Smooth the image using a Gaussian with ``sigma`` width.\n\n    * Apply the horizontal and vertical Sobel operators to get the gradients\n      within the image. The edge strength is the norm of the gradient.\n\n    * Thin potential edges to 1-pixel wide curves. First, find the normal\n      to the edge at each point. This is done by looking at the\n      signs and the relative magnitude of the X-Sobel and Y-Sobel\n      to sort the points into 4 categories: horizontal, vertical,\n      diagonal and antidiagonal. Then look in the normal and reverse\n      directions to see if the values in either of those directions are\n      greater than the point in question. Use interpolation to get a mix of\n      points instead of picking the one that's the closest to the normal.\n\n    * Perform a hysteresis thresholding: first label all points above the\n      high threshold as edges. Then recursively label any point above the\n      low threshold that is 8-connected to a labeled point as an edge.\n\n    References\n    -----------\n    .. [1] Canny, J., A Computational Approach To Edge Detection, IEEE Trans.\n           Pattern Analysis and Machine Intelligence, 8:679-714, 1986\n    .. [2] William Green's Canny tutorial\n           http://dasl.mem.drexel.edu/alumni/bGreen/www.pages.drexel.edu/_weg22/can_tut.html\n\n    Examples\n    --------\n    >>> from skimage import feature\n    >>> # Generate noisy image of a square\n    >>> im = np.zeros((256, 256))\n    >>> im[64:-64, 64:-64] = 1\n    >>> im += 0.2 * np.random.rand(*im.shape)\n    >>> # First trial with the Canny filter, with the default smoothing\n    >>> edges1 = feature.canny(im)\n    >>> # Increase the smoothing for better results\n    >>> edges2 = feature.canny(im, sigma=3)\n    "
+assert_nD(image, 2)
+if (low_threshold is None):
+    low_threshold = (0.1 * dtype_limits(image, clip_negative=False)[1])
+if (high_threshold is None):
+    high_threshold = (0.2 * dtype_limits(image, clip_negative=False)[1])
+if (mask is None):
+    mask = numpy.ones(image.shape, dtype=bool)
+
+def fsmooth(x):
+    return gaussian_filter(x, sigma, mode='constant')
+smoothed = smooth_with_function_and_mask(image, fsmooth, mask)
+jsobel = scipy.ndimage.sobel(smoothed, axis=1)
+isobel = scipy.ndimage.sobel(smoothed, axis=0)
+abs_isobel = numpy.abs(isobel)
+abs_jsobel = numpy.abs(jsobel)
+magnitude = numpy.hypot(isobel, jsobel)
+s = generate_binary_structure(2, 2)
+eroded_mask = binary_erosion(mask, s, border_value=0)
+eroded_mask = (eroded_mask & (magnitude > 0))
+local_maxima = numpy.zeros(image.shape, bool)
+pts_plus = (((isobel >= 0) & (jsobel >= 0)) & (abs_isobel >= abs_jsobel))
+pts_minus = (((isobel <= 0) & (jsobel <= 0)) & (abs_isobel >= abs_jsobel))
+pts = (pts_plus | pts_minus)
+pts = (eroded_mask & pts)
+c1 = magnitude[1:, :][pts[:(- 1), :]]
+c2 = magnitude[1:, 1:][pts[:(- 1), :(- 1)]]
+m = magnitude[pts]
+w = (abs_jsobel[pts] / abs_isobel[pts])
+c_plus = (((c2 * w) + (c1 * (1 - w))) <= m)
+c1 = magnitude[:(- 1), :][pts[1:, :]]
+c2 = magnitude[:(- 1), :(- 1)][pts[1:, 1:]]
+c_minus = (((c2 * w) + (c1 * (1 - w))) <= m)
+local_maxima[pts] = (c_plus & c_minus)
+pts_plus = (((isobel >= 0) & (jsobel >= 0)) & (abs_isobel <= abs_jsobel))
+pts_minus = (((isobel <= 0) & (jsobel <= 0)) & (abs_isobel <= abs_jsobel))
+pts = (pts_plus | pts_minus)
+pts = (eroded_mask & pts)
+c1 = magnitude[:, 1:][pts[:, :(- 1)]]
+c2 = magnitude[1:, 1:][pts[:(- 1), :(- 1)]]
+m = magnitude[pts]
+w = (abs_isobel[pts] / abs_jsobel[pts])
+c_plus = (((c2 * w) + (c1 * (1 - w))) <= m)
+c1 = magnitude[:, :(- 1)][pts[:, 1:]]
+c2 = magnitude[:(- 1), :(- 1)][pts[1:, 1:]]
+c_minus = (((c2 * w) + (c1 * (1 - w))) <= m)
+local_maxima[pts] = (c_plus & c_minus)
+pts_plus = (((isobel <= 0) & (jsobel >= 0)) & (abs_isobel <= abs_jsobel))
+pts_minus = (((isobel >= 0) & (jsobel <= 0)) & (abs_isobel <= abs_jsobel))
+pts = (pts_plus | pts_minus)
+pts = (eroded_mask & pts)
+c1a = magnitude[:, 1:][pts[:, :(- 1)]]
+c2a = magnitude[:(- 1), 1:][pts[1:, :(- 1)]]
+m = magnitude[pts]
+w = (abs_isobel[pts] / abs_jsobel[pts])
+c_plus = (((c2a * w) + (c1a * (1.0 - w))) <= m)
+c1 = magnitude[:, :(- 1)][pts[:, 1:]]
+c2 = magnitude[1:, :(- 1)][pts[:(- 1), 1:]]
+c_minus = (((c2 * w) + (c1 * (1.0 - w))) <= m)
+local_maxima[pts] = (c_plus & c_minus)
+pts_plus = (((isobel <= 0) & (jsobel >= 0)) & (abs_isobel >= abs_jsobel))
+pts_minus = (((isobel >= 0) & (jsobel <= 0)) & (abs_isobel >= abs_jsobel))
+pts = (pts_plus | pts_minus)
+pts = (eroded_mask & pts)
+c1 = magnitude[:(- 1), :][pts[1:, :]]
+c2 = magnitude[:(- 1), 1:][pts[1:, :(- 1)]]
+m = magnitude[pts]
+w = (abs_jsobel[pts] / abs_isobel[pts])
+c_plus = (((c2 * w) + (c1 * (1 - w))) <= m)
+c1 = magnitude[1:, :][pts[:(- 1), :]]
+c2 = magnitude[1:, :(- 1)][pts[:(- 1), 1:]]
+c_minus = (((c2 * w) + (c1 * (1 - w))) <= m)
+local_maxima[pts] = (c_plus & c_minus)
+if use_quantiles:
+    if ((high_threshold > 1.0) or (low_threshold > 1.0)):
+        raise ValueError('Quantile thresholds must not be > 1.0')
+    if ((high_threshold < 0.0) or (low_threshold < 0.0)):
+        raise ValueError('Quantile thresholds must not be < 0.0')
+    tempResult = percentile(magnitude, (100.0 * high_threshold))
+	
+===================================================================	
+canny: 98	
+----------------------------	
+
+"Edge filter an image using the Canny algorithm.\n\n    Parameters\n    -----------\n    image : 2D array\n        Greyscale input image to detect edges on; can be of any dtype.\n    sigma : float\n        Standard deviation of the Gaussian filter.\n    low_threshold : float\n        Lower bound for hysteresis thresholding (linking edges).\n        If None, low_threshold is set to 10% of dtype's max.\n    high_threshold : float\n        Upper bound for hysteresis thresholding (linking edges).\n        If None, high_threshold is set to 20% of dtype's max.\n    mask : array, dtype=bool, optional\n        Mask to limit the application of Canny to a certain area.\n    use_quantiles : bool, optional\n        If True then treat low_threshold and high_threshold as quantiles of the\n        edge magnitude image, rather than absolute edge magnitude values. If True\n        then the thresholds must be in the range [0, 1].\n\n    Returns\n    -------\n    output : 2D array (image)\n        The binary edge map.\n\n    See also\n    --------\n    skimage.sobel\n\n    Notes\n    -----\n    The steps of the algorithm are as follows:\n\n    * Smooth the image using a Gaussian with ``sigma`` width.\n\n    * Apply the horizontal and vertical Sobel operators to get the gradients\n      within the image. The edge strength is the norm of the gradient.\n\n    * Thin potential edges to 1-pixel wide curves. First, find the normal\n      to the edge at each point. This is done by looking at the\n      signs and the relative magnitude of the X-Sobel and Y-Sobel\n      to sort the points into 4 categories: horizontal, vertical,\n      diagonal and antidiagonal. Then look in the normal and reverse\n      directions to see if the values in either of those directions are\n      greater than the point in question. Use interpolation to get a mix of\n      points instead of picking the one that's the closest to the normal.\n\n    * Perform a hysteresis thresholding: first label all points above the\n      high threshold as edges. Then recursively label any point above the\n      low threshold that is 8-connected to a labeled point as an edge.\n\n    References\n    -----------\n    .. [1] Canny, J., A Computational Approach To Edge Detection, IEEE Trans.\n           Pattern Analysis and Machine Intelligence, 8:679-714, 1986\n    .. [2] William Green's Canny tutorial\n           http://dasl.mem.drexel.edu/alumni/bGreen/www.pages.drexel.edu/_weg22/can_tut.html\n\n    Examples\n    --------\n    >>> from skimage import feature\n    >>> # Generate noisy image of a square\n    >>> im = np.zeros((256, 256))\n    >>> im[64:-64, 64:-64] = 1\n    >>> im += 0.2 * np.random.rand(*im.shape)\n    >>> # First trial with the Canny filter, with the default smoothing\n    >>> edges1 = feature.canny(im)\n    >>> # Increase the smoothing for better results\n    >>> edges2 = feature.canny(im, sigma=3)\n    "
+assert_nD(image, 2)
+if (low_threshold is None):
+    low_threshold = (0.1 * dtype_limits(image, clip_negative=False)[1])
+if (high_threshold is None):
+    high_threshold = (0.2 * dtype_limits(image, clip_negative=False)[1])
+if (mask is None):
+    mask = numpy.ones(image.shape, dtype=bool)
+
+def fsmooth(x):
+    return gaussian_filter(x, sigma, mode='constant')
+smoothed = smooth_with_function_and_mask(image, fsmooth, mask)
+jsobel = scipy.ndimage.sobel(smoothed, axis=1)
+isobel = scipy.ndimage.sobel(smoothed, axis=0)
+abs_isobel = numpy.abs(isobel)
+abs_jsobel = numpy.abs(jsobel)
+magnitude = numpy.hypot(isobel, jsobel)
+s = generate_binary_structure(2, 2)
+eroded_mask = binary_erosion(mask, s, border_value=0)
+eroded_mask = (eroded_mask & (magnitude > 0))
+local_maxima = numpy.zeros(image.shape, bool)
+pts_plus = (((isobel >= 0) & (jsobel >= 0)) & (abs_isobel >= abs_jsobel))
+pts_minus = (((isobel <= 0) & (jsobel <= 0)) & (abs_isobel >= abs_jsobel))
+pts = (pts_plus | pts_minus)
+pts = (eroded_mask & pts)
+c1 = magnitude[1:, :][pts[:(- 1), :]]
+c2 = magnitude[1:, 1:][pts[:(- 1), :(- 1)]]
+m = magnitude[pts]
+w = (abs_jsobel[pts] / abs_isobel[pts])
+c_plus = (((c2 * w) + (c1 * (1 - w))) <= m)
+c1 = magnitude[:(- 1), :][pts[1:, :]]
+c2 = magnitude[:(- 1), :(- 1)][pts[1:, 1:]]
+c_minus = (((c2 * w) + (c1 * (1 - w))) <= m)
+local_maxima[pts] = (c_plus & c_minus)
+pts_plus = (((isobel >= 0) & (jsobel >= 0)) & (abs_isobel <= abs_jsobel))
+pts_minus = (((isobel <= 0) & (jsobel <= 0)) & (abs_isobel <= abs_jsobel))
+pts = (pts_plus | pts_minus)
+pts = (eroded_mask & pts)
+c1 = magnitude[:, 1:][pts[:, :(- 1)]]
+c2 = magnitude[1:, 1:][pts[:(- 1), :(- 1)]]
+m = magnitude[pts]
+w = (abs_isobel[pts] / abs_jsobel[pts])
+c_plus = (((c2 * w) + (c1 * (1 - w))) <= m)
+c1 = magnitude[:, :(- 1)][pts[:, 1:]]
+c2 = magnitude[:(- 1), :(- 1)][pts[1:, 1:]]
+c_minus = (((c2 * w) + (c1 * (1 - w))) <= m)
+local_maxima[pts] = (c_plus & c_minus)
+pts_plus = (((isobel <= 0) & (jsobel >= 0)) & (abs_isobel <= abs_jsobel))
+pts_minus = (((isobel >= 0) & (jsobel <= 0)) & (abs_isobel <= abs_jsobel))
+pts = (pts_plus | pts_minus)
+pts = (eroded_mask & pts)
+c1a = magnitude[:, 1:][pts[:, :(- 1)]]
+c2a = magnitude[:(- 1), 1:][pts[1:, :(- 1)]]
+m = magnitude[pts]
+w = (abs_isobel[pts] / abs_jsobel[pts])
+c_plus = (((c2a * w) + (c1a * (1.0 - w))) <= m)
+c1 = magnitude[:, :(- 1)][pts[:, 1:]]
+c2 = magnitude[1:, :(- 1)][pts[:(- 1), 1:]]
+c_minus = (((c2 * w) + (c1 * (1.0 - w))) <= m)
+local_maxima[pts] = (c_plus & c_minus)
+pts_plus = (((isobel <= 0) & (jsobel >= 0)) & (abs_isobel >= abs_jsobel))
+pts_minus = (((isobel >= 0) & (jsobel <= 0)) & (abs_isobel >= abs_jsobel))
+pts = (pts_plus | pts_minus)
+pts = (eroded_mask & pts)
+c1 = magnitude[:(- 1), :][pts[1:, :]]
+c2 = magnitude[:(- 1), 1:][pts[1:, :(- 1)]]
+m = magnitude[pts]
+w = (abs_jsobel[pts] / abs_isobel[pts])
+c_plus = (((c2 * w) + (c1 * (1 - w))) <= m)
+c1 = magnitude[1:, :][pts[:(- 1), :]]
+c2 = magnitude[1:, :(- 1)][pts[:(- 1), 1:]]
+c_minus = (((c2 * w) + (c1 * (1 - w))) <= m)
+local_maxima[pts] = (c_plus & c_minus)
+if use_quantiles:
+    if ((high_threshold > 1.0) or (low_threshold > 1.0)):
+        raise ValueError('Quantile thresholds must not be > 1.0')
+    if ((high_threshold < 0.0) or (low_threshold < 0.0)):
+        raise ValueError('Quantile thresholds must not be < 0.0')
+    high_threshold = numpy.percentile(magnitude, (100.0 * high_threshold))
+    tempResult = percentile(magnitude, (100.0 * low_threshold))
+	
+***************************************************	
+sunpy_sunpy-0.8.0: 0	
+***************************************************	
+spacetelescope_synphot-0.1: 0	
+***************************************************	
+librosa_librosa-0.5.1: 5	
+===================================================================	
+cmap: 94	
+----------------------------	
+
+'Get a default colormap from the given data.\n\n    If the data is boolean, use a black and white colormap.\n\n    If the data has both positive and negative values,\n    use a diverging colormap.\n\n    Otherwise, use a sequential colormap.\n\n    Parameters\n    ----------\n    data : np.ndarray\n        Input data\n\n    robust : bool\n        If True, discard the top and bottom 2% of data when calculating\n        range.\n\n    cmap_seq : str\n        The sequential colormap name\n\n    cmap_bool : str\n        The boolean colormap name\n\n    cmap_div : str\n        The diverging colormap name\n\n    Returns\n    -------\n    cmap : matplotlib.colors.Colormap\n        The colormap to use for `data`\n\n    See Also\n    --------\n    matplotlib.pyplot.colormaps\n    '
+data = numpy.atleast_1d(data)
+if (data.dtype == 'bool'):
+    return matplotlib.pyplot.get_cmap(cmap_bool)
+data = data[numpy.isfinite(data)]
+if robust:
+    (min_p, max_p) = (2, 98)
+else:
+    (min_p, max_p) = (0, 100)
+tempResult = percentile(data, max_p)
+	
+===================================================================	
+cmap: 95	
+----------------------------	
+
+'Get a default colormap from the given data.\n\n    If the data is boolean, use a black and white colormap.\n\n    If the data has both positive and negative values,\n    use a diverging colormap.\n\n    Otherwise, use a sequential colormap.\n\n    Parameters\n    ----------\n    data : np.ndarray\n        Input data\n\n    robust : bool\n        If True, discard the top and bottom 2% of data when calculating\n        range.\n\n    cmap_seq : str\n        The sequential colormap name\n\n    cmap_bool : str\n        The boolean colormap name\n\n    cmap_div : str\n        The diverging colormap name\n\n    Returns\n    -------\n    cmap : matplotlib.colors.Colormap\n        The colormap to use for `data`\n\n    See Also\n    --------\n    matplotlib.pyplot.colormaps\n    '
+data = numpy.atleast_1d(data)
+if (data.dtype == 'bool'):
+    return matplotlib.pyplot.get_cmap(cmap_bool)
+data = data[numpy.isfinite(data)]
+if robust:
+    (min_p, max_p) = (2, 98)
+else:
+    (min_p, max_p) = (0, 100)
+max_val = numpy.percentile(data, max_p)
+tempResult = percentile(data, min_p)
+	
+===================================================================	
+__test: 64	
+----------------------------	
+
+C2 = librosa.hybrid_cqt(y, sr=sr, hop_length=hop_length, fmin=fmin, n_bins=n_bins, bins_per_octave=bins_per_octave, tuning=tuning, filter_scale=resolution, norm=norm, sparsity=sparsity)
+C1 = numpy.abs(librosa.cqt(y, sr=sr, hop_length=hop_length, fmin=fmin, n_bins=n_bins, bins_per_octave=bins_per_octave, tuning=tuning, filter_scale=resolution, norm=norm, sparsity=sparsity))
+eq_(C1.shape, C2.shape)
+idx1 = (C1 > (0.0001 * C1.max()))
+idx2 = (C2 > (0.0001 * C2.max()))
+perc = 0.99
+thresh = 0.001
+idx = (idx1 | idx2)
+tempResult = percentile(numpy.abs((C1[idx] - C2[idx])), perc)
+	
+===================================================================	
+test_hpss: 73	
+----------------------------	
+
+(y, sr) = librosa.load(__EXAMPLE_FILE)
+(y_harm, y_perc) = librosa.effects.hpss(y)
+y_residual = ((y - y_harm) - y_perc)
+rms_orig = librosa.feature.rmse(y=y)
+rms_res = librosa.feature.rmse(y=y_residual)
+tempResult = percentile(rms_orig, 0.01)
+	
+===================================================================	
+test_hpss: 73	
+----------------------------	
+
+(y, sr) = librosa.load(__EXAMPLE_FILE)
+(y_harm, y_perc) = librosa.effects.hpss(y)
+y_residual = ((y - y_harm) - y_perc)
+rms_orig = librosa.feature.rmse(y=y)
+rms_res = librosa.feature.rmse(y=y_residual)
+tempResult = percentile(rms_res, 0.99)
+	
+***************************************************	
+mne_python-0.15.0: 6	
+===================================================================	
+test_scaler: 52	
+----------------------------	
+
+'Test methods of Scaler.'
+raw = mne.io.read_raw_fif(raw_fname)
+events = read_events(event_name)
+picks = pick_types(raw.info, meg=True, stim=False, ecg=False, eog=False, exclude='bads')
+picks = picks[1:13:3]
+epochs = Epochs(raw, events, event_id, tmin, tmax, picks=picks, baseline=(None, 0), preload=True)
+epochs_data = epochs.get_data()
+y = epochs.events[:, (- 1)]
+methods = (None, dict(mag=5, grad=10, eeg=20), 'mean', 'median')
+infos = (epochs.info, epochs.info, None, None)
+epochs_data_t = epochs_data.transpose([1, 0, 2])
+for (method, info) in zip(methods, infos):
+    if ((method == 'median') and (not check_version('sklearn', '0.17'))):
+        assert_raises(ValueError, Scaler, info, method)
+        continue
+    if ((method == 'mean') and (not check_version('sklearn', ''))):
+        assert_raises(ImportError, Scaler, info, method)
+        continue
+    scaler = Scaler(info, method)
+    X = scaler.fit_transform(epochs_data, y)
+    assert_equal(X.shape, epochs_data.shape)
+    if ((method is None) or isinstance(method, dict)):
+        sd = (DEFAULTS['scalings'] if (method is None) else method)
+        stds = numpy.zeros(len(picks))
+        for key in ('mag', 'grad'):
+            stds[pick_types(epochs.info, meg=key)] = (1.0 / sd[key])
+        stds[pick_types(epochs.info, meg=False, eeg=True)] = (1.0 / sd['eeg'])
+        means = numpy.zeros(len(epochs.ch_names))
+    elif (method == 'mean'):
+        stds = numpy.array([numpy.std(ch_data) for ch_data in epochs_data_t])
+        means = numpy.array([numpy.mean(ch_data) for ch_data in epochs_data_t])
+    else:
+        tempResult = percentile(ch_data, [25, 50, 75])
+	
+===================================================================	
+_bootstrap_ci: 77	
+----------------------------	
+
+'Get confidence intervals from non-parametric bootstrap.'
+if (stat_fun == 'mean'):
+
+    def stat_fun(x):
+        return x.mean(axis=0)
+elif (stat_fun == 'median'):
+
+    def stat_fun(x):
+        return numpy.median(x, axis=0)
+elif (not callable(stat_fun)):
+    raise ValueError("stat_fun must be 'mean', 'median' or callable.")
+n_trials = arr.shape[0]
+indices = numpy.arange(n_trials, dtype=int)
+rng = check_random_state(random_state)
+boot_indices = rng.choice(indices, replace=True, size=(n_bootstraps, len(indices)))
+stat = numpy.array([stat_fun(arr[inds]) for inds in boot_indices])
+ci = ((((1 - ci) / 2) * 100), ((1 - ((1 - ci) / 2)) * 100))
+tempResult = percentile(stat, ci, axis=0)
+	
+===================================================================	
+test_accuracy: 249	
+----------------------------	
+
+'Test dipole fitting to sub-mm accuracy.'
+evoked = read_evokeds(fname_evo)[0].crop(0.0, 0.0)
+evoked.pick_types(meg=True, eeg=False)
+evoked.pick_channels([c for c in evoked.ch_names[::4]])
+for (rad, perc_90) in zip((0.09, None), (0.002, 0.004)):
+    bem = make_sphere_model('auto', rad, evoked.info, relative_radii=(0.999, 0.998, 0.997, 0.995))
+    src = read_source_spaces(fname_src)
+    fwd = make_forward_solution(evoked.info, None, src, bem)
+    fwd = convert_forward_solution(fwd, force_fixed=True, use_cps=True)
+    vertices = [src[0]['vertno'], src[1]['vertno']]
+    n_vertices = sum((len(v) for v in vertices))
+    amp = 1e-08
+    data = numpy.eye((n_vertices + 1))[:n_vertices]
+    data[((- 1), (- 1))] = 1.0
+    data *= amp
+    stc = SourceEstimate(data, vertices, 0.0, 0.001, 'sample')
+    evoked.info.normalize_proj()
+    sim = simulate_evoked(fwd, stc, evoked.info, cov=None, nave=numpy.inf)
+    cov = make_ad_hoc_cov(evoked.info)
+    dip = fit_dipole(sim, cov, bem, min_dist=0.001)[0]
+    ds = []
+    for vi in range(n_vertices):
+        if (vi < len(vertices[0])):
+            hi = 0
+            vertno = vi
+        else:
+            hi = 1
+            vertno = (vi - len(vertices[0]))
+        vertno = src[hi]['vertno'][vertno]
+        rr = src[hi]['rr'][vertno]
+        d = numpy.sqrt(numpy.sum(((rr - dip.pos[vi]) ** 2)))
+        ds.append(d)
+    tempResult = percentile(ds, [50, 90])
+	
+===================================================================	
+_compute_scalings: 1102	
+----------------------------	
+
+"Compute scalings for each channel type automatically.\n\n    Parameters\n    ----------\n    scalings : dict\n        The scalings for each channel type. If any values are\n        'auto', this will automatically compute a reasonable\n        scaling for that channel type. Any values that aren't\n        'auto' will not be changed.\n    inst : instance of Raw or Epochs\n        The data for which you want to compute scalings. If data\n        is not preloaded, this will read a subset of times / epochs\n        up to 100mb in size in order to compute scalings.\n\n    Returns\n    -------\n    scalings : dict\n        A scalings dictionary with updated values\n    "
+from ..io.base import BaseRaw
+from ..epochs import BaseEpochs
+if (not isinstance(inst, (BaseRaw, BaseEpochs))):
+    raise ValueError('Must supply either Raw or Epochs')
+if (scalings is None):
+    return scalings
+ch_types = channel_indices_by_type(inst.info)
+ch_types = dict([(i_type, i_ixs) for (i_type, i_ixs) in ch_types.items() if (len(i_ixs) != 0)])
+if (scalings == 'auto'):
+    scalings = dict(((i_type, 'auto') for i_type in ch_types.keys()))
+if (not isinstance(scalings, dict)):
+    raise ValueError(('scalings must be a dictionary of ch_type: val pairs, not type %s ' % type(scalings)))
+scalings = deepcopy(scalings)
+if (inst.preload is False):
+    if isinstance(inst, BaseRaw):
+        n_times = (100000000.0 // (len(inst.ch_names) * 8))
+        n_times = numpy.clip(n_times, 1, inst.n_times)
+        n_secs = (n_times / float(inst.info['sfreq']))
+        time_middle = numpy.mean(inst.times)
+        tmin = numpy.clip((time_middle - (n_secs / 2.0)), inst.times.min(), None)
+        tmax = numpy.clip((time_middle + (n_secs / 2.0)), None, inst.times.max())
+        data = inst._read_segment(tmin, tmax)
+    elif isinstance(inst, BaseEpochs):
+        n_epochs = (100000000.0 // ((len(inst.ch_names) * len(inst.times)) * 8))
+        n_epochs = int(numpy.clip(n_epochs, 1, len(inst)))
+        ixs_epochs = numpy.random.choice(range(len(inst)), n_epochs, False)
+        inst = inst.copy()[ixs_epochs].load_data()
+else:
+    data = inst._data
+if isinstance(inst, BaseEpochs):
+    data = inst._data.reshape([len(inst.ch_names), (- 1)])
+for (key, value) in scalings.items():
+    if (value != 'auto'):
+        continue
+    if (key not in ch_types.keys()):
+        raise ValueError("Sensor {0} doesn't exist in data".format(key))
+    this_data = data[ch_types[key]]
+    tempResult = percentile(this_data.ravel(), [0.5, 99.5])
+	
+===================================================================	
+_limits_to_control_points: 904	
+----------------------------	
+
+"Convert limits (values or percentiles) to control points.\n\n    Note: If using 'mne', generate cmap control points for a directly\n    mirrored cmap for simplicity (i.e., no normalization is computed to account\n    for a 2-tailed mne cmap).\n\n    Parameters\n    ----------\n    clim : str | dict\n        Desired limits use to set cmap control points.\n\n    Returns\n    -------\n    ctrl_pts : list (length 3)\n        Array of floats corresponding to values to use as cmap control points.\n    colormap : str\n        The colormap.\n    "
+if (colormap == 'auto'):
+    if (clim == 'auto'):
+        colormap = ('mne' if (stc_data < 0).any() else 'hot')
+    elif ('lims' in clim):
+        colormap = 'hot'
+    else:
+        colormap = 'mne'
+if (clim == 'auto'):
+    tempResult = percentile(numpy.abs(stc_data), [96, 97.5, 99.95])
+	
+===================================================================	
+_limits_to_control_points: 911	
+----------------------------	
+
+"Convert limits (values or percentiles) to control points.\n\n    Note: If using 'mne', generate cmap control points for a directly\n    mirrored cmap for simplicity (i.e., no normalization is computed to account\n    for a 2-tailed mne cmap).\n\n    Parameters\n    ----------\n    clim : str | dict\n        Desired limits use to set cmap control points.\n\n    Returns\n    -------\n    ctrl_pts : list (length 3)\n        Array of floats corresponding to values to use as cmap control points.\n    colormap : str\n        The colormap.\n    "
+if (colormap == 'auto'):
+    if (clim == 'auto'):
+        colormap = ('mne' if (stc_data < 0).any() else 'hot')
+    elif ('lims' in clim):
+        colormap = 'hot'
+    else:
+        colormap = 'mne'
+if (clim == 'auto'):
+    ctrl_pts = numpy.percentile(numpy.abs(stc_data), [96, 97.5, 99.95])
+elif isinstance(clim, dict):
+    limit_key = ['lims', 'pos_lims'][(colormap in ('mne', 'mne_analyze'))]
+    if ((colormap != 'auto') and (limit_key not in clim.keys())):
+        raise KeyError('"pos_lims" must be used with "mne" colormap')
+    clim['kind'] = clim.get('kind', 'percent')
+    if (clim['kind'] == 'percent'):
+        tempResult = percentile(numpy.abs(stc_data), list(numpy.abs(clim[limit_key])))
+	
+***************************************************	

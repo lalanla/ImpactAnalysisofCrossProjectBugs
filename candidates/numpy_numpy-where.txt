@@ -1,0 +1,134 @@
+astropy_astropy-1.3.0: 0	
+***************************************************	
+scipy_scipy-0.19.0: 6	
+===================================================================	
+_pivot_col: 56	
+----------------------------	
+
+"\n    Given a linear programming simplex tableau, determine the column\n    of the variable to enter the basis.\n\n    Parameters\n    ----------\n    T : 2D ndarray\n        The simplex tableau.\n    tol : float\n        Elements in the objective row larger than -tol will not be considered\n        for pivoting.  Nominally this value is zero, but numerical issues\n        cause a tolerance about zero to be necessary.\n    bland : bool\n        If True, use Bland's rule for selection of the column (select the\n        first column with a negative coefficient in the objective row,\n        regardless of magnitude).\n\n    Returns\n    -------\n    status: bool\n        True if a suitable pivot column was found, otherwise False.\n        A return of False indicates that the linear programming simplex\n        algorithm is complete.\n    col: int\n        The index of the column of the pivot element.\n        If status is False, col will be returned as nan.\n    "
+ma = numpy.ma.masked_where((T[(- 1), :(- 1)] >= (- tol)), T[(- 1), :(- 1)], copy=False)
+if (ma.count() == 0):
+    return (False, numpy.nan)
+if bland:
+    return (True, numpy.where((ma.mask == False))[0][0])
+tempResult = where((ma == ma.min()))
+	
+===================================================================	
+_pivot_row: 69	
+----------------------------	
+
+'\n    Given a linear programming simplex tableau, determine the row for the\n    pivot operation.\n\n    Parameters\n    ----------\n    T : 2D ndarray\n        The simplex tableau.\n    pivcol : int\n        The index of the pivot column.\n    phase : int\n        The phase of the simplex algorithm (1 or 2).\n    tol : float\n        Elements in the pivot column smaller than tol will not be considered\n        for pivoting.  Nominally this value is zero, but numerical issues\n        cause a tolerance about zero to be necessary.\n\n    Returns\n    -------\n    status: bool\n        True if a suitable pivot row was found, otherwise False.  A return\n        of False indicates that the linear programming problem is unbounded.\n    row: int\n        The index of the row of the pivot element.  If status is False, row\n        will be returned as nan.\n    '
+if (phase == 1):
+    k = 2
+else:
+    k = 1
+ma = numpy.ma.masked_where((T[:(- k), pivcol] <= tol), T[:(- k), pivcol], copy=False)
+if (ma.count() == 0):
+    return (False, numpy.nan)
+mb = numpy.ma.masked_where((T[:(- k), pivcol] <= tol), T[:(- k), (- 1)], copy=False)
+q = (mb / ma)
+tempResult = where((q == q.min()))
+	
+===================================================================	
+kurtosis: 832	
+----------------------------	
+"\n    Computes the kurtosis (Fisher or Pearson) of a dataset.\n\n    Kurtosis is the fourth central moment divided by the square of the\n    variance. If Fisher's definition is used, then 3.0 is subtracted from\n    the result to give 0.0 for a normal distribution.\n\n    If bias is False then the kurtosis is calculated using k statistics to\n    eliminate bias coming from biased moment estimators\n\n    Use `kurtosistest` to see if result is close enough to normal.\n\n    Parameters\n    ----------\n    a : array\n        data for which the kurtosis is calculated\n    axis : int or None, optional\n        Axis along which the kurtosis is calculated. Default is 0.\n        If None, compute over the whole array `a`.\n    fisher : bool, optional\n        If True, Fisher's definition is used (normal ==> 0.0). If False,\n        Pearson's definition is used (normal ==> 3.0).\n    bias : bool, optional\n        If False, then the calculations are corrected for statistical bias.\n\n    Returns\n    -------\n    kurtosis : array\n        The kurtosis of values along an axis. If all values are equal,\n        return -3 for Fisher's definition and 0 for Pearson's definition.\n\n    Notes\n    -----\n    For more details about `kurtosis`, see `stats.kurtosis`.\n\n    "
+(a, axis) = _chk_asarray(a, axis)
+m2 = moment(a, 2, axis)
+m4 = moment(a, 4, axis)
+olderr = np.seterr(all='ignore')
+try:
+    tempResult = where((m2 == 0), 0, (m4 / (m2 ** 2.0)))	
+===================================================================	
+skewtest: 894	
+----------------------------	
+
+'\n    Tests whether the skew is different from the normal distribution.\n\n    Parameters\n    ----------\n    a : array\n        The data to be tested\n    axis : int or None, optional\n       Axis along which statistics are calculated. Default is 0.\n       If None, compute over the whole array `a`.\n\n    Returns\n    -------\n    statistic : float\n        The computed z-score for this test.\n    pvalue : float\n        a 2-sided p-value for the hypothesis test\n\n    Notes\n    -----\n    For more details about `skewtest`, see `stats.skewtest`.\n\n    '
+(a, axis) = _chk_asarray(a, axis)
+if (axis is None):
+    a = a.ravel()
+    axis = 0
+b2 = skew(a, axis)
+n = a.count(axis)
+if (numpy.min(n) < 8):
+    raise ValueError(('skewtest is not valid with less than 8 samples; %i samples were given.' % numpy.min(n)))
+y = (b2 * numpy.ma.sqrt((((n + 1) * (n + 3)) / (6.0 * (n - 2)))))
+beta2 = ((((3.0 * (((n * n) + (27 * n)) - 70)) * (n + 1)) * (n + 3)) / ((((n - 2.0) * (n + 5)) * (n + 7)) * (n + 9)))
+W2 = ((- 1) + numpy.ma.sqrt((2 * (beta2 - 1))))
+delta = (1 / numpy.ma.sqrt((0.5 * numpy.ma.log(W2))))
+alpha = numpy.ma.sqrt((2.0 / (W2 - 1)))
+tempResult = where((y == 0), 1, y)
+	
+===================================================================	
+_betai: 151	
+----------------------------	
+
+x = numpy.asanyarray(x)
+tempResult = where((x < 1.0), x, 1.0)
+	
+===================================================================	
+skew: 813	
+----------------------------	
+'\n    Computes the skewness of a data set.\n\n    Parameters\n    ----------\n    a : ndarray\n        data\n    axis : int or None, optional\n        Axis along which skewness is calculated. Default is 0.\n        If None, compute over the whole array `a`.\n    bias : bool, optional\n        If False, then the calculations are corrected for statistical bias.\n\n    Returns\n    -------\n    skewness : ndarray\n        The skewness of values along an axis, returning 0 where all values are\n        equal.\n\n    Notes\n    -----\n    For more details about `skew`, see `stats.skew`.\n\n    '
+(a, axis) = _chk_asarray(a, axis)
+n = a.count(axis)
+m2 = moment(a, 2, axis)
+m3 = moment(a, 3, axis)
+olderr = np.seterr(all='ignore')
+try:
+    tempResult = where((m2 == 0), 0, (m3 / (m2 ** 1.5)))	
+***************************************************	
+sklearn_sklearn-0.18.0: 0	
+***************************************************	
+matplotlib_matplotlib-2.0.0: 2	
+===================================================================	
+SymmetricalLogTransform.transform_non_affine: 198	
+----------------------------	
+
+sign = numpy.sign(a)
+masked = numpy.ma.masked_inside(a, (- self.linthresh), self.linthresh, copy=False)
+log = ((sign * self.linthresh) * (self._linscale_adj + (numpy.ma.log((numpy.abs(masked) / self.linthresh)) / self._log_base)))
+if masked.mask.any():
+    tempResult = where(masked.mask, (a * self._linscale_adj), log)
+	
+===================================================================	
+InvertedSymmetricalLogTransform.transform_non_affine: 225	
+----------------------------	
+
+sign = numpy.sign(a)
+masked = numpy.ma.masked_inside(a, (- self.invlinthresh), self.invlinthresh, copy=False)
+exp = ((sign * self.linthresh) * numpy.ma.power(self.base, ((sign * (masked / self.linthresh)) - self._linscale_adj)))
+if masked.mask.any():
+    tempResult = where(masked.mask, (a / self._linscale_adj), exp)
+	
+***************************************************	
+ipython_ipython-6.1.0: 0	
+***************************************************	
+pandas_pandas-0.19.2: 0	
+***************************************************	
+dask_dask-0.7.0: 0	
+***************************************************	
+nengo_nengo-2.0.0: 0	
+***************************************************	
+sympy_sympy-1.0.0: 0	
+***************************************************	
+daducci_amico-dev: 0	
+***************************************************	
+aplpy_aplpy-1.1.1: 0	
+***************************************************	
+markovmodel_msmtools-1.0.2: 0	
+***************************************************	
+nilearn_nilearn-0.4.0: 0	
+***************************************************	
+poliastro_poliastro-0.8.0: 0	
+***************************************************	
+skimage_skimage-0.13.0: 0	
+***************************************************	
+sunpy_sunpy-0.8.0: 0	
+***************************************************	
+spacetelescope_synphot-0.1: 0	
+***************************************************	
+librosa_librosa-0.5.1: 0	
+***************************************************	
+mne_python-0.15.0: 0	
+***************************************************	

@@ -1,0 +1,509 @@
+astropy_astropy-1.3.0: 4	
+===================================================================	
+binned_binom_proportion: 69	
+----------------------------	
+
+'Binomial proportion and confidence interval in bins of a continuous\n    variable ``x``.\n\n    Given a set of datapoint pairs where the ``x`` values are\n    continuously distributed and the ``success`` values are binomial\n    ("success / failure" or "true / false"), place the pairs into\n    bins according to ``x`` value and calculate the binomial proportion\n    (fraction of successes) and confidence interval in each bin.\n\n    Parameters\n    ----------\n    x : list_like\n        Values.\n    success : list_like (bool)\n        Success (`True`) or failure (`False`) corresponding to each value\n        in ``x``.  Must be same length as ``x``.\n    bins : int or sequence of scalars, optional\n        If bins is an int, it defines the number of equal-width bins\n        in the given range (10, by default). If bins is a sequence, it\n        defines the bin edges, including the rightmost edge, allowing\n        for non-uniform bin widths (in this case, \'range\' is ignored).\n    range : (float, float), optional\n        The lower and upper range of the bins. If `None` (default),\n        the range is set to ``(x.min(), x.max())``. Values outside the\n        range are ignored.\n    conf : float in [0, 1], optional\n        Desired probability content in the confidence\n        interval ``(p - perr[0], p + perr[1])`` in each bin. Default is\n        0.68269.\n    interval : {\'wilson\', \'jeffreys\', \'flat\', \'wald\'}, optional\n        Formula used to calculate confidence interval on the\n        binomial proportion in each bin. See `binom_conf_interval` for\n        definition of the intervals.  The \'wilson\', \'jeffreys\',\n        and \'flat\' intervals generally give similar results.  \'wilson\'\n        should be somewhat faster, while \'jeffreys\' and \'flat\' are\n        marginally superior, but differ in the assumed prior.\n        The \'wald\' interval is generally not recommended.\n        It is provided for comparison purposes. Default is \'wilson\'.\n\n    Returns\n    -------\n    bin_ctr : numpy.ndarray\n        Central value of bins. Bins without any entries are not returned.\n    bin_halfwidth : numpy.ndarray\n        Half-width of each bin such that ``bin_ctr - bin_halfwidth`` and\n        ``bin_ctr + bins_halfwidth`` give the left and right side of each bin,\n        respectively.\n    p : numpy.ndarray\n        Efficiency in each bin.\n    perr : numpy.ndarray\n        2-d array of shape (2, len(p)) representing the upper and lower\n        uncertainty on p in each bin.\n\n    See Also\n    --------\n    binom_conf_interval : Function used to estimate confidence interval in\n                          each bin.\n\n\n    Examples\n    --------\n    Suppose we wish to estimate the efficiency of a survey in\n    detecting astronomical sources as a function of magnitude (i.e.,\n    the probability of detecting a source given its magnitude). In a\n    realistic case, we might prepare a large number of sources with\n    randomly selected magnitudes, inject them into simulated images,\n    and then record which were detected at the end of the reduction\n    pipeline. As a toy example, we generate 100 data points with\n    randomly selected magnitudes between 20 and 30 and "observe" them\n    with a known detection function (here, the error function, with\n    50% detection probability at magnitude 25):\n\n    >>> from scipy.special import erf\n    >>> from scipy.stats.distributions import binom\n    >>> def true_efficiency(x):\n    ...     return 0.5 - 0.5 * erf((x - 25.) / 2.)\n    >>> mag = 20. + 10. * np.random.rand(100)\n    >>> detected = binom.rvs(1, true_efficiency(mag))\n    >>> bins, binshw, p, perr = binned_binom_proportion(mag, detected, bins=20)\n    >>> plt.errorbar(bins, p, xerr=binshw, yerr=perr, ls=\'none\', marker=\'o\',\n    ...              label=\'estimate\')\n\n    .. plot::\n\n       import numpy as np\n       from scipy.special import erf\n       from scipy.stats.distributions import binom\n       import matplotlib.pyplot as plt\n       from astropy.stats import binned_binom_proportion\n       def true_efficiency(x):\n           return 0.5 - 0.5 * erf((x - 25.) / 2.)\n       np.random.seed(400)\n       mag = 20. + 10. * np.random.rand(100)\n       np.random.seed(600)\n       detected = binom.rvs(1, true_efficiency(mag))\n       bins, binshw, p, perr = binned_binom_proportion(mag, detected, bins=20)\n       plt.errorbar(bins, p, xerr=binshw, yerr=perr, ls=\'none\', marker=\'o\',\n                    label=\'estimate\')\n       X = np.linspace(20., 30., 1000)\n       plt.plot(X, true_efficiency(X), label=\'true efficiency\')\n       plt.ylim(0., 1.)\n       plt.title(\'Detection efficiency vs magnitude\')\n       plt.xlabel(\'Magnitude\')\n       plt.ylabel(\'Detection efficiency\')\n       plt.legend()\n       plt.show()\n\n    The above example uses the Wilson confidence interval to calculate\n    the uncertainty ``perr`` in each bin (see the definition of various\n    confidence intervals in `binom_conf_interval`). A commonly used\n    alternative is the Wald interval. However, the Wald interval can\n    give nonsensical uncertainties when the efficiency is near 0 or 1,\n    and is therefore **not** recommended. As an illustration, the\n    following example shows the same data as above but uses the Wald\n    interval rather than the Wilson interval to calculate ``perr``:\n\n    >>> bins, binshw, p, perr = binned_binom_proportion(mag, detected, bins=20,\n    ...                                                 interval=\'wald\')\n    >>> plt.errorbar(bins, p, xerr=binshw, yerr=perr, ls=\'none\', marker=\'o\',\n    ...              label=\'estimate\')\n\n    .. plot::\n\n       import numpy as np\n       from scipy.special import erf\n       from scipy.stats.distributions import binom\n       import matplotlib.pyplot as plt\n       from astropy.stats import binned_binom_proportion\n       def true_efficiency(x):\n           return 0.5 - 0.5 * erf((x - 25.) / 2.)\n       np.random.seed(400)\n       mag = 20. + 10. * np.random.rand(100)\n       np.random.seed(600)\n       detected = binom.rvs(1, true_efficiency(mag))\n       bins, binshw, p, perr = binned_binom_proportion(mag, detected, bins=20,\n                                                       interval=\'wald\')\n       plt.errorbar(bins, p, xerr=binshw, yerr=perr, ls=\'none\', marker=\'o\',\n                    label=\'estimate\')\n       X = np.linspace(20., 30., 1000)\n       plt.plot(X, true_efficiency(X), label=\'true efficiency\')\n       plt.ylim(0., 1.)\n       plt.title(\'The Wald interval can give nonsensical uncertainties\')\n       plt.xlabel(\'Magnitude\')\n       plt.ylabel(\'Detection efficiency\')\n       plt.legend()\n       plt.show()\n\n    '
+x = numpy.ravel(x)
+success = np.ravel(success).astype(numpy.bool)
+if (x.shape != success.shape):
+    raise ValueError('sizes of x and success must match')
+tempResult = histogram(x, bins=bins, range=range)
+	
+===================================================================	
+binned_binom_proportion: 70	
+----------------------------	
+
+'Binomial proportion and confidence interval in bins of a continuous\n    variable ``x``.\n\n    Given a set of datapoint pairs where the ``x`` values are\n    continuously distributed and the ``success`` values are binomial\n    ("success / failure" or "true / false"), place the pairs into\n    bins according to ``x`` value and calculate the binomial proportion\n    (fraction of successes) and confidence interval in each bin.\n\n    Parameters\n    ----------\n    x : list_like\n        Values.\n    success : list_like (bool)\n        Success (`True`) or failure (`False`) corresponding to each value\n        in ``x``.  Must be same length as ``x``.\n    bins : int or sequence of scalars, optional\n        If bins is an int, it defines the number of equal-width bins\n        in the given range (10, by default). If bins is a sequence, it\n        defines the bin edges, including the rightmost edge, allowing\n        for non-uniform bin widths (in this case, \'range\' is ignored).\n    range : (float, float), optional\n        The lower and upper range of the bins. If `None` (default),\n        the range is set to ``(x.min(), x.max())``. Values outside the\n        range are ignored.\n    conf : float in [0, 1], optional\n        Desired probability content in the confidence\n        interval ``(p - perr[0], p + perr[1])`` in each bin. Default is\n        0.68269.\n    interval : {\'wilson\', \'jeffreys\', \'flat\', \'wald\'}, optional\n        Formula used to calculate confidence interval on the\n        binomial proportion in each bin. See `binom_conf_interval` for\n        definition of the intervals.  The \'wilson\', \'jeffreys\',\n        and \'flat\' intervals generally give similar results.  \'wilson\'\n        should be somewhat faster, while \'jeffreys\' and \'flat\' are\n        marginally superior, but differ in the assumed prior.\n        The \'wald\' interval is generally not recommended.\n        It is provided for comparison purposes. Default is \'wilson\'.\n\n    Returns\n    -------\n    bin_ctr : numpy.ndarray\n        Central value of bins. Bins without any entries are not returned.\n    bin_halfwidth : numpy.ndarray\n        Half-width of each bin such that ``bin_ctr - bin_halfwidth`` and\n        ``bin_ctr + bins_halfwidth`` give the left and right side of each bin,\n        respectively.\n    p : numpy.ndarray\n        Efficiency in each bin.\n    perr : numpy.ndarray\n        2-d array of shape (2, len(p)) representing the upper and lower\n        uncertainty on p in each bin.\n\n    See Also\n    --------\n    binom_conf_interval : Function used to estimate confidence interval in\n                          each bin.\n\n\n    Examples\n    --------\n    Suppose we wish to estimate the efficiency of a survey in\n    detecting astronomical sources as a function of magnitude (i.e.,\n    the probability of detecting a source given its magnitude). In a\n    realistic case, we might prepare a large number of sources with\n    randomly selected magnitudes, inject them into simulated images,\n    and then record which were detected at the end of the reduction\n    pipeline. As a toy example, we generate 100 data points with\n    randomly selected magnitudes between 20 and 30 and "observe" them\n    with a known detection function (here, the error function, with\n    50% detection probability at magnitude 25):\n\n    >>> from scipy.special import erf\n    >>> from scipy.stats.distributions import binom\n    >>> def true_efficiency(x):\n    ...     return 0.5 - 0.5 * erf((x - 25.) / 2.)\n    >>> mag = 20. + 10. * np.random.rand(100)\n    >>> detected = binom.rvs(1, true_efficiency(mag))\n    >>> bins, binshw, p, perr = binned_binom_proportion(mag, detected, bins=20)\n    >>> plt.errorbar(bins, p, xerr=binshw, yerr=perr, ls=\'none\', marker=\'o\',\n    ...              label=\'estimate\')\n\n    .. plot::\n\n       import numpy as np\n       from scipy.special import erf\n       from scipy.stats.distributions import binom\n       import matplotlib.pyplot as plt\n       from astropy.stats import binned_binom_proportion\n       def true_efficiency(x):\n           return 0.5 - 0.5 * erf((x - 25.) / 2.)\n       np.random.seed(400)\n       mag = 20. + 10. * np.random.rand(100)\n       np.random.seed(600)\n       detected = binom.rvs(1, true_efficiency(mag))\n       bins, binshw, p, perr = binned_binom_proportion(mag, detected, bins=20)\n       plt.errorbar(bins, p, xerr=binshw, yerr=perr, ls=\'none\', marker=\'o\',\n                    label=\'estimate\')\n       X = np.linspace(20., 30., 1000)\n       plt.plot(X, true_efficiency(X), label=\'true efficiency\')\n       plt.ylim(0., 1.)\n       plt.title(\'Detection efficiency vs magnitude\')\n       plt.xlabel(\'Magnitude\')\n       plt.ylabel(\'Detection efficiency\')\n       plt.legend()\n       plt.show()\n\n    The above example uses the Wilson confidence interval to calculate\n    the uncertainty ``perr`` in each bin (see the definition of various\n    confidence intervals in `binom_conf_interval`). A commonly used\n    alternative is the Wald interval. However, the Wald interval can\n    give nonsensical uncertainties when the efficiency is near 0 or 1,\n    and is therefore **not** recommended. As an illustration, the\n    following example shows the same data as above but uses the Wald\n    interval rather than the Wilson interval to calculate ``perr``:\n\n    >>> bins, binshw, p, perr = binned_binom_proportion(mag, detected, bins=20,\n    ...                                                 interval=\'wald\')\n    >>> plt.errorbar(bins, p, xerr=binshw, yerr=perr, ls=\'none\', marker=\'o\',\n    ...              label=\'estimate\')\n\n    .. plot::\n\n       import numpy as np\n       from scipy.special import erf\n       from scipy.stats.distributions import binom\n       import matplotlib.pyplot as plt\n       from astropy.stats import binned_binom_proportion\n       def true_efficiency(x):\n           return 0.5 - 0.5 * erf((x - 25.) / 2.)\n       np.random.seed(400)\n       mag = 20. + 10. * np.random.rand(100)\n       np.random.seed(600)\n       detected = binom.rvs(1, true_efficiency(mag))\n       bins, binshw, p, perr = binned_binom_proportion(mag, detected, bins=20,\n                                                       interval=\'wald\')\n       plt.errorbar(bins, p, xerr=binshw, yerr=perr, ls=\'none\', marker=\'o\',\n                    label=\'estimate\')\n       X = np.linspace(20., 30., 1000)\n       plt.plot(X, true_efficiency(X), label=\'true efficiency\')\n       plt.ylim(0., 1.)\n       plt.title(\'The Wald interval can give nonsensical uncertainties\')\n       plt.xlabel(\'Magnitude\')\n       plt.ylabel(\'Detection efficiency\')\n       plt.legend()\n       plt.show()\n\n    '
+x = numpy.ravel(x)
+success = np.ravel(success).astype(numpy.bool)
+if (x.shape != success.shape):
+    raise ValueError('sizes of x and success must match')
+(n, bin_edges) = numpy.histogram(x, bins=bins, range=range)
+tempResult = histogram(x[success], bins=bin_edges)
+	
+===================================================================	
+_KnuthF.eval: 101	
+----------------------------	
+
+'Evaluate the Knuth function\n\n        Parameters\n        ----------\n        dx : float\n            Width of bins\n\n        Returns\n        -------\n        F : float\n            evaluation of the negative Knuth likelihood function:\n            smaller values indicate a better fit.\n        '
+M = int(M)
+if (M <= 0):
+    return numpy.inf
+bins = self.bins(M)
+tempResult = histogram(self.data, bins)
+	
+===================================================================	
+histogram: 27	
+----------------------------	
+
+"Enhanced histogram function, providing adaptive binnings\n\n    This is a histogram function that enables the use of more sophisticated\n    algorithms for determining bins.  Aside from the ``bins`` argument allowing\n    a string specified how bins are computed, the parameters are the same\n    as ``numpy.histogram()``.\n\n    Parameters\n    ----------\n    a : array_like\n        array of data to be histogrammed\n\n    bins : int or list or str (optional)\n        If bins is a string, then it must be one of:\n\n        - 'blocks' : use bayesian blocks for dynamic bin widths\n\n        - 'knuth' : use Knuth's rule to determine bins\n\n        - 'scott' : use Scott's rule to determine bins\n\n        - 'freedman' : use the Freedman-Diaconis rule to determine bins\n\n    range : tuple or None (optional)\n        the minimum and maximum range for the histogram.  If not specified,\n        it will be (x.min(), x.max())\n\n    weights : array_like, optional\n        Not Implemented\n\n    other keyword arguments are described in numpy.histogram().\n\n    Returns\n    -------\n    hist : array\n        The values of the histogram. See ``normed`` and ``weights`` for a\n        description of the possible semantics.\n    bin_edges : array of dtype float\n        Return the bin edges ``(length(hist)+1)``.\n\n    See Also\n    --------\n    numpy.histogram\n    "
+if isinstance(bins, extern.six.string_types):
+    a = np.asarray(a).ravel()
+    if (weights is not None):
+        raise NotImplementedError('weights are not yet supported for the enhanced histogram')
+    if (range is not None):
+        a = a[((a >= range[0]) & (a <= range[1]))]
+    if (bins == 'blocks'):
+        bins = bayesian_blocks(a)
+    elif (bins == 'knuth'):
+        (da, bins) = knuth_bin_width(a, True)
+    elif (bins == 'scott'):
+        (da, bins) = scott_bin_width(a, True)
+    elif (bins == 'freedman'):
+        (da, bins) = freedman_bin_width(a, True)
+    else:
+        raise ValueError("unrecognized bin code: '{}'".format(bins))
+tempResult = histogram(a, bins=bins, range=range, weights=weights, **kwargs)
+	
+***************************************************	
+scipy_scipy-0.19.0: 8	
+===================================================================	
+_hist: 343	
+----------------------------	
+
+tempResult = histogram(vals, _bins)
+	
+===================================================================	
+_histogram: 502	
+----------------------------	
+
+"\n    Separates the range into several bins and returns the number of instances\n    in each bin.\n\n    Parameters\n    ----------\n    a : array_like\n        Array of scores which will be put into bins.\n    numbins : int, optional\n        The number of bins to use for the histogram. Default is 10.\n    defaultlimits : tuple (lower, upper), optional\n        The lower and upper values for the range of the histogram.\n        If no value is given, a range slightly larger than the range of the\n        values in a is used. Specifically ``(a.min() - s, a.max() + s)``,\n        where ``s = (1/2)(a.max() - a.min()) / (numbins - 1)``.\n    weights : array_like, optional\n        The weights for each value in `a`. Default is None, which gives each\n        value a weight of 1.0\n    printextras : bool, optional\n        If True, if there are extra points (i.e. the points that fall outside\n        the bin limits) a warning is raised saying how many of those points\n        there are.  Default is False.\n\n    Returns\n    -------\n    count : ndarray\n        Number of points (or sum of weights) in each bin.\n    lowerlimit : float\n        Lowest value of histogram, the lower limit of the first bin.\n    binsize : float\n        The size of the bins (all bins have the same size).\n    extrapoints : int\n        The number of points outside the range of the histogram.\n\n    See Also\n    --------\n    numpy.histogram\n\n    Notes\n    -----\n    This histogram is based on numpy's histogram but has a larger range by\n    default if default limits is not set.\n\n    "
+a = numpy.ravel(a)
+if (defaultlimits is None):
+    if (a.size == 0):
+        defaultlimits = (0, 1)
+    else:
+        data_min = a.min()
+        data_max = a.max()
+        s = ((data_max - data_min) / (2.0 * (numbins - 1.0)))
+        defaultlimits = ((data_min - s), (data_max + s))
+tempResult = histogram(a, bins=numbins, range=defaultlimits, weights=weights)
+	
+===================================================================	
+TestBinnedStatistic.test_1d_count: 24	
+----------------------------	
+
+x = self.x
+v = self.v
+(count1, edges1, bc) = binned_statistic(x, v, 'count', bins=10)
+tempResult = histogram(x, bins=10)
+	
+===================================================================	
+TestBinnedStatistic.test_1d_sum: 46	
+----------------------------	
+
+x = self.x
+v = self.v
+(sum1, edges1, bc) = binned_statistic(x, v, 'sum', bins=10)
+tempResult = histogram(x, bins=10, weights=v)
+	
+===================================================================	
+module: 16	
+----------------------------	
+
+from __future__ import division, print_function, absolute_import
+import warnings
+import numpy as np
+import numpy.testing as npt
+from scipy import integrate
+from scipy import stats
+from scipy.special import betainc
+from common_tests import check_normalization, check_moment, check_mean_expect, check_var_expect, check_skew_expect, check_kurt_expect, check_entropy, check_private_entropy, check_edge_support, check_named_args, check_random_state_property, check_meth_dtype, check_ppf_dtype, check_cmplx_deriv, check_pickling, check_rvs_broadcast
+from scipy.stats._distr_params import distcont
+'\nTest all continuous distributions.\n\nParameters were chosen for those distributions that pass the\nKolmogorov-Smirnov test.  This provides safe parameters for each\ndistributions so that we can perform further testing of class methods.\n\nThese tests currently check only/mostly for serious errors and exceptions,\nnot for numerically exact results.\n'
+DECIMAL = 5
+distcont_extra = [['betaprime', (100, 86)], ['fatiguelife', (5,)], ['mielke', (4.642049549212149, 0.5970741954551694)], ['invweibull', (0.5884711211926479,)], ['burr', (0.9483983807536605, 4.3820284068855795)], ['genextreme', (3.3184017469423535,)]]
+distslow = ['rdist', 'gausshyper', 'recipinvgauss', 'ksone', 'genexpon', 'vonmises', 'vonmises_line', 'mielke', 'semicircular', 'cosine', 'invweibull', 'powerlognorm', 'johnsonsu', 'kstwobign']
+fails_cmplx = set(['beta', 'betaprime', 'chi', 'chi2', 'dgamma', 'dweibull', 'erlang', 'f', 'gamma', 'gausshyper', 'gengamma', 'gennorm', 'genpareto', 'halfgennorm', 'invgamma', 'ksone', 'kstwobign', 'levy_l', 'loggamma', 'logistic', 'maxwell', 'nakagami', 'ncf', 'nct', 'ncx2', 'pearson3', 'rice', 't', 'skewnorm', 'tukeylambda', 'vonmises', 'vonmises_line', 'rv_histogram_instance'])
+tempResult = histogram([1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 8, 8, 9], bins=8)
+	
+===================================================================	
+check_discrete_chisquare: 147	
+----------------------------	
+
+'Perform chisquare test for random sample of a discrete distribution\n\n    Parameters\n    ----------\n    distname : string\n        name of distribution function\n    arg : sequence\n        parameters of distribution\n    alpha : float\n        significance level, threshold for p-value\n\n    Returns\n    -------\n    result : bool\n        0 if test passes, 1 if test fails\n\n    '
+wsupp = 0.05
+lo = int(max(distfn.a, (- 1000)))
+distsupport = xrange(lo, (int(min(distfn.b, 1000)) + 1))
+last = 0
+distsupp = [lo]
+distmass = []
+for ii in distsupport:
+    current = distfn.cdf(ii, *arg)
+    if ((current - last) >= (wsupp - 1e-14)):
+        distsupp.append(ii)
+        distmass.append((current - last))
+        last = current
+        if (current > (1 - wsupp)):
+            break
+if (distsupp[(- 1)] < distfn.b):
+    distsupp.append(distfn.b)
+    distmass.append((1 - last))
+distsupp = numpy.array(distsupp)
+distmass = numpy.array(distmass)
+histsupp = (distsupp + 1e-08)
+histsupp[0] = distfn.a
+tempResult = histogram(rvs, histsupp)
+	
+===================================================================	
+TestHistogram.setUp: 2198	
+----------------------------	
+
+tempResult = histogram([1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 8, 8, 9], bins=8)
+	
+===================================================================	
+TestHistogram.setUp: 2201	
+----------------------------	
+
+histogram = numpy.histogram([1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 8, 8, 9], bins=8)
+self.template = scipy.stats.rv_histogram(histogram)
+data = scipy.stats.norm.rvs(loc=1.0, scale=2.5, size=10000, random_state=123)
+tempResult = histogram(data, bins=50)
+	
+***************************************************	
+sklearn_sklearn-0.18.0: 0	
+***************************************************	
+matplotlib_matplotlib-2.0.0: 8	
+===================================================================	
+module: 10	
+----------------------------	
+
+'\n==================\nAnimated histogram\n==================\n\nThis example shows how to use a path patch to draw a bunch of\nrectangles for an animated histogram.\n\n'
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import matplotlib.path as path
+import matplotlib.animation as animation
+(fig, ax) = matplotlib.pyplot.subplots()
+data = numpy.random.randn(1000)
+tempResult = histogram(data, 100)
+	
+===================================================================	
+animate: 37	
+----------------------------	
+
+data = numpy.random.randn(1000)
+tempResult = histogram(data, 100)
+	
+===================================================================	
+module: 9	
+----------------------------	
+
+'\n========================================================\nBuilding histograms using Rectangles and PolyCollections\n========================================================\n\nThis example shows how to use a path patch to draw a bunch of\nrectangles.  The technique of using lots of Rectangle instances, or\nthe faster method of using PolyCollections, were implemented before we\nhad proper paths with moveto/lineto, closepoly etc in mpl.  Now that\nwe have them, we can draw collections of regularly shaped objects with\nhomogeneous properties more efficiently with a PathCollection.  This\nexample makes a histogram -- its more work to set up the vertex arrays\nat the outset, but it should be much faster for large numbers of\nobjects\n'
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import matplotlib.path as path
+(fig, ax) = matplotlib.pyplot.subplots()
+data = numpy.random.randn(1000)
+tempResult = histogram(data, 50)
+	
+===================================================================	
+module: 10	
+----------------------------	
+
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import matplotlib.path as path
+fig = matplotlib.pyplot.figure()
+ax = fig.add_subplot(111)
+numpy.random.seed(19680801)
+data = numpy.random.randn(1000)
+tempResult = histogram(data, 100)
+	
+===================================================================	
+module: 11	
+----------------------------	
+
+"\n=======================================================\nDemo of how to produce multiple histograms side by side\n=======================================================\n\nThis example plots horizontal histograms of different samples along\na categorical x-axis. Additionally, the histograms are plotted to\nbe symmetrical about their x-position, thus making them very similar\nto violin plots.\n\nTo make this highly specialized plot, we can't use the standard ``hist``\nmethod. Instead we use ``barh`` to draw the horizontal bars directly. The\nvertical positions and lengths of the bars are computed via the\n``np.histogram`` function. The histograms for all the samples are\ncomputed using the same range (min and max values) and number of bins,\nso that the bins for each sample are in the same vertical positions.\n\nSelecting different bin counts and sizes can significantly affect the\nshape of a histogram. The Astropy docs have a great section on how to\nselect these parameters:\nhttp://docs.astropy.org/en/stable/visualization/histogram.html\n"
+import numpy as np
+import matplotlib.pyplot as plt
+numpy.random.seed(0)
+number_of_bins = 20
+number_of_data_points = 387
+labels = ['A', 'B', 'C']
+data_sets = [numpy.random.normal(0, 1, number_of_data_points), numpy.random.normal(6, 1, number_of_data_points), numpy.random.normal((- 3), 1, number_of_data_points)]
+hist_range = (numpy.min(data_sets), numpy.max(data_sets))
+tempResult = histogram(d, range=hist_range, bins=number_of_bins)
+	
+===================================================================	
+entropy: 423	
+----------------------------	
+
+'\n    Return the entropy of the data in *y* in units of nat.\n\n    .. math::\n\n      -\\sum p_i \\ln(p_i)\n\n    where :math:`p_i` is the probability of observing *y* in the\n    :math:`i^{th}` bin of *bins*.  *bins* can be a number of bins or a\n    range of bins; see :func:`numpy.histogram`.\n\n    Compare *S* with analytic calculation for a Gaussian::\n\n      x = mu + sigma * randn(200000)\n      Sanalytic = 0.5 * ( 1.0 + log(2*pi*sigma**2.0) )\n    '
+tempResult = histogram(y, bins)
+	
+===================================================================	
+Axes.hist: 2234	
+----------------------------	
+
+"\n        Plot a histogram.\n\n        Compute and draw the histogram of *x*. The return value is a\n        tuple (*n*, *bins*, *patches*) or ([*n0*, *n1*, ...], *bins*,\n        [*patches0*, *patches1*,...]) if the input contains multiple\n        data.\n\n        Multiple data can be provided via *x* as a list of datasets\n        of potentially different length ([*x0*, *x1*, ...]), or as\n        a 2-D ndarray in which each column is a dataset.  Note that\n        the ndarray form is transposed relative to the list form.\n\n        Masked arrays are not supported at present.\n\n        Parameters\n        ----------\n        x : (n,) array or sequence of (n,) arrays\n            Input values, this takes either a single array or a sequency of\n            arrays which are not required to be of the same length\n\n        bins : integer or array_like or 'auto', optional\n            If an integer is given, `bins + 1` bin edges are returned,\n            consistently with :func:`numpy.histogram` for numpy version >=\n            1.3.\n\n            Unequally spaced bins are supported if `bins` is a sequence.\n\n            If Numpy 1.11 is installed, may also be ``'auto'``.\n\n            Default is taken from the rcParam ``hist.bins``.\n\n        range : tuple or None, optional\n            The lower and upper range of the bins. Lower and upper outliers\n            are ignored. If not provided, `range` is (x.min(), x.max()). Range\n            has no effect if `bins` is a sequence.\n\n            If `bins` is a sequence or `range` is specified, autoscaling\n            is based on the specified bin range instead of the\n            range of x.\n\n            Default is ``None``\n\n        normed : boolean, optional\n            If `True`, the first element of the return tuple will\n            be the counts normalized to form a probability density, i.e.,\n            ``n/(len(x)`dbin)``, i.e., the integral of the histogram will sum\n            to 1. If *stacked* is also *True*, the sum of the histograms is\n            normalized to 1.\n\n            Default is ``False``\n\n        weights : (n, ) array_like or None, optional\n            An array of weights, of the same shape as `x`.  Each value in `x`\n            only contributes its associated weight towards the bin count\n            (instead of 1).  If `normed` is True, the weights are normalized,\n            so that the integral of the density over the range remains 1.\n\n            Default is ``None``\n\n        cumulative : boolean, optional\n            If `True`, then a histogram is computed where each bin gives the\n            counts in that bin plus all bins for smaller values. The last bin\n            gives the total number of datapoints.  If `normed` is also `True`\n            then the histogram is normalized such that the last bin equals 1.\n            If `cumulative` evaluates to less than 0 (e.g., -1), the direction\n            of accumulation is reversed.  In this case, if `normed` is also\n            `True`, then the histogram is normalized such that the first bin\n            equals 1.\n\n            Default is ``False``\n\n        bottom : array_like, scalar, or None\n            Location of the bottom baseline of each bin.  If a scalar,\n            the base line for each bin is shifted by the same amount.\n            If an array, each bin is shifted independently and the length\n            of bottom must match the number of bins.  If None, defaults to 0.\n\n            Default is ``None``\n\n        histtype : {'bar', 'barstacked', 'step',  'stepfilled'}, optional\n            The type of histogram to draw.\n\n            - 'bar' is a traditional bar-type histogram.  If multiple data\n              are given the bars are aranged side by side.\n\n            - 'barstacked' is a bar-type histogram where multiple\n              data are stacked on top of each other.\n\n            - 'step' generates a lineplot that is by default\n              unfilled.\n\n            - 'stepfilled' generates a lineplot that is by default\n              filled.\n\n            Default is 'bar'\n\n        align : {'left', 'mid', 'right'}, optional\n            Controls how the histogram is plotted.\n\n                - 'left': bars are centered on the left bin edges.\n\n                - 'mid': bars are centered between the bin edges.\n\n                - 'right': bars are centered on the right bin edges.\n\n            Default is 'mid'\n\n        orientation : {'horizontal', 'vertical'}, optional\n            If 'horizontal', `~matplotlib.pyplot.barh` will be used for\n            bar-type histograms and the *bottom* kwarg will be the left edges.\n\n        rwidth : scalar or None, optional\n            The relative width of the bars as a fraction of the bin width.  If\n            `None`, automatically compute the width.\n\n            Ignored if `histtype` is 'step' or 'stepfilled'.\n\n            Default is ``None``\n\n        log : boolean, optional\n            If `True`, the histogram axis will be set to a log scale. If `log`\n            is `True` and `x` is a 1D array, empty bins will be filtered out\n            and only the non-empty (`n`, `bins`, `patches`) will be returned.\n\n            Default is ``False``\n\n        color : color or array_like of colors or None, optional\n            Color spec or sequence of color specs, one per dataset.  Default\n            (`None`) uses the standard line color sequence.\n\n            Default is ``None``\n\n        label : string or None, optional\n            String, or sequence of strings to match multiple datasets.  Bar\n            charts yield multiple patches per dataset, but only the first gets\n            the label, so that the legend command will work as expected.\n\n            default is ``None``\n\n        stacked : boolean, optional\n            If `True`, multiple data are stacked on top of each other If\n            `False` multiple data are aranged side by side if histtype is\n            'bar' or on top of each other if histtype is 'step'\n\n            Default is ``False``\n\n        Returns\n        -------\n        n : array or list of arrays\n            The values of the histogram bins. See **normed** and **weights**\n            for a description of the possible semantics. If input **x** is an\n            array, then this is an array of length **nbins**. If input is a\n            sequence arrays ``[data1, data2,..]``, then this is a list of\n            arrays with the values of the histograms for each of the arrays\n            in the same order.\n\n        bins : array\n            The edges of the bins. Length nbins + 1 (nbins left edges and right\n            edge of last bin).  Always a single array even when multiple data\n            sets are passed in.\n\n        patches : list or list of lists\n            Silent list of individual patches used to create the histogram\n            or list of such list if multiple input datasets.\n\n        Other Parameters\n        ----------------\n        kwargs : `~matplotlib.patches.Patch` properties\n\n        See also\n        --------\n        hist2d : 2D histograms\n\n        Notes\n        -----\n        Until numpy release 1.5, the underlying numpy histogram function was\n        incorrect with `normed`=`True` if bin sizes were unequal.  MPL\n        inherited that error.  It is now corrected within MPL when using\n        earlier numpy versions.\n\n        Examples\n        --------\n        .. plot:: mpl_examples/statistics/histogram_demo_features.py\n\n        "
+
+def _normalize_input(inp, ename='input'):
+    'Normalize 1 or 2d input into list of np.ndarray or\n            a single 2D np.ndarray.\n\n            Parameters\n            ----------\n            inp : iterable\n            ename : str, optional\n                Name to use in ValueError if `inp` can not be normalized\n\n            '
+    if (isinstance(x, numpy.ndarray) or (not iterable(matplotlib.cbook.safe_first_element(inp)))):
+        inp = numpy.asarray(inp)
+        if (inp.ndim == 2):
+            inp = inp.T
+        elif (inp.ndim == 1):
+            inp = inp.reshape(1, inp.shape[0])
+        else:
+            raise ValueError('{ename} must be 1D or 2D'.format(ename=ename))
+        if (inp.shape[1] < inp.shape[0]):
+            warnings.warn(('2D hist input should be nsamples x nvariables;\n this looks transposed (shape is %d x %d)' % inp.shape[::(- 1)]))
+    else:
+        inp = [numpy.asarray(xi) for xi in inp]
+    return inp
+if (not self._hold):
+    self.cla()
+if numpy.isscalar(x):
+    x = [x]
+if (bins is None):
+    bins = rcParams['hist.bins']
+bin_range = range
+range = __builtins__['range']
+if (histtype not in ['bar', 'barstacked', 'step', 'stepfilled']):
+    raise ValueError(('histtype %s is not recognized' % histtype))
+if (align not in ['left', 'mid', 'right']):
+    raise ValueError(('align kwarg %s is not recognized' % align))
+if (orientation not in ['horizontal', 'vertical']):
+    raise ValueError(('orientation kwarg %s is not recognized' % orientation))
+if ((histtype == 'barstacked') and (not stacked)):
+    stacked = True
+self._process_unit_info(xdata=x, kwargs=kwargs)
+x = self.convert_xunits(x)
+if (bin_range is not None):
+    bin_range = self.convert_xunits(bin_range)
+binsgiven = (matplotlib.cbook.iterable(bins) or (bin_range is not None))
+flat = numpy.ravel(x)
+input_empty = (len(flat) == 0)
+if input_empty:
+    x = numpy.array([[]])
+else:
+    x = _normalize_input(x, 'x')
+nx = len(x)
+if (weights is not None):
+    w = _normalize_input(weights, 'weights')
+else:
+    w = ([None] * nx)
+if (len(w) != nx):
+    raise ValueError('weights should have the same shape as x')
+for (xi, wi) in zip(x, w):
+    if ((wi is not None) and (len(wi) != len(xi))):
+        raise ValueError('weights should have the same shape as x')
+if (color is None):
+    color = [self._get_lines.get_next_color() for i in xrange(nx)]
+else:
+    color = matplotlib.colors.to_rgba_array(color)
+    if (len(color) != nx):
+        raise ValueError('color kwarg must have one color per dataset')
+_saved_bounds = self.dataLim.bounds
+if ((not binsgiven) and (not input_empty)):
+    xmin = numpy.inf
+    xmax = (- numpy.inf)
+    for xi in x:
+        if (len(xi) > 0):
+            xmin = min(xmin, xi.min())
+            xmax = max(xmax, xi.max())
+    bin_range = (xmin, xmax)
+hist_kwargs = dict(range=bin_range)
+n = []
+mlast = None
+for i in xrange(nx):
+    tempResult = histogram(x[i], bins, weights=w[i], **hist_kwargs)
+	
+===================================================================	
+calculate_rms: 173	
+----------------------------	
+
+'Calculate the per-pixel errors, then compute the root mean square error.'
+if (expectedImage.shape != actualImage.shape):
+    raise ImageComparisonFailure('image sizes do not match expected size: {0} actual size {1}'.format(expectedImage.shape, actualImage.shape))
+num_values = numpy.prod(expectedImage.shape)
+abs_diff_image = abs((expectedImage - actualImage))
+expected_version = distutils.version.LooseVersion('1.6')
+found_version = distutils.version.LooseVersion(numpy.__version__)
+if (found_version >= expected_version):
+    histogram = numpy.bincount(abs_diff_image.ravel(), minlength=256)
+else:
+    tempResult = histogram(abs_diff_image, bins=numpy.arange(257))
+	
+***************************************************	
+ipython_ipython-6.1.0: 0	
+***************************************************	
+pandas_pandas-0.19.2: 1	
+===================================================================	
+HistPlot._args_adjust: 1381	
+----------------------------	
+
+if is_integer(self.bins):
+    values = self.data._convert(datetime=True)._get_numeric_data()
+    values = numpy.ravel(values)
+    values = values[(~ isnull(values))]
+    tempResult = histogram(values, bins=self.bins, range=self.kwds.get('range', None), weights=self.kwds.get('weights', None))
+	
+***************************************************	
+dask_dask-0.7.0: 1	
+===================================================================	
+block_hist: 1083	
+----------------------------	
+
+tempResult = histogram(x, bins, weights=weights)
+	
+***************************************************	
+nengo_nengo-2.0.0: 4	
+===================================================================	
+test_uniform: 36	
+----------------------------	
+
+n = 100
+dist = nengo.dists.Uniform(low, high)
+samples = dist.sample(n, rng=rng)
+if (low < high):
+    assert numpy.all((samples >= low))
+    assert numpy.all((samples < high))
+else:
+    assert numpy.all((samples <= low))
+    assert numpy.all((samples > high))
+tempResult = histogram(samples, bins=5)
+	
+===================================================================	
+test_pdf: 17	
+----------------------------	
+
+s = 0.25
+f = (lambda x: (numpy.exp((((- 0.5) * ((x + 0.5) ** 2)) / (s ** 2))) + numpy.exp((((- 0.5) * ((x - 0.5) ** 2)) / (s ** 2)))))
+xref = numpy.linspace((- 2), 2, 101)
+pref = f(xref)
+pref /= pref.sum()
+dist = nengo.dists.PDF(xref, pref)
+n = 100000
+samples = dist.sample(n, rng=rng)
+tempResult = histogram(samples, bins=101)
+	
+===================================================================	
+test_choice: 85	
+----------------------------	
+
+n = 1000
+choices = [[1, 1], [1, (- 1)], [(- 1), 1], [(- 1), (- 1)]]
+N = len(choices)
+dist = nengo.dists.Choice(choices, weights=weights)
+with pytest.raises(ValueError):
+    dist.sample(n, d=4, rng=rng)
+sample = dist.sample(n, rng=rng)
+(tsample, tchoices) = (list(map(tuple, sample)), list(map(tuple, choices)))
+inds = [tchoices.index(s) for s in tsample]
+tempResult = histogram(inds, bins=numpy.linspace((- 0.5), (N - 0.5), (N + 1)))
+	
+===================================================================	
+test_noise: 102	
+----------------------------	
+
+'Make sure that we can generate noise properly.'
+n = 1000
+(mean, std) = (0.1, 0.8)
+noise = Signal(numpy.zeros(n), name='noise')
+process = nengo.processes.StochasticProcess(nengo.dists.Gaussian(mean, std))
+m = Model(dt=0.001)
+m.operators += [Reset(noise), SimNoise(noise, process)]
+sim = RefSimulator(None, model=m, seed=seed)
+samples = numpy.zeros((100, n))
+for i in range(100):
+    sim.step()
+    samples[i] = sim.signals[noise]
+tempResult = histogram(samples.flat, bins=51)
+	
+***************************************************	
+sympy_sympy-1.0.0: 0	
+***************************************************	
+daducci_amico-dev: 0	
+***************************************************	
+aplpy_aplpy-1.1.1: 0	
+***************************************************	
+markovmodel_msmtools-1.0.2: 0	
+***************************************************	
+nilearn_nilearn-0.4.0: 0	
+***************************************************	
+poliastro_poliastro-0.8.0: 0	
+***************************************************	
+skimage_skimage-0.13.0: 3	
+===================================================================	
+histogram: 32	
+----------------------------	
+
+'Return histogram of image.\n\n    Unlike `numpy.histogram`, this function returns the centers of bins and\n    does not rebin integer arrays. For integer arrays, each integer value has\n    its own bin, which improves speed and intensity-resolution.\n\n    The histogram is computed on the flattened image: for color images, the\n    function should be used separately on each channel to obtain a histogram\n    for each color channel.\n\n    Parameters\n    ----------\n    image : array\n        Input image.\n    nbins : int\n        Number of bins used to calculate histogram. This value is ignored for\n        integer arrays.\n\n    Returns\n    -------\n    hist : array\n        The values of the histogram.\n    bin_centers : array\n        The values at the center of the bins.\n\n    See Also\n    --------\n    cumulative_distribution\n\n    Examples\n    --------\n    >>> from skimage import data, exposure, img_as_float\n    >>> image = img_as_float(data.camera())\n    >>> np.histogram(image, bins=2)\n    (array([107432, 154712]), array([ 0. ,  0.5,  1. ]))\n    >>> exposure.histogram(image, nbins=2)\n    (array([107432, 154712]), array([ 0.25,  0.75]))\n    '
+sh = image.shape
+if ((len(sh) == 3) and (sh[(- 1)] < 4)):
+    warn('This might be a color image. The histogram will be computed on the flattened image. You can instead apply this function to each color channel.')
+if numpy.issubdtype(image.dtype, numpy.integer):
+    offset = 0
+    image_min = numpy.min(image)
+    if (image_min < 0):
+        offset = image_min
+        image_range = (np.max(image).astype(numpy.int64) - image_min)
+        offset_dtype = numpy.promote_types(numpy.min_scalar_type(image_range), numpy.min_scalar_type(image_min))
+        if (image.dtype != offset_dtype):
+            image = image.astype(offset_dtype)
+        image = (image - offset)
+    hist = numpy.bincount(image.ravel())
+    bin_centers = (numpy.arange(len(hist)) + offset)
+    idx = numpy.nonzero(hist)[0][0]
+    return (hist[idx:], bin_centers[idx:])
+else:
+    tempResult = histogram(image.flat, bins=nbins)
+	
+===================================================================	
+test_grey: 17	
+----------------------------	
+
+img = numpy.zeros((20, 21))
+img[:10, 10:] = 0.2
+img[10:, :10] = 0.4
+img[10:, 10:] = 0.6
+seg = felzenszwalb(img, sigma=0)
+assert_equal(len(numpy.unique(seg)), 4)
+for i in range(4):
+    tempResult = histogram(img[(seg == i)], bins=[0, 0.1, 0.3, 0.5, 1])
+	
+===================================================================	
+test_grey: 19	
+----------------------------	
+
+rnd = numpy.random.RandomState(0)
+img = numpy.zeros((20, 21))
+img[:10, 10:] = 0.2
+img[10:, :10] = 0.4
+img[10:, 10:] = 0.6
+img += (0.1 * rnd.normal(size=img.shape))
+seg = quickshift(img, kernel_size=2, max_dist=3, random_seed=0, convert2lab=False, sigma=0)
+assert_equal(len(numpy.unique(seg)), 4)
+for i in range(4):
+    tempResult = histogram(img[(seg == i)], bins=[0, 0.1, 0.3, 0.5, 1])
+	
+***************************************************	
+sunpy_sunpy-0.8.0: 0	
+***************************************************	
+spacetelescope_synphot-0.1: 0	
+***************************************************	
+librosa_librosa-0.5.1: 1	
+===================================================================	
+pitch_tuning: 31	
+----------------------------	
+
+'Given a collection of pitches, estimate its tuning offset\n    (in fractions of a bin) relative to A440=440.0Hz.\n\n    Parameters\n    ----------\n    frequencies : array-like, float\n        A collection of frequencies detected in the signal.\n        See `piptrack`\n\n    resolution : float in `(0, 1)`\n        Resolution of the tuning as a fraction of a bin.\n        0.01 corresponds to cents.\n\n    bins_per_octave : int > 0 [scalar]\n        How many frequency bins per octave\n\n    Returns\n    -------\n    tuning: float in `[-0.5, 0.5)`\n        estimated tuning deviation (fractions of a bin)\n\n    See Also\n    --------\n    estimate_tuning\n        Estimating tuning from time-series or spectrogram input\n\n    Examples\n    --------\n    >>> # Generate notes at +25 cents\n    >>> freqs = librosa.cqt_frequencies(24, 55, tuning=0.25)\n    >>> librosa.pitch_tuning(freqs)\n    0.25\n\n    >>> # Track frequencies from a real spectrogram\n    >>> y, sr = librosa.load(librosa.util.example_audio_file())\n    >>> pitches, magnitudes, stft = librosa.ifptrack(y, sr)\n    >>> # Select out pitches with high energy\n    >>> pitches = pitches[magnitudes > np.median(magnitudes)]\n    >>> librosa.pitch_tuning(pitches)\n    0.089999999999999969\n\n    '
+frequencies = numpy.atleast_1d(frequencies)
+frequencies = frequencies[(frequencies > 0)]
+if (not numpy.any(frequencies)):
+    warnings.warn('Trying to estimate tuning from empty frequency set.')
+    return 0.0
+residual = numpy.mod((bins_per_octave * time_frequency.hz_to_octs(frequencies)), 1.0)
+residual[(residual >= 0.5)] -= 1.0
+bins = numpy.linspace((- 0.5), 0.5, int(numpy.ceil((1.0 / resolution))), endpoint=False)
+tempResult = histogram(residual, bins)
+	
+***************************************************	
+mne_python-0.15.0: 0	
+***************************************************	

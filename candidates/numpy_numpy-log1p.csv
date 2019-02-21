@@ -1,0 +1,10 @@
+project, module, line
+scipy_scipy,cauchy,119
+scipy_scipy,xfunc1,2591
+scipy_scipy,test_boxcox1p_basic,36
+scipy_scipy,test_boxcox1p_underflow,49
+scipy_scipy,TestGeom.test_logcdf_logsf,254
+sklearn_sklearn,test_np_log,32
+nengo_nengo,LIFRate.step_math,148
+nilearn_nilearn,_logistic,91
+nilearn_nilearn,_logistic,92

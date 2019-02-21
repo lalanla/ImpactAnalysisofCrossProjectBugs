@@ -1,0 +1,587 @@
+﻿astropy_astropy-1.3.0: 1	
+===================================================================	
+_ndarray_representer: 46	
+----------------------------	
+
+if (not (obj.flags['C_CONTIGUOUS'] or obj.flags['F_CONTIGUOUS'])):
+    tempResult = ascontiguousarray(obj)
+	
+***************************************************	
+scipy_scipy-0.19.0: 29	
+===================================================================	
+NdPPoly.__init__: 714	
+----------------------------	
+
+tempResult = ascontiguousarray(v, dtype=numpy.float64)
+	
+===================================================================	
+NdPPoly.__init__: 731	
+----------------------------	
+
+self.x = tuple((numpy.ascontiguousarray(v, dtype=numpy.float64) for v in x))
+self.c = numpy.asarray(c)
+if (extrapolate is None):
+    extrapolate = True
+self.extrapolate = bool(extrapolate)
+ndim = len(self.x)
+if any(((v.ndim != 1) for v in self.x)):
+    raise ValueError('x arrays must all be 1-dimensional')
+if any(((v.size < 2) for v in self.x)):
+    raise ValueError('x arrays must all contain at least 2 points')
+if (c.ndim < (2 * ndim)):
+    raise ValueError('c must have at least 2*len(x) dimensions')
+if any((numpy.any(((v[1:] - v[:(- 1)]) < 0)) for v in self.x)):
+    raise ValueError('x-coordinates are not in increasing order')
+if any(((a != (b.size - 1)) for (a, b) in zip(c.shape[ndim:(2 * ndim)], self.x))):
+    raise ValueError('x and c do not agree on the number of intervals')
+dtype = self._get_dtype(self.c.dtype)
+tempResult = ascontiguousarray(self.c, dtype=dtype)
+	
+===================================================================	
+_PPolyBase.__init__: 285	
+----------------------------	
+
+self.c = numpy.asarray(c)
+tempResult = ascontiguousarray(x, dtype=numpy.float64)
+	
+===================================================================	
+_PPolyBase.__init__: 311	
+----------------------------	
+
+self.c = numpy.asarray(c)
+self.x = numpy.ascontiguousarray(x, dtype=numpy.float64)
+if (extrapolate is None):
+    extrapolate = True
+elif (extrapolate != 'periodic'):
+    extrapolate = bool(extrapolate)
+self.extrapolate = extrapolate
+if (not (0 <= axis < (self.c.ndim - 1))):
+    raise ValueError(('%s must be between 0 and %s' % (axis, (c.ndim - 1))))
+self.axis = axis
+if (axis != 0):
+    self.c = numpy.rollaxis(self.c, (axis + 1))
+    self.c = numpy.rollaxis(self.c, (axis + 1))
+if (self.x.ndim != 1):
+    raise ValueError('x must be 1-dimensional')
+if (self.x.size < 2):
+    raise ValueError('at least 2 breakpoints are needed')
+if (self.c.ndim < 2):
+    raise ValueError('c must have at least 2 dimensions')
+if (self.c.shape[0] == 0):
+    raise ValueError('polynomial must be at least of order 0')
+if (self.c.shape[1] != (self.x.size - 1)):
+    raise ValueError('number of coefficients != len(x)-1')
+dx = numpy.diff(self.x)
+if (not (numpy.all((dx >= 0)) or numpy.all((dx <= 0)))):
+    raise ValueError('`x` must be strictly increasing or decreasing.')
+dtype = self._get_dtype(self.c.dtype)
+tempResult = ascontiguousarray(self.c, dtype=dtype)
+	
+===================================================================	
+_PPolyBase.__call__: 394	
+----------------------------	
+
+"\n        Evaluate the piecewise polynomial or its derivative.\n\n        Parameters\n        ----------\n        x : array_like\n            Points to evaluate the interpolant at.\n        nu : int, optional\n            Order of derivative to evaluate. Must be non-negative.\n        extrapolate : {bool, 'periodic', None}, optional\n            If bool, determines whether to extrapolate to out-of-bounds points\n            based on first and last intervals, or to return NaNs.\n            If 'periodic', periodic extrapolation is used.\n            If None (default), use `self.extrapolate`.\n\n        Returns\n        -------\n        y : array_like\n            Interpolated values. Shape is determined by replacing\n            the interpolation axis in the original array with the shape of x.\n\n        Notes\n        -----\n        Derivatives are evaluated piecewise for each polynomial\n        segment, even if the polynomial is not differentiable at the\n        breakpoints. The polynomial intervals are considered half-open,\n        ``[a, b)``, except for the last interval which is closed\n        ``[a, b]``.\n        "
+if (extrapolate is None):
+    extrapolate = self.extrapolate
+x = numpy.asarray(x)
+(x_shape, x_ndim) = (x.shape, x.ndim)
+tempResult = ascontiguousarray(x.ravel(), dtype=numpy.float_)
+	
+===================================================================	
+NdPPoly.__call__: 765	
+----------------------------	
+
+'\n        Evaluate the piecewise polynomial or its derivative\n\n        Parameters\n        ----------\n        x : array-like\n            Points to evaluate the interpolant at.\n        nu : tuple, optional\n            Orders of derivatives to evaluate. Each must be non-negative.\n        extrapolate : bool, optional\n            Whether to extrapolate to out-of-bounds points based on first\n            and last intervals, or to return NaNs.\n\n        Returns\n        -------\n        y : array-like\n            Interpolated values. Shape is determined by replacing\n            the interpolation axis in the original array with the shape of x.\n\n        Notes\n        -----\n        Derivatives are evaluated piecewise for each polynomial\n        segment, even if the polynomial is not differentiable at the\n        breakpoints. The polynomial intervals are considered half-open,\n        ``[a, b)``, except for the last interval which is closed\n        ``[a, b]``.\n\n        '
+if (extrapolate is None):
+    extrapolate = self.extrapolate
+else:
+    extrapolate = bool(extrapolate)
+ndim = len(self.x)
+x = _ndim_coords_from_arrays(x)
+x_shape = x.shape
+tempResult = ascontiguousarray(x.reshape((- 1), x.shape[(- 1)]), dtype=numpy.float_)
+	
+===================================================================	
+atleast_1d_and_contiguous: 8	
+----------------------------	
+
+tempResult = ascontiguousarray(ary, dtype)
+	
+===================================================================	
+_as_float_array: 169	
+----------------------------	
+
+'Convert the input into a C contiguous float array.'
+tempResult = ascontiguousarray(x)
+	
+===================================================================	
+BSpline.__call__: 91	
+----------------------------	
+
+'\n        Evaluate a spline function.\n\n        Parameters\n        ----------\n        x : array_like\n            points to evaluate the spline at.\n        nu: int, optional\n            derivative to evaluate (default is 0).\n        extrapolate : bool, optional\n            whether to extrapolate based on the first and last intervals\n            or return nans. Default is `self.extrapolate`.\n\n        Returns\n        -------\n        y : array_like\n            Shape is determined by replacing the interpolation axis\n            in the coefficient array with the shape of `x`.\n\n        '
+if (extrapolate is None):
+    extrapolate = self.extrapolate
+x = numpy.asarray(x)
+(x_shape, x_ndim) = (x.shape, x.ndim)
+tempResult = ascontiguousarray(x.ravel(), dtype=numpy.float_)
+	
+===================================================================	
+make_lsq_spline: 300	
+----------------------------	
+
+"Compute the (coefficients of) an LSQ B-spline.\n\n    The result is a linear combination\n\n    .. math::\n\n            S(x) = \\sum_j c_j B_j(x; t)\n\n    of the B-spline basis elements, :math:`B_j(x; t)`, which minimizes\n\n    .. math::\n\n        \\sum_{j} \\left( w_j \\times (S(x_j) - y_j) \\right)^2\n\n    Parameters\n    ----------\n    x : array_like, shape (m,)\n        Abscissas.\n    y : array_like, shape (m, ...)\n        Ordinates.\n    t : array_like, shape (n + k + 1,).\n        Knots.\n        Knots and data points must satisfy Schoenberg-Whitney conditions.\n    k : int, optional\n        B-spline degree. Default is cubic, k=3.\n    w : array_like, shape (n,), optional\n        Weights for spline fitting. Must be positive. If ``None``,\n        then weights are all equal.\n        Default is ``None``.\n    axis : int, optional\n        Interpolation axis. Default is zero.\n    check_finite : bool, optional\n        Whether to check that the input arrays contain only finite numbers.\n        Disabling may give a performance gain, but may result in problems\n        (crashes, non-termination) if the inputs do contain infinities or NaNs.\n        Default is True.\n\n    Returns\n    -------\n    b : a BSpline object of the degree `k` with knots `t`.\n\n    Notes\n    -----\n\n    The number of data points must be larger than the spline degree `k`.\n\n    Knots `t` must satisfy the Schoenberg-Whitney conditions,\n    i.e., there must be a subset of data points ``x[j]`` such that\n    ``t[j] < x[j] < t[j+k+1]``, for ``j=0, 1,...,n-k-2``.\n\n    Examples\n    --------\n    Generate some noisy data:\n\n    >>> x = np.linspace(-3, 3, 50)\n    >>> y = np.exp(-x**2) + 0.1 * np.random.randn(50)\n\n    Now fit a smoothing cubic spline with a pre-defined internal knots.\n    Here we make the knot vector (k+1)-regular by adding boundary knots:\n\n    >>> from scipy.interpolate import make_lsq_spline, BSpline\n    >>> t = [-1, 0, 1]\n    >>> k = 3\n    >>> t = np.r_[(x[0],)*(k+1),\n    ...           t,\n    ...           (x[-1],)*(k+1)]\n    >>> spl = make_lsq_spline(x, y, t, k)\n\n    For comparison, we also construct an interpolating spline for the same\n    set of data:\n\n    >>> from scipy.interpolate import make_interp_spline\n    >>> spl_i = make_interp_spline(x, y)\n\n    Plot both:\n\n    >>> import matplotlib.pyplot as plt\n    >>> xs = np.linspace(-3, 3, 100)\n    >>> plt.plot(x, y, 'ro', ms=5)\n    >>> plt.plot(xs, spl(xs), 'g-', lw=3, label='LSQ spline')\n    >>> plt.plot(xs, spl_i(xs), 'b-', lw=3, alpha=0.7, label='interp spline')\n    >>> plt.legend(loc='best')\n    >>> plt.show()\n\n    **NaN handling**: If the input arrays contain ``nan`` values, the result is\n    not useful since the underlying spline fitting routines cannot deal with\n    ``nan``. A workaround is to use zero weights for not-a-number data points:\n\n    >>> y[8] = np.nan\n    >>> w = np.isnan(y)\n    >>> y[w] = 0.\n    >>> tck = make_lsq_spline(x, y, t, w=~w)\n\n    Notice the need to replace a ``nan`` by a numerical value (precise value\n    does not matter as long as the corresponding weight is zero.)\n\n    See Also\n    --------\n    BSpline : base class representing the B-spline objects\n    make_interp_spline : a similar factory function for interpolating splines\n    LSQUnivariateSpline : a FITPACK-based spline fitting routine\n    splrep : a FITPACK-based fitting routine\n\n    "
+x = _as_float_array(x, check_finite)
+y = _as_float_array(y, check_finite)
+t = _as_float_array(t, check_finite)
+if (w is not None):
+    w = _as_float_array(w, check_finite)
+else:
+    w = numpy.ones_like(x)
+k = int(k)
+axis = (axis % y.ndim)
+y = numpy.rollaxis(y, axis)
+if ((x.ndim != 1) or numpy.any(((x[1:] - x[:(- 1)]) <= 0))):
+    raise ValueError('Expect x to be a 1-D sorted array_like.')
+if (x.shape[0] < (k + 1)):
+    raise 'Need more x points.'
+if (k < 0):
+    raise ValueError('Expect non-negative k.')
+if ((t.ndim != 1) or numpy.any(((t[1:] - t[:(- 1)]) < 0))):
+    raise ValueError('Expect t to be a 1-D sorted array_like.')
+if (x.size != y.shape[0]):
+    raise ValueError('x & y are incompatible.')
+if ((k > 0) and numpy.any(((x < t[k]) | (x > t[(- k)])))):
+    raise ValueError(('Out of bounds w/ x = %s.' % x))
+if (x.size != w.size):
+    raise ValueError('Incompatible weights.')
+n = ((t.size - k) - 1)
+lower = True
+extradim = prod(y.shape[1:])
+ab = numpy.zeros(((k + 1), n), dtype=numpy.float_, order='F')
+rhs = numpy.zeros((n, extradim), dtype=y.dtype, order='F')
+_bspl._norm_eq_lsq(x, t, k, y.reshape((- 1), extradim), w, ab, rhs)
+rhs = rhs.reshape(((n,) + y.shape[1:]))
+cho_decomp = cholesky_banded(ab, overwrite_ab=True, lower=lower, check_finite=check_finite)
+c = cho_solve_banded((cho_decomp, lower), rhs, overwrite_b=True, check_finite=check_finite)
+tempResult = ascontiguousarray(c)
+	
+===================================================================	
+BSpline.__init__: 32	
+----------------------------	
+
+super(BSpline, self).__init__()
+self.k = int(k)
+self.c = numpy.asarray(c)
+tempResult = ascontiguousarray(t, dtype=numpy.float64)
+	
+===================================================================	
+BSpline.__init__: 59	
+----------------------------	
+
+super(BSpline, self).__init__()
+self.k = int(k)
+self.c = numpy.asarray(c)
+self.t = numpy.ascontiguousarray(t, dtype=numpy.float64)
+self.extrapolate = bool(extrapolate)
+n = ((self.t.shape[0] - self.k) - 1)
+if (not (0 <= axis < self.c.ndim)):
+    raise ValueError(('%s must be between 0 and %s' % (axis, c.ndim)))
+self.axis = axis
+if (axis != 0):
+    self.c = numpy.rollaxis(self.c, axis)
+if (k < 0):
+    raise ValueError('Spline order cannot be negative.')
+if (int(k) != k):
+    raise ValueError('Spline order must be integer.')
+if (self.t.ndim != 1):
+    raise ValueError('Knot vector must be one-dimensional.')
+if (n < (self.k + 1)):
+    raise ValueError(('Need at least %d knots for degree %d' % (((2 * k) + 2), k)))
+if (np.diff(self.t) < 0).any():
+    raise ValueError('Knots must be in a non-decreasing order.')
+if (len(numpy.unique(self.t[k:(n + 1)])) < 2):
+    raise ValueError('Need at least two internal knots.')
+if (not np.isfinite(self.t).all()):
+    raise ValueError('Knots should not have nans or infs.')
+if (self.c.ndim < 1):
+    raise ValueError('Coefficients must be at least 1-dimensional.')
+if (self.c.shape[0] < n):
+    raise ValueError('Knots, coefficients and degree are inconsistent.')
+dt = _get_dtype(self.c.dtype)
+tempResult = ascontiguousarray(self.c, dtype=dt)
+	
+===================================================================	
+make_interp_spline: 187	
+----------------------------	
+
+"Compute the (coefficients of) interpolating B-spline.\n\n    Parameters\n    ----------\n    x : array_like, shape (n,)\n        Abscissas.\n    y : array_like, shape (n, ...)\n        Ordinates.\n    k : int, optional\n        B-spline degree. Default is cubic, k=3.\n    t : array_like, shape (nt + k + 1,), optional.\n        Knots.\n        The number of knots needs to agree with the number of datapoints and\n        the number of derivatives at the edges. Specifically, ``nt - n`` must\n        equal ``len(deriv_l) + len(deriv_r)``.\n    bc_type : 2-tuple or None\n        Boundary conditions.\n        Default is None, which means choosing the boundary conditions\n        automatically. Otherwise, it must be a length-two tuple where the first\n        element sets the boundary conditions at ``x[0]`` and the second\n        element sets the boundary conditions at ``x[-1]``. Each of these must\n        be an iterable of pairs ``(order, value)`` which gives the values of\n        derivatives of specified orders at the given edge of the interpolation\n        interval.\n    axis : int, optional\n        Interpolation axis. Default is 0.\n    check_finite : bool, optional\n        Whether to check that the input arrays contain only finite numbers.\n        Disabling may give a performance gain, but may result in problems\n        (crashes, non-termination) if the inputs do contain infinities or NaNs.\n        Default is True.\n\n    Returns\n    -------\n    b : a BSpline object of the degree ``k`` and with knots ``t``.\n\n    Examples\n    --------\n\n    Use cubic interpolation on Chebyshev nodes:\n\n    >>> def cheb_nodes(N):\n    ...     jj = 2.*np.arange(N) + 1\n    ...     x = np.cos(np.pi * jj / 2 / N)[::-1]\n    ...     return x\n\n    >>> x = cheb_nodes(20)\n    >>> y = np.sqrt(1 - x**2)\n\n    >>> from scipy.interpolate import BSpline, make_interp_spline\n    >>> b = make_interp_spline(x, y)\n    >>> np.allclose(b(x), y)\n    True\n\n    Note that the default is a cubic spline with a not-a-knot boundary condition\n\n    >>> b.k\n    3\n\n    Here we use a 'natural' spline, with zero 2nd derivatives at edges:\n\n    >>> l, r = [(2, 0)], [(2, 0)]\n    >>> b_n = make_interp_spline(x, y, bc_type=(l, r))\n    >>> np.allclose(b_n(x), y)\n    True\n    >>> x0, x1 = x[0], x[-1]\n    >>> np.allclose([b_n(x0, 2), b_n(x1, 2)], [0, 0])\n    True\n\n    Interpolation of parametric curves is also supported. As an example, we\n    compute a discretization of a snail curve in polar coordinates\n\n    >>> phi = np.linspace(0, 2.*np.pi, 40)\n    >>> r = 0.3 + np.cos(phi)\n    >>> x, y = r*np.cos(phi), r*np.sin(phi)  # convert to Cartesian coordinates\n\n    Build an interpolating curve, parameterizing it by the angle\n\n    >>> from scipy.interpolate import make_interp_spline\n    >>> spl = make_interp_spline(phi, np.c_[x, y])\n\n    Evaluate the interpolant on a finer grid (note that we transpose the result\n    to unpack it into a pair of x- and y-arrays)\n\n    >>> phi_new = np.linspace(0, 2.*np.pi, 100)\n    >>> x_new, y_new = spl(phi_new).T\n\n    Plot the result\n\n    >>> import matplotlib.pyplot as plt\n    >>> plt.plot(x, y, 'o')\n    >>> plt.plot(x_new, y_new, '-')\n    >>> plt.show()\n\n    See Also\n    --------\n    BSpline : base class representing the B-spline objects\n    CubicSpline : a cubic spline in the polynomial basis\n    make_lsq_spline : a similar factory function for spline fitting\n    UnivariateSpline : a wrapper over FITPACK spline fitting routines\n    splrep : a wrapper over FITPACK spline fitting routines\n\n    "
+if (bc_type is None):
+    bc_type = (None, None)
+(deriv_l, deriv_r) = bc_type
+if (k == 0):
+    if any(((_ is not None) for _ in (t, deriv_l, deriv_r))):
+        raise ValueError('Too much info for k=0: t and bc_type can only be None.')
+    x = _as_float_array(x, check_finite)
+    t = numpy.r_[(x, x[(- 1)])]
+    c = numpy.asarray(y)
+    tempResult = ascontiguousarray(c, dtype=_get_dtype(c.dtype))
+	
+===================================================================	
+make_interp_spline: 195	
+----------------------------	
+
+"Compute the (coefficients of) interpolating B-spline.\n\n    Parameters\n    ----------\n    x : array_like, shape (n,)\n        Abscissas.\n    y : array_like, shape (n, ...)\n        Ordinates.\n    k : int, optional\n        B-spline degree. Default is cubic, k=3.\n    t : array_like, shape (nt + k + 1,), optional.\n        Knots.\n        The number of knots needs to agree with the number of datapoints and\n        the number of derivatives at the edges. Specifically, ``nt - n`` must\n        equal ``len(deriv_l) + len(deriv_r)``.\n    bc_type : 2-tuple or None\n        Boundary conditions.\n        Default is None, which means choosing the boundary conditions\n        automatically. Otherwise, it must be a length-two tuple where the first\n        element sets the boundary conditions at ``x[0]`` and the second\n        element sets the boundary conditions at ``x[-1]``. Each of these must\n        be an iterable of pairs ``(order, value)`` which gives the values of\n        derivatives of specified orders at the given edge of the interpolation\n        interval.\n    axis : int, optional\n        Interpolation axis. Default is 0.\n    check_finite : bool, optional\n        Whether to check that the input arrays contain only finite numbers.\n        Disabling may give a performance gain, but may result in problems\n        (crashes, non-termination) if the inputs do contain infinities or NaNs.\n        Default is True.\n\n    Returns\n    -------\n    b : a BSpline object of the degree ``k`` and with knots ``t``.\n\n    Examples\n    --------\n\n    Use cubic interpolation on Chebyshev nodes:\n\n    >>> def cheb_nodes(N):\n    ...     jj = 2.*np.arange(N) + 1\n    ...     x = np.cos(np.pi * jj / 2 / N)[::-1]\n    ...     return x\n\n    >>> x = cheb_nodes(20)\n    >>> y = np.sqrt(1 - x**2)\n\n    >>> from scipy.interpolate import BSpline, make_interp_spline\n    >>> b = make_interp_spline(x, y)\n    >>> np.allclose(b(x), y)\n    True\n\n    Note that the default is a cubic spline with a not-a-knot boundary condition\n\n    >>> b.k\n    3\n\n    Here we use a 'natural' spline, with zero 2nd derivatives at edges:\n\n    >>> l, r = [(2, 0)], [(2, 0)]\n    >>> b_n = make_interp_spline(x, y, bc_type=(l, r))\n    >>> np.allclose(b_n(x), y)\n    True\n    >>> x0, x1 = x[0], x[-1]\n    >>> np.allclose([b_n(x0, 2), b_n(x1, 2)], [0, 0])\n    True\n\n    Interpolation of parametric curves is also supported. As an example, we\n    compute a discretization of a snail curve in polar coordinates\n\n    >>> phi = np.linspace(0, 2.*np.pi, 40)\n    >>> r = 0.3 + np.cos(phi)\n    >>> x, y = r*np.cos(phi), r*np.sin(phi)  # convert to Cartesian coordinates\n\n    Build an interpolating curve, parameterizing it by the angle\n\n    >>> from scipy.interpolate import make_interp_spline\n    >>> spl = make_interp_spline(phi, np.c_[x, y])\n\n    Evaluate the interpolant on a finer grid (note that we transpose the result\n    to unpack it into a pair of x- and y-arrays)\n\n    >>> phi_new = np.linspace(0, 2.*np.pi, 100)\n    >>> x_new, y_new = spl(phi_new).T\n\n    Plot the result\n\n    >>> import matplotlib.pyplot as plt\n    >>> plt.plot(x, y, 'o')\n    >>> plt.plot(x_new, y_new, '-')\n    >>> plt.show()\n\n    See Also\n    --------\n    BSpline : base class representing the B-spline objects\n    CubicSpline : a cubic spline in the polynomial basis\n    make_lsq_spline : a similar factory function for spline fitting\n    UnivariateSpline : a wrapper over FITPACK spline fitting routines\n    splrep : a wrapper over FITPACK spline fitting routines\n\n    "
+if (bc_type is None):
+    bc_type = (None, None)
+(deriv_l, deriv_r) = bc_type
+if (k == 0):
+    if any(((_ is not None) for _ in (t, deriv_l, deriv_r))):
+        raise ValueError('Too much info for k=0: t and bc_type can only be None.')
+    x = _as_float_array(x, check_finite)
+    t = numpy.r_[(x, x[(- 1)])]
+    c = numpy.asarray(y)
+    c = numpy.ascontiguousarray(c, dtype=_get_dtype(c.dtype))
+    return BSpline.construct_fast(t, c, k, axis=axis)
+if ((k == 1) and (t is None)):
+    if (not ((deriv_l is None) and (deriv_r is None))):
+        raise ValueError('Too much info for k=1: bc_type can only be None.')
+    x = _as_float_array(x, check_finite)
+    t = numpy.r_[(x[0], x, x[(- 1)])]
+    c = numpy.asarray(y)
+    tempResult = ascontiguousarray(c, dtype=_get_dtype(c.dtype))
+	
+===================================================================	
+make_interp_spline: 262	
+----------------------------	
+
+"Compute the (coefficients of) interpolating B-spline.\n\n    Parameters\n    ----------\n    x : array_like, shape (n,)\n        Abscissas.\n    y : array_like, shape (n, ...)\n        Ordinates.\n    k : int, optional\n        B-spline degree. Default is cubic, k=3.\n    t : array_like, shape (nt + k + 1,), optional.\n        Knots.\n        The number of knots needs to agree with the number of datapoints and\n        the number of derivatives at the edges. Specifically, ``nt - n`` must\n        equal ``len(deriv_l) + len(deriv_r)``.\n    bc_type : 2-tuple or None\n        Boundary conditions.\n        Default is None, which means choosing the boundary conditions\n        automatically. Otherwise, it must be a length-two tuple where the first\n        element sets the boundary conditions at ``x[0]`` and the second\n        element sets the boundary conditions at ``x[-1]``. Each of these must\n        be an iterable of pairs ``(order, value)`` which gives the values of\n        derivatives of specified orders at the given edge of the interpolation\n        interval.\n    axis : int, optional\n        Interpolation axis. Default is 0.\n    check_finite : bool, optional\n        Whether to check that the input arrays contain only finite numbers.\n        Disabling may give a performance gain, but may result in problems\n        (crashes, non-termination) if the inputs do contain infinities or NaNs.\n        Default is True.\n\n    Returns\n    -------\n    b : a BSpline object of the degree ``k`` and with knots ``t``.\n\n    Examples\n    --------\n\n    Use cubic interpolation on Chebyshev nodes:\n\n    >>> def cheb_nodes(N):\n    ...     jj = 2.*np.arange(N) + 1\n    ...     x = np.cos(np.pi * jj / 2 / N)[::-1]\n    ...     return x\n\n    >>> x = cheb_nodes(20)\n    >>> y = np.sqrt(1 - x**2)\n\n    >>> from scipy.interpolate import BSpline, make_interp_spline\n    >>> b = make_interp_spline(x, y)\n    >>> np.allclose(b(x), y)\n    True\n\n    Note that the default is a cubic spline with a not-a-knot boundary condition\n\n    >>> b.k\n    3\n\n    Here we use a 'natural' spline, with zero 2nd derivatives at edges:\n\n    >>> l, r = [(2, 0)], [(2, 0)]\n    >>> b_n = make_interp_spline(x, y, bc_type=(l, r))\n    >>> np.allclose(b_n(x), y)\n    True\n    >>> x0, x1 = x[0], x[-1]\n    >>> np.allclose([b_n(x0, 2), b_n(x1, 2)], [0, 0])\n    True\n\n    Interpolation of parametric curves is also supported. As an example, we\n    compute a discretization of a snail curve in polar coordinates\n\n    >>> phi = np.linspace(0, 2.*np.pi, 40)\n    >>> r = 0.3 + np.cos(phi)\n    >>> x, y = r*np.cos(phi), r*np.sin(phi)  # convert to Cartesian coordinates\n\n    Build an interpolating curve, parameterizing it by the angle\n\n    >>> from scipy.interpolate import make_interp_spline\n    >>> spl = make_interp_spline(phi, np.c_[x, y])\n\n    Evaluate the interpolant on a finer grid (note that we transpose the result\n    to unpack it into a pair of x- and y-arrays)\n\n    >>> phi_new = np.linspace(0, 2.*np.pi, 100)\n    >>> x_new, y_new = spl(phi_new).T\n\n    Plot the result\n\n    >>> import matplotlib.pyplot as plt\n    >>> plt.plot(x, y, 'o')\n    >>> plt.plot(x_new, y_new, '-')\n    >>> plt.show()\n\n    See Also\n    --------\n    BSpline : base class representing the B-spline objects\n    CubicSpline : a cubic spline in the polynomial basis\n    make_lsq_spline : a similar factory function for spline fitting\n    UnivariateSpline : a wrapper over FITPACK spline fitting routines\n    splrep : a wrapper over FITPACK spline fitting routines\n\n    "
+if (bc_type is None):
+    bc_type = (None, None)
+(deriv_l, deriv_r) = bc_type
+if (k == 0):
+    if any(((_ is not None) for _ in (t, deriv_l, deriv_r))):
+        raise ValueError('Too much info for k=0: t and bc_type can only be None.')
+    x = _as_float_array(x, check_finite)
+    t = numpy.r_[(x, x[(- 1)])]
+    c = numpy.asarray(y)
+    c = numpy.ascontiguousarray(c, dtype=_get_dtype(c.dtype))
+    return BSpline.construct_fast(t, c, k, axis=axis)
+if ((k == 1) and (t is None)):
+    if (not ((deriv_l is None) and (deriv_r is None))):
+        raise ValueError('Too much info for k=1: bc_type can only be None.')
+    x = _as_float_array(x, check_finite)
+    t = numpy.r_[(x[0], x, x[(- 1)])]
+    c = numpy.asarray(y)
+    c = numpy.ascontiguousarray(c, dtype=_get_dtype(c.dtype))
+    return BSpline.construct_fast(t, c, k, axis=axis)
+if (t is None):
+    if ((deriv_l is None) and (deriv_r is None)):
+        if (k == 2):
+            t = ((x[1:] + x[:(- 1)]) / 2.0)
+            t = numpy.r_[(((x[0],) * (k + 1)), t[1:(- 1)], ((x[(- 1)],) * (k + 1)))]
+        else:
+            t = _not_a_knot(x, k)
+    else:
+        t = _augknt(x, k)
+x = _as_float_array(x, check_finite)
+y = _as_float_array(y, check_finite)
+t = _as_float_array(t, check_finite)
+k = int(k)
+axis = (axis % y.ndim)
+y = numpy.rollaxis(y, axis)
+if ((x.ndim != 1) or numpy.any((x[1:] <= x[:(- 1)]))):
+    raise ValueError('Expect x to be a 1-D sorted array_like.')
+if (k < 0):
+    raise ValueError('Expect non-negative k.')
+if ((t.ndim != 1) or numpy.any((t[1:] < t[:(- 1)]))):
+    raise ValueError('Expect t to be a 1-D sorted array_like.')
+if (x.size != y.shape[0]):
+    raise ValueError('x and y are incompatible.')
+if (t.size < ((x.size + k) + 1)):
+    raise ValueError(('Got %d knots, need at least %d.' % (t.size, ((x.size + k) + 1))))
+if ((x[0] < t[k]) or (x[(- 1)] > t[(- k)])):
+    raise ValueError(('Out of bounds w/ x = %s.' % x))
+if (deriv_l is not None):
+    (deriv_l_ords, deriv_l_vals) = zip(*deriv_l)
+else:
+    (deriv_l_ords, deriv_l_vals) = ([], [])
+(deriv_l_ords, deriv_l_vals) = numpy.atleast_1d(deriv_l_ords, deriv_l_vals)
+nleft = deriv_l_ords.shape[0]
+if (deriv_r is not None):
+    (deriv_r_ords, deriv_r_vals) = zip(*deriv_r)
+else:
+    (deriv_r_ords, deriv_r_vals) = ([], [])
+(deriv_r_ords, deriv_r_vals) = numpy.atleast_1d(deriv_r_ords, deriv_r_vals)
+nright = deriv_r_ords.shape[0]
+n = x.size
+nt = ((t.size - k) - 1)
+if ((nt - n) != (nleft + nright)):
+    raise ValueError('number of derivatives at boundaries.')
+kl = ku = k
+ab = numpy.zeros(((((2 * kl) + ku) + 1), nt), dtype=numpy.float_, order='F')
+_bspl._colloc(x, t, k, ab, offset=nleft)
+if (nleft > 0):
+    _bspl._handle_lhs_derivatives(t, k, x[0], ab, kl, ku, deriv_l_ords)
+if (nright > 0):
+    _bspl._handle_lhs_derivatives(t, k, x[(- 1)], ab, kl, ku, deriv_r_ords, offset=(nt - nright))
+extradim = prod(y.shape[1:])
+rhs = numpy.empty((nt, extradim), dtype=y.dtype)
+if (nleft > 0):
+    rhs[:nleft] = deriv_l_vals.reshape((- 1), extradim)
+rhs[nleft:(nt - nright)] = y.reshape((- 1), extradim)
+if (nright > 0):
+    rhs[(nt - nright):] = deriv_r_vals.reshape((- 1), extradim)
+if check_finite:
+    (ab, rhs) = map(numpy.asarray_chkfinite, (ab, rhs))
+(gbsv,) = get_lapack_funcs(('gbsv',), (ab, rhs))
+(lu, piv, c, info) = gbsv(kl, ku, ab, rhs, overwrite_ab=True, overwrite_b=True)
+if (info > 0):
+    raise LinAlgError('Collocation matix is singular.')
+elif (info < 0):
+    raise ValueError(('illegal value in %d-th argument of internal gbsv' % (- info)))
+tempResult = ascontiguousarray(c.reshape(((nt,) + y.shape[1:])))
+	
+===================================================================	
+VarReader4.read_sparse_array: 118	
+----------------------------	
+
+' Read and return sparse matrix type\n\n        Parameters\n        ----------\n        hdr : ``VarHeader4`` instance\n\n        Returns\n        -------\n        arr : ``scipy.sparse.coo_matrix``\n            with dtype ``float`` and shape read from the sparse matrix data\n\n        Notes\n        -----\n        MATLAB 4 real sparse arrays are saved in a N+1 by 3 array format, where\n        N is the number of non-zero values.  Column 1 values [0:N] are the\n        (1-based) row indices of the each non-zero value, column 2 [0:N] are the\n        column indices, column 3 [0:N] are the (real) values.  The last values\n        [-1,0:2] of the rows, column indices are shape[0] and shape[1]\n        respectively of the output matrix. The last value for the values column\n        is a padding 0. mrows and ncols values from the header give the shape of\n        the stored matrix, here [N+1, 3].  Complex data is saved as a 4 column\n        matrix, where the fourth column contains the imaginary component; the\n        last value is again 0.  Complex sparse data do *not* have the header\n        ``imagf`` field set to True; the fact that the data are complex is only\n        detectable because there are 4 storage columns\n        '
+res = self.read_sub_array(hdr)
+tmp = res[:(- 1), :]
+dims = res[(- 1), 0:2]
+tempResult = ascontiguousarray(tmp[:, 0], dtype='intc')
+	
+===================================================================	
+VarReader4.read_sparse_array: 119	
+----------------------------	
+
+' Read and return sparse matrix type\n\n        Parameters\n        ----------\n        hdr : ``VarHeader4`` instance\n\n        Returns\n        -------\n        arr : ``scipy.sparse.coo_matrix``\n            with dtype ``float`` and shape read from the sparse matrix data\n\n        Notes\n        -----\n        MATLAB 4 real sparse arrays are saved in a N+1 by 3 array format, where\n        N is the number of non-zero values.  Column 1 values [0:N] are the\n        (1-based) row indices of the each non-zero value, column 2 [0:N] are the\n        column indices, column 3 [0:N] are the (real) values.  The last values\n        [-1,0:2] of the rows, column indices are shape[0] and shape[1]\n        respectively of the output matrix. The last value for the values column\n        is a padding 0. mrows and ncols values from the header give the shape of\n        the stored matrix, here [N+1, 3].  Complex data is saved as a 4 column\n        matrix, where the fourth column contains the imaginary component; the\n        last value is again 0.  Complex sparse data do *not* have the header\n        ``imagf`` field set to True; the fact that the data are complex is only\n        detectable because there are 4 storage columns\n        '
+res = self.read_sub_array(hdr)
+tmp = res[:(- 1), :]
+dims = res[(- 1), 0:2]
+I = numpy.ascontiguousarray(tmp[:, 0], dtype='intc')
+tempResult = ascontiguousarray(tmp[:, 1], dtype='intc')
+	
+===================================================================	
+VarReader4.read_sparse_array: 123	
+----------------------------	
+
+' Read and return sparse matrix type\n\n        Parameters\n        ----------\n        hdr : ``VarHeader4`` instance\n\n        Returns\n        -------\n        arr : ``scipy.sparse.coo_matrix``\n            with dtype ``float`` and shape read from the sparse matrix data\n\n        Notes\n        -----\n        MATLAB 4 real sparse arrays are saved in a N+1 by 3 array format, where\n        N is the number of non-zero values.  Column 1 values [0:N] are the\n        (1-based) row indices of the each non-zero value, column 2 [0:N] are the\n        column indices, column 3 [0:N] are the (real) values.  The last values\n        [-1,0:2] of the rows, column indices are shape[0] and shape[1]\n        respectively of the output matrix. The last value for the values column\n        is a padding 0. mrows and ncols values from the header give the shape of\n        the stored matrix, here [N+1, 3].  Complex data is saved as a 4 column\n        matrix, where the fourth column contains the imaginary component; the\n        last value is again 0.  Complex sparse data do *not* have the header\n        ``imagf`` field set to True; the fact that the data are complex is only\n        detectable because there are 4 storage columns\n        '
+res = self.read_sub_array(hdr)
+tmp = res[:(- 1), :]
+dims = res[(- 1), 0:2]
+I = numpy.ascontiguousarray(tmp[:, 0], dtype='intc')
+J = numpy.ascontiguousarray(tmp[:, 1], dtype='intc')
+I -= 1
+J -= 1
+if (res.shape[1] == 3):
+    tempResult = ascontiguousarray(tmp[:, 2], dtype='float')
+	
+===================================================================	
+VarReader4.read_sparse_array: 125	
+----------------------------	
+
+' Read and return sparse matrix type\n\n        Parameters\n        ----------\n        hdr : ``VarHeader4`` instance\n\n        Returns\n        -------\n        arr : ``scipy.sparse.coo_matrix``\n            with dtype ``float`` and shape read from the sparse matrix data\n\n        Notes\n        -----\n        MATLAB 4 real sparse arrays are saved in a N+1 by 3 array format, where\n        N is the number of non-zero values.  Column 1 values [0:N] are the\n        (1-based) row indices of the each non-zero value, column 2 [0:N] are the\n        column indices, column 3 [0:N] are the (real) values.  The last values\n        [-1,0:2] of the rows, column indices are shape[0] and shape[1]\n        respectively of the output matrix. The last value for the values column\n        is a padding 0. mrows and ncols values from the header give the shape of\n        the stored matrix, here [N+1, 3].  Complex data is saved as a 4 column\n        matrix, where the fourth column contains the imaginary component; the\n        last value is again 0.  Complex sparse data do *not* have the header\n        ``imagf`` field set to True; the fact that the data are complex is only\n        detectable because there are 4 storage columns\n        '
+res = self.read_sub_array(hdr)
+tmp = res[:(- 1), :]
+dims = res[(- 1), 0:2]
+I = numpy.ascontiguousarray(tmp[:, 0], dtype='intc')
+J = numpy.ascontiguousarray(tmp[:, 1], dtype='intc')
+I -= 1
+J -= 1
+if (res.shape[1] == 3):
+    V = numpy.ascontiguousarray(tmp[:, 2], dtype='float')
+else:
+    tempResult = ascontiguousarray(tmp[:, 2], dtype='complex')
+	
+===================================================================	
+solve_toeplitz: 182	
+----------------------------	
+
+'Solve a Toeplitz system using Levinson Recursion\n\n    The Toeplitz matrix has constant diagonals, with c as its first column\n    and r as its first row.  If r is not given, ``r == conjugate(c)`` is\n    assumed.\n\n    Parameters\n    ----------\n    c_or_cr : array_like or tuple of (array_like, array_like)\n        The vector ``c``, or a tuple of arrays (``c``, ``r``). Whatever the\n        actual shape of ``c``, it will be converted to a 1-D array. If not\n        supplied, ``r = conjugate(c)`` is assumed; in this case, if c[0] is\n        real, the Toeplitz matrix is Hermitian. r[0] is ignored; the first row\n        of the Toeplitz matrix is ``[c[0], r[1:]]``.  Whatever the actual shape\n        of ``r``, it will be converted to a 1-D array.\n    b : (M,) or (M, K) array_like\n        Right-hand side in ``T x = b``.\n    check_finite : bool, optional\n        Whether to check that the input matrices contain only finite numbers.\n        Disabling may give a performance gain, but may result in problems\n        (result entirely NaNs) if the inputs do contain infinities or NaNs.\n\n    Returns\n    -------\n    x : (M,) or (M, K) ndarray\n        The solution to the system ``T x = b``.  Shape of return matches shape\n        of `b`.\n\n    Notes\n    -----\n    The solution is computed using Levinson-Durbin recursion, which is faster\n    than generic least-squares methods, but can be less numerically stable.\n    '
+if isinstance(c_or_cr, tuple):
+    (c, r) = c_or_cr
+    c = _asarray_validated(c, check_finite=check_finite).ravel()
+    r = _asarray_validated(r, check_finite=check_finite).ravel()
+else:
+    c = _asarray_validated(c_or_cr, check_finite=check_finite).ravel()
+    r = c.conjugate()
+vals = numpy.concatenate((r[(- 1):0:(- 1)], c))
+if (b is None):
+    raise ValueError('illegal value, `b` is a required argument')
+b = _asarray_validated(b)
+if (vals.shape[0] != ((2 * b.shape[0]) - 1)):
+    raise ValueError('incompatible dimensions')
+if (numpy.iscomplexobj(vals) or numpy.iscomplexobj(b)):
+    vals = numpy.asarray(vals, dtype=numpy.complex128, order='c')
+    b = numpy.asarray(b, dtype=numpy.complex128)
+else:
+    vals = numpy.asarray(vals, dtype=numpy.double, order='c')
+    b = numpy.asarray(b, dtype=numpy.double)
+if (b.ndim == 1):
+    tempResult = ascontiguousarray(b)
+	
+===================================================================	
+solve_toeplitz: 186	
+----------------------------	
+
+'Solve a Toeplitz system using Levinson Recursion\n\n    The Toeplitz matrix has constant diagonals, with c as its first column\n    and r as its first row.  If r is not given, ``r == conjugate(c)`` is\n    assumed.\n\n    Parameters\n    ----------\n    c_or_cr : array_like or tuple of (array_like, array_like)\n        The vector ``c``, or a tuple of arrays (``c``, ``r``). Whatever the\n        actual shape of ``c``, it will be converted to a 1-D array. If not\n        supplied, ``r = conjugate(c)`` is assumed; in this case, if c[0] is\n        real, the Toeplitz matrix is Hermitian. r[0] is ignored; the first row\n        of the Toeplitz matrix is ``[c[0], r[1:]]``.  Whatever the actual shape\n        of ``r``, it will be converted to a 1-D array.\n    b : (M,) or (M, K) array_like\n        Right-hand side in ``T x = b``.\n    check_finite : bool, optional\n        Whether to check that the input matrices contain only finite numbers.\n        Disabling may give a performance gain, but may result in problems\n        (result entirely NaNs) if the inputs do contain infinities or NaNs.\n\n    Returns\n    -------\n    x : (M,) or (M, K) ndarray\n        The solution to the system ``T x = b``.  Shape of return matches shape\n        of `b`.\n\n    Notes\n    -----\n    The solution is computed using Levinson-Durbin recursion, which is faster\n    than generic least-squares methods, but can be less numerically stable.\n    '
+if isinstance(c_or_cr, tuple):
+    (c, r) = c_or_cr
+    c = _asarray_validated(c, check_finite=check_finite).ravel()
+    r = _asarray_validated(r, check_finite=check_finite).ravel()
+else:
+    c = _asarray_validated(c_or_cr, check_finite=check_finite).ravel()
+    r = c.conjugate()
+vals = numpy.concatenate((r[(- 1):0:(- 1)], c))
+if (b is None):
+    raise ValueError('illegal value, `b` is a required argument')
+b = _asarray_validated(b)
+if (vals.shape[0] != ((2 * b.shape[0]) - 1)):
+    raise ValueError('incompatible dimensions')
+if (numpy.iscomplexobj(vals) or numpy.iscomplexobj(b)):
+    vals = numpy.asarray(vals, dtype=numpy.complex128, order='c')
+    b = numpy.asarray(b, dtype=numpy.complex128)
+else:
+    vals = numpy.asarray(vals, dtype=numpy.double, order='c')
+    b = numpy.asarray(b, dtype=numpy.double)
+if (b.ndim == 1):
+    (x, _) = levinson(vals, numpy.ascontiguousarray(b))
+else:
+    b_shape = b.shape
+    b = b.reshape(b.shape[0], (- 1))
+    tempResult = ascontiguousarray(b[:, i])
+	
+===================================================================	
+zoom: 180	
+----------------------------	
+
+"\n    Zoom an array.\n\n    The array is zoomed using spline interpolation of the requested order.\n\n    Parameters\n    ----------\n    input : ndarray\n        The input array.\n    zoom : float or sequence, optional\n        The zoom factor along the axes. If a float, `zoom` is the same for each\n        axis. If a sequence, `zoom` should contain one value for each axis.\n    output : ndarray or dtype, optional\n        The array in which to place the output, or the dtype of the returned\n        array.\n    order : int, optional\n        The order of the spline interpolation, default is 3.\n        The order has to be in the range 0-5.\n    mode : str, optional\n        Points outside the boundaries of the input are filled according\n        to the given mode ('constant', 'nearest', 'reflect', 'mirror' or 'wrap').\n        Default is 'constant'.\n    cval : scalar, optional\n        Value used for points outside the boundaries of the input if\n        ``mode='constant'``. Default is 0.0\n    prefilter : bool, optional\n        The parameter prefilter determines if the input is pre-filtered with\n        `spline_filter` before interpolation (necessary for spline\n        interpolation of order > 1).  If False, it is assumed that the input is\n        already filtered. Default is True.\n\n    Returns\n    -------\n    zoom : ndarray or None\n        The zoomed input. If `output` is given as a parameter, None is\n        returned.\n\n    "
+if ((order < 0) or (order > 5)):
+    raise RuntimeError('spline order not supported')
+input = numpy.asarray(input)
+if numpy.iscomplexobj(input):
+    raise TypeError('Complex type not supported')
+if (input.ndim < 1):
+    raise RuntimeError('input and output rank must be > 0')
+mode = _extend_mode_to_code(mode)
+if (prefilter and (order > 1)):
+    filtered = spline_filter(input, order, output=numpy.float64)
+else:
+    filtered = input
+zoom = _ni_support._normalize_sequence(zoom, input.ndim)
+output_shape = tuple([int(round((ii * jj))) for (ii, jj) in zip(input.shape, zoom)])
+output_shape_old = tuple([int((ii * jj)) for (ii, jj) in zip(input.shape, zoom)])
+if (output_shape != output_shape_old):
+    warnings.warn('From scipy 0.13.0, the output shape of zoom() is calculated with round() instead of int() - for these inputs the size of the returned array has changed.', UserWarning)
+zoom_div = (numpy.array(output_shape, float) - 1)
+zoom = numpy.divide((numpy.array(input.shape) - 1), zoom_div, out=numpy.ones_like(input.shape, dtype=numpy.float64), where=(zoom_div != 0))
+(output, return_value) = _ni_support._get_output(output, input, shape=output_shape)
+tempResult = ascontiguousarray(zoom)
+	
+===================================================================	
+_complex2real: 125	
+----------------------------	
+
+tempResult = ascontiguousarray(z, dtype=complex)
+	
+===================================================================	
+_real2complex: 122	
+----------------------------	
+
+tempResult = ascontiguousarray(x, dtype=float)
+	
+===================================================================	
+max_len_seq: 19	
+----------------------------	
+
+"\n    Maximum length sequence (MLS) generator.\n\n    Parameters\n    ----------\n    nbits : int\n        Number of bits to use. Length of the resulting sequence will\n        be ``(2**nbits) - 1``. Note that generating long sequences\n        (e.g., greater than ``nbits == 16``) can take a long time.\n    state : array_like, optional\n        If array, must be of length ``nbits``, and will be cast to binary\n        (bool) representation. If None, a seed of ones will be used,\n        producing a repeatable representation. If ``state`` is all\n        zeros, an error is raised as this is invalid. Default: None.\n    length : int, optional\n        Number of samples to compute. If None, the entire length\n        ``(2**nbits) - 1`` is computed.\n    taps : array_like, optional\n        Polynomial taps to use (e.g., ``[7, 6, 1]`` for an 8-bit sequence).\n        If None, taps will be automatically selected (for up to\n        ``nbits == 32``).\n\n    Returns\n    -------\n    seq : array\n        Resulting MLS sequence of 0's and 1's.\n    state : array\n        The final state of the shift register.\n\n    Notes\n    -----\n    The algorithm for MLS generation is generically described in:\n\n        https://en.wikipedia.org/wiki/Maximum_length_sequence\n\n    The default values for taps are specifically taken from the first\n    option listed for each value of ``nbits`` in:\n\n        http://www.newwaveinstruments.com/resources/articles/\n            m_sequence_linear_feedback_shift_register_lfsr.htm\n\n    .. versionadded:: 0.15.0\n\n    Examples\n    --------\n    MLS uses binary convention:\n\n    >>> from scipy.signal import max_len_seq\n    >>> max_len_seq(4)[0]\n    array([1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0], dtype=int8)\n\n    MLS has a white spectrum (except for DC):\n\n    >>> import matplotlib.pyplot as plt\n    >>> from numpy.fft import fft, ifft, fftshift, fftfreq\n    >>> seq = max_len_seq(6)[0]*2-1  # +1 and -1\n    >>> spec = fft(seq)\n    >>> N = len(seq)\n    >>> plt.plot(fftshift(fftfreq(N)), fftshift(np.abs(spec)), '.-')\n    >>> plt.margins(0.1, 0.1)\n    >>> plt.grid(True)\n    >>> plt.show()\n\n    Circular autocorrelation of MLS is an impulse:\n\n    >>> acorrcirc = ifft(spec * np.conj(spec)).real\n    >>> plt.figure()\n    >>> plt.plot(np.arange(-N/2+1, N/2+1), fftshift(acorrcirc), '.-')\n    >>> plt.margins(0.1, 0.1)\n    >>> plt.grid(True)\n    >>> plt.show()\n\n    Linear autocorrelation of MLS is approximately an impulse:\n\n    >>> acorr = np.correlate(seq, seq, 'full')\n    >>> plt.figure()\n    >>> plt.plot(np.arange(-N+1, N), acorr, '.-')\n    >>> plt.margins(0.1, 0.1)\n    >>> plt.grid(True)\n    >>> plt.show()\n\n    "
+if (taps is None):
+    if (nbits not in _mls_taps):
+        known_taps = numpy.array(list(_mls_taps.keys()))
+        raise ValueError(('nbits must be between %s and %s if taps is None' % (known_taps.min(), known_taps.max())))
+    taps = numpy.array(_mls_taps[nbits], numpy.intp)
+else:
+    taps = numpy.unique(numpy.array(taps, numpy.intp))[::(- 1)]
+    if (numpy.any((taps < 0)) or numpy.any((taps > nbits)) or (taps.size < 1)):
+        raise ValueError('taps must be non-empty with values between zero and nbits (inclusive)')
+    tempResult = ascontiguousarray(taps)
+	
+===================================================================	
+_UpFIRDn.__init__: 28	
+----------------------------	
+
+'Helper for resampling'
+h = numpy.asarray(h)
+if ((h.ndim != 1) or (h.size == 0)):
+    raise ValueError('h must be 1D with non-zero length')
+self._output_type = numpy.result_type(h.dtype, x_dtype, numpy.float32)
+h = numpy.asarray(h, self._output_type)
+self._up = int(up)
+self._down = int(down)
+if ((self._up < 1) or (self._down < 1)):
+    raise ValueError('Both up and down must be >= 1')
+self._h_trans_flip = _pad_h(h, self._up)
+tempResult = ascontiguousarray(self._h_trans_flip)
+	
+===================================================================	
+_convert_to_double: 24	
+----------------------------	
+
+tempResult = ascontiguousarray(X, dtype=numpy.double)
+	
+===================================================================	
+squareform: 433	
+----------------------------	
+
+"\n    Converts a vector-form distance vector to a square-form distance\n    matrix, and vice-versa.\n\n    Parameters\n    ----------\n    X : ndarray\n        Either a condensed or redundant distance matrix.\n    force : str, optional\n        As with MATLAB(TM), if force is equal to ``'tovector'`` or\n        ``'tomatrix'``, the input will be treated as a distance matrix or\n        distance vector respectively.\n    checks : bool, optional\n        If set to False, no checks will be made for matrix\n        symmetry nor zero diagonals. This is useful if it is known that\n        ``X - X.T1`` is small and ``diag(X)`` is close to zero.\n        These values are ignored any way so they do not disrupt the\n        squareform transformation.\n\n    Returns\n    -------\n    Y : ndarray\n        If a condensed distance matrix is passed, a redundant one is\n        returned, or if a redundant one is passed, a condensed distance\n        matrix is returned.\n\n    Notes\n    -----\n    1. v = squareform(X)\n\n       Given a square d-by-d symmetric distance matrix X,\n       ``v = squareform(X)`` returns a ``d * (d-1) / 2`` (or\n       :math:`{n \\choose 2}`) sized vector v.\n\n      :math:`v[{n \\choose 2}-{n-i \\choose 2} + (j-i-1)]` is the distance\n      between points i and j. If X is non-square or asymmetric, an error\n      is returned.\n\n    2. X = squareform(v)\n\n      Given a ``d*(d-1)/2`` sized v for some integer ``d >= 2`` encoding\n      distances as described, ``X = squareform(v)`` returns a d by d distance\n      matrix X.  The ``X[i, j]`` and ``X[j, i]`` values are set to\n      :math:`v[{n \\choose 2}-{n-i \\choose 2} + (j-i-1)]` and all\n      diagonal elements are zero.\n\n    In Scipy 0.19.0, ``squareform`` stopped casting all input types to\n    float64, and started returning arrays of the same dtype as the input.\n\n    "
+tempResult = ascontiguousarray(X)
+	
+===================================================================	
+_convert_to_bool: 21	
+----------------------------	
+
+tempResult = ascontiguousarray(X, dtype=bool)
+	
+***************************************************	
+sklearn_sklearn-0.18.0: 12	
+===================================================================	
+_kmeans_single_elkan: 150	
+----------------------------	
+
+if scipy.sparse.issparse(X):
+    raise ValueError("algorithm='elkan' not supported for sparse input X")
+X = check_array(X, order='C')
+random_state = check_random_state(random_state)
+if (x_squared_norms is None):
+    x_squared_norms = row_norms(X, squared=True)
+centers = _init_centroids(X, n_clusters, init, random_state=random_state, x_squared_norms=x_squared_norms)
+tempResult = ascontiguousarray(centers)
+	
+===================================================================	
+MiniBatchKMeans.partial_fit: 482	
+----------------------------	
+
+'Update k means estimate on a single mini-batch X.\n\n        Parameters\n        ----------\n        X : array-like, shape = [n_samples, n_features]\n            Coordinates of the data points to cluster.\n        '
+X = check_array(X, accept_sparse='csr')
+(n_samples, n_features) = X.shape
+if hasattr(self.init, '__array__'):
+    tempResult = ascontiguousarray(self.init, dtype=X.dtype)
+	
+===================================================================	
+MiniBatchKMeans.fit: 419	
+----------------------------	
+
+'Compute the centroids on X by chunking it into mini-batches.\n\n        Parameters\n        ----------\n        X : array-like, shape = [n_samples, n_features]\n            Coordinates of the data points to cluster\n        '
+random_state = check_random_state(self.random_state)
+X = check_array(X, accept_sparse='csr', order='C', dtype=[numpy.float64, numpy.float32])
+(n_samples, n_features) = X.shape
+if (n_samples < self.n_clusters):
+    raise ValueError('Number of samples smaller than number of clusters.')
+n_init = self.n_init
+if hasattr(self.init, '__array__'):
+    tempResult = ascontiguousarray(self.init, dtype=X.dtype)
+
+***************************************************	
+

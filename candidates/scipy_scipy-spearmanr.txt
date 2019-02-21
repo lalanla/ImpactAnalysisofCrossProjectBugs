@@ -1,0 +1,64 @@
+astropy_astropy-1.3.0: 0	
+***************************************************	
+sklearn_sklearn-0.18.0: 0	
+***************************************************	
+matplotlib_matplotlib-2.0.0: 0	
+***************************************************	
+ipython_ipython-6.1.0: 0	
+***************************************************	
+pandas_pandas-0.19.2: 1	
+===================================================================	
+TestSeriesAnalytics.test_corr_rank: 494	
+----------------------------	
+
+pandas.util.testing._skip_if_no_scipy()
+import scipy
+import scipy.stats as stats
+A = pandas.util.testing.makeTimeSeries()
+B = pandas.util.testing.makeTimeSeries()
+A[(- 5):] = A[:5]
+result = A.corr(B, method='kendall')
+expected = scipy.stats.kendalltau(A, B)[0]
+self.assertAlmostEqual(result, expected)
+result = A.corr(B, method='spearman')
+tempResult = spearmanr(A, B)
+	
+***************************************************	
+dask_dask-0.7.0: 0	
+***************************************************	
+nengo_nengo-2.0.0: 0	
+***************************************************	
+sympy_sympy-1.0.0: 0	
+***************************************************	
+daducci_amico-dev: 0	
+***************************************************	
+aplpy_aplpy-1.1.1: 0	
+***************************************************	
+markovmodel_msmtools-1.0.2: 0	
+***************************************************	
+nilearn_nilearn-0.4.0: 1	
+===================================================================	
+_EarlyStoppingCallback.test_score: 136	
+----------------------------	
+
+"Compute test score for model, given weights map `w`.\n\n        We use correlations between linear prediction and\n        ground truth (y_test).\n\n        We return 2 scores for model selection: one is the Spearman\n        correlation, which captures ordering between input and\n        output, but tends to have 'flat' regions. The other\n        is the Pearson correlation, that we can use to disambiguate\n        between regions with equivalent Spearman correlation.\n\n        "
+if self.is_classif:
+    w = w[:(- 1)]
+if (w.ptp() == 0):
+    return ((- numpy.inf), (- numpy.inf))
+y_pred = numpy.dot(self.X_test, w)
+tempResult = spearmanr(y_pred, self.y_test)
+	
+***************************************************	
+poliastro_poliastro-0.8.0: 0	
+***************************************************	
+skimage_skimage-0.13.0: 0	
+***************************************************	
+sunpy_sunpy-0.8.0: 0	
+***************************************************	
+spacetelescope_synphot-0.1: 0	
+***************************************************	
+librosa_librosa-0.5.1: 0	
+***************************************************	
+mne_python-0.15.0: 0	
+***************************************************	

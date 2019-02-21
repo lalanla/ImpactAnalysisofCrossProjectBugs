@@ -1,0 +1,967 @@
+astropy_astropy-1.3.0: 5	
+===================================================================	
+CartesianRepresentation.transform: 301	
+----------------------------	
+
+"\n        Transform the cartesian coordinates using a 3x3 matrix.\n\n        This returns a new representation and does not modify the original one.\n\n        Parameters\n        ----------\n        matrix : `~numpy.ndarray`\n            A 3x3 transformation matrix, such as a rotation matrix.\n\n        Examples\n        --------\n\n        We can start off by creating a cartesian representation object:\n\n            >>> from astropy import units as u\n            >>> from astropy.coordinates import CartesianRepresentation\n            >>> rep = CartesianRepresentation([1, 2] * u.pc,\n            ...                               [2, 3] * u.pc,\n            ...                               [3, 4] * u.pc)\n\n        We now create a rotation matrix around the z axis:\n\n            >>> from astropy.coordinates.matrix_utilities import rotation_matrix\n            >>> rotation = rotation_matrix(30 * u.deg, axis='z')\n\n        Finally, we can apply this transformation:\n\n            >>> rep_new = rep.transform(rotation)\n            >>> rep_new.xyz  # doctest: +FLOAT_CMP\n            <Quantity [[ 1.8660254 , 3.23205081],\n                       [ 1.23205081, 1.59807621],\n                       [ 3.        , 4.        ]] pc>\n        "
+try:
+    matrix_shape = matrix.shape
+except AttributeError:
+    matrix = numpy.array(matrix)
+    matrix_shape = matrix.shape
+if (matrix_shape[(- 2):] != (3, 3)):
+    raise ValueError("tried to do matrix multiplication with an array that doesn't end in 3x3")
+oldxyz = self.xyz
+if (self.isscalar and (not matrix_shape[:(- 2)])):
+    newxyz = matrix.dot(oldxyz.value)
+else:
+    tempResult = einsum('...ij,j...->i...', matrix, oldxyz.value)
+	
+===================================================================	
+norm: 61	
+----------------------------	
+
+'\n    Normalise a p-vector.\n    '
+tempResult = einsum('...i,...i', p, p)
+	
+===================================================================	
+matmul: 23	
+----------------------------	
+
+'Matrix product of two arrays.\n\n        The behavior depends on the arguments in the following way.\n\n        - If both arguments are 2-D they are multiplied like conventional\n          matrices.\n        - If either argument is N-D, N > 2, it is treated as a stack of\n          matrices residing in the last two indexes and broadcast accordingly.\n        - If the first argument is 1-D, it is promoted to a matrix by\n          prepending a 1 to its dimensions. After matrix multiplication\n          the prepended 1 is removed.\n        - If the second argument is 1-D, it is promoted to a matrix by\n          appending a 1 to its dimensions. After matrix multiplication\n          the appended 1 is removed.\n\n        Multiplication by a scalar is not allowed, use ``*`` instead. Note that\n        multiplying a stack of matrices with a vector will result in a stack of\n        vectors, but matmul will not recognize it as such.\n\n        ``matmul`` differs from ``dot`` in two important ways.\n\n        - Multiplication by scalars is not allowed.\n        - Stacks of matrices are broadcast together as if the matrices\n          were elements.\n\n        Parameters\n        ----------\n        a : array_like\n            First argument.\n        b : array_like\n            Second argument.\n        out : ndarray, optional\n            Output argument. This must have the exact kind that would be returned\n            if it was not used. In particular, it must have the right type, must be\n            C-contiguous, and its dtype must be the dtype that would be returned\n            for `dot(a,b)`. This is a performance feature. Therefore, if these\n            conditions are not met, an exception is raised, instead of attempting\n\n        Notes\n        -----\n        This routine mimicks ``matmul`` using ``einsum``.  See\n        http://docs.scipy.org/doc/numpy/reference/generated/numpy.matmul.html\n        '
+a = numpy.asanyarray(a)
+b = numpy.asanyarray(b)
+if (out is None):
+    kwargs = {}
+else:
+    kwargs = {'out': out}
+if (a.ndim >= 2):
+    if (b.ndim >= 2):
+        tempResult = einsum('...ij,...jk->...ik', a, b, **kwargs)
+	
+===================================================================	
+matmul: 25	
+----------------------------	
+
+'Matrix product of two arrays.\n\n        The behavior depends on the arguments in the following way.\n\n        - If both arguments are 2-D they are multiplied like conventional\n          matrices.\n        - If either argument is N-D, N > 2, it is treated as a stack of\n          matrices residing in the last two indexes and broadcast accordingly.\n        - If the first argument is 1-D, it is promoted to a matrix by\n          prepending a 1 to its dimensions. After matrix multiplication\n          the prepended 1 is removed.\n        - If the second argument is 1-D, it is promoted to a matrix by\n          appending a 1 to its dimensions. After matrix multiplication\n          the appended 1 is removed.\n\n        Multiplication by a scalar is not allowed, use ``*`` instead. Note that\n        multiplying a stack of matrices with a vector will result in a stack of\n        vectors, but matmul will not recognize it as such.\n\n        ``matmul`` differs from ``dot`` in two important ways.\n\n        - Multiplication by scalars is not allowed.\n        - Stacks of matrices are broadcast together as if the matrices\n          were elements.\n\n        Parameters\n        ----------\n        a : array_like\n            First argument.\n        b : array_like\n            Second argument.\n        out : ndarray, optional\n            Output argument. This must have the exact kind that would be returned\n            if it was not used. In particular, it must have the right type, must be\n            C-contiguous, and its dtype must be the dtype that would be returned\n            for `dot(a,b)`. This is a performance feature. Therefore, if these\n            conditions are not met, an exception is raised, instead of attempting\n\n        Notes\n        -----\n        This routine mimicks ``matmul`` using ``einsum``.  See\n        http://docs.scipy.org/doc/numpy/reference/generated/numpy.matmul.html\n        '
+a = numpy.asanyarray(a)
+b = numpy.asanyarray(b)
+if (out is None):
+    kwargs = {}
+else:
+    kwargs = {'out': out}
+if (a.ndim >= 2):
+    if (b.ndim >= 2):
+        return numpy.einsum('...ij,...jk->...ik', a, b, **kwargs)
+    if (b.ndim == 1):
+        tempResult = einsum('...ij,...j->...i', a, b, **kwargs)
+	
+===================================================================	
+matmul: 27	
+----------------------------	
+
+'Matrix product of two arrays.\n\n        The behavior depends on the arguments in the following way.\n\n        - If both arguments are 2-D they are multiplied like conventional\n          matrices.\n        - If either argument is N-D, N > 2, it is treated as a stack of\n          matrices residing in the last two indexes and broadcast accordingly.\n        - If the first argument is 1-D, it is promoted to a matrix by\n          prepending a 1 to its dimensions. After matrix multiplication\n          the prepended 1 is removed.\n        - If the second argument is 1-D, it is promoted to a matrix by\n          appending a 1 to its dimensions. After matrix multiplication\n          the appended 1 is removed.\n\n        Multiplication by a scalar is not allowed, use ``*`` instead. Note that\n        multiplying a stack of matrices with a vector will result in a stack of\n        vectors, but matmul will not recognize it as such.\n\n        ``matmul`` differs from ``dot`` in two important ways.\n\n        - Multiplication by scalars is not allowed.\n        - Stacks of matrices are broadcast together as if the matrices\n          were elements.\n\n        Parameters\n        ----------\n        a : array_like\n            First argument.\n        b : array_like\n            Second argument.\n        out : ndarray, optional\n            Output argument. This must have the exact kind that would be returned\n            if it was not used. In particular, it must have the right type, must be\n            C-contiguous, and its dtype must be the dtype that would be returned\n            for `dot(a,b)`. This is a performance feature. Therefore, if these\n            conditions are not met, an exception is raised, instead of attempting\n\n        Notes\n        -----\n        This routine mimicks ``matmul`` using ``einsum``.  See\n        http://docs.scipy.org/doc/numpy/reference/generated/numpy.matmul.html\n        '
+a = numpy.asanyarray(a)
+b = numpy.asanyarray(b)
+if (out is None):
+    kwargs = {}
+else:
+    kwargs = {'out': out}
+if (a.ndim >= 2):
+    if (b.ndim >= 2):
+        return numpy.einsum('...ij,...jk->...ik', a, b, **kwargs)
+    if (b.ndim == 1):
+        return numpy.einsum('...ij,...j->...i', a, b, **kwargs)
+elif ((a.ndim == 1) and (b.ndim >= 2)):
+    tempResult = einsum('...i,...ik->...k', a, b, **kwargs)
+	
+***************************************************	
+scipy_scipy-0.19.0: 5	
+===================================================================	
+stacked_matmul: 101	
+----------------------------	
+
+'Stacked matrix multiply: out[i,:,:] = np.dot(a[i,:,:], b[i,:,:]).\n\n    In our case a[i, :, :] and b[i, :, :] are always square.\n    '
+if (a.shape[1] > 50):
+    out = numpy.empty_like(a)
+    for i in range(a.shape[0]):
+        out[i] = numpy.dot(a[i], b[i])
+    return out
+else:
+    tempResult = einsum('...ij,...jk->...ik', a, b)
+	
+===================================================================	
+LbfgsInvHessProduct.__init__: 134	
+----------------------------	
+
+'Construct the operator.'
+if ((sk.shape != yk.shape) or (sk.ndim != 2)):
+    raise ValueError('sk and yk must have matching shape, (n_corrs, n)')
+(n_corrs, n) = sk.shape
+super(LbfgsInvHessProduct, self).__init__(dtype=numpy.float64, shape=(n, n))
+self.sk = sk
+self.yk = yk
+self.n_corrs = n_corrs
+tempResult = einsum('ij,ij->i', sk, yk)
+	
+===================================================================	
+_row_norms: 551	
+----------------------------	
+
+tempResult = einsum('ij,ij->i', X, X, dtype=numpy.double)
+	
+===================================================================	
+TestUtilities.barycentric_transform: 158	
+----------------------------	
+
+ndim = tr.shape[1]
+r = tr[:, (- 1), :]
+Tinv = tr[:, :(- 1), :]
+tempResult = einsum('ijk,ik->ij', Tinv, (x - r))
+	
+===================================================================	
+multinomial_gen.cov: 981	
+----------------------------	
+
+'\n        Covariance matrix of the multinomial distribution.\n\n        Parameters\n        ----------\n        %(_doc_default_callparams)s\n\n        Returns\n        -------\n        cov : ndarray\n            The covariance matrix of the distribution\n        '
+(n, p, npcond) = self._process_parameters(n, p)
+nn = n[(..., numpy.newaxis, numpy.newaxis)]
+tempResult = einsum('...j,...k->...jk', (- p), p)
+	
+***************************************************	
+sklearn_sklearn-0.18.0: 8	
+===================================================================	
+_BinaryGaussianProcessClassifierLaplace.log_marginal_likelihood: 107	
+----------------------------	
+
+'Returns log-marginal likelihood of theta for training data.\n\n        Parameters\n        ----------\n        theta : array-like, shape = (n_kernel_params,) or None\n            Kernel hyperparameters for which the log-marginal likelihood is\n            evaluated. If None, the precomputed log_marginal_likelihood\n            of ``self.kernel_.theta`` is returned.\n\n        eval_gradient : bool, default: False\n            If True, the gradient of the log-marginal likelihood with respect\n            to the kernel hyperparameters at position theta is returned\n            additionally. If True, theta must not be None.\n\n        Returns\n        -------\n        log_likelihood : float\n            Log-marginal likelihood of theta for training data.\n\n        log_likelihood_gradient : array, shape = (n_kernel_params,), optional\n            Gradient of the log-marginal likelihood with respect to the kernel\n            hyperparameters at position theta.\n            Only returned when eval_gradient is True.\n        '
+if (theta is None):
+    if eval_gradient:
+        raise ValueError('Gradient can only be evaluated for theta!=None')
+    return self.log_marginal_likelihood_value_
+kernel = self.kernel_.clone_with_theta(theta)
+if eval_gradient:
+    (K, K_gradient) = kernel(self.X_train_, eval_gradient=True)
+else:
+    K = kernel(self.X_train_)
+(Z, (pi, W_sr, L, b, a)) = self._posterior_mode(K, return_temporaries=True)
+if (not eval_gradient):
+    return Z
+d_Z = numpy.empty(theta.shape[0])
+R = (W_sr[:, numpy.newaxis] * cho_solve((L, True), numpy.diag(W_sr)))
+C = solve(L, (W_sr[:, numpy.newaxis] * K))
+tempResult = einsum('ij, ij -> j', C, C)
+	
+===================================================================	
+_BinaryGaussianProcessClassifierLaplace.predict_proba: 83	
+----------------------------	
+
+'Return probability estimates for the test vector X.\n\n        Parameters\n        ----------\n        X : array-like, shape = (n_samples, n_features)\n\n        Returns\n        -------\n        C : array-like, shape = (n_samples, n_classes)\n            Returns the probability of the samples for each class in\n            the model. The columns correspond to the classes in sorted\n            order, as they appear in the attribute ``classes_``.\n        '
+check_is_fitted(self, ['X_train_', 'y_train_', 'pi_', 'W_sr_', 'L_'])
+K_star = self.kernel_(self.X_train_, X)
+f_star = K_star.T.dot((self.y_train_ - self.pi_))
+v = solve(self.L_, (self.W_sr_[:, numpy.newaxis] * K_star))
+tempResult = einsum('ij,ij->j', v, v)
+	
+===================================================================	
+GaussianProcessRegressor.log_marginal_likelihood: 139	
+----------------------------	
+
+'Returns log-marginal likelihood of theta for training data.\n\n        Parameters\n        ----------\n        theta : array-like, shape = (n_kernel_params,) or None\n            Kernel hyperparameters for which the log-marginal likelihood is\n            evaluated. If None, the precomputed log_marginal_likelihood\n            of ``self.kernel_.theta`` is returned.\n\n        eval_gradient : bool, default: False\n            If True, the gradient of the log-marginal likelihood with respect\n            to the kernel hyperparameters at position theta is returned\n            additionally. If True, theta must not be None.\n\n        Returns\n        -------\n        log_likelihood : float\n            Log-marginal likelihood of theta for training data.\n\n        log_likelihood_gradient : array, shape = (n_kernel_params,), optional\n            Gradient of the log-marginal likelihood with respect to the kernel\n            hyperparameters at position theta.\n            Only returned when eval_gradient is True.\n        '
+if (theta is None):
+    if eval_gradient:
+        raise ValueError('Gradient can only be evaluated for theta!=None')
+    return self.log_marginal_likelihood_value_
+kernel = self.kernel_.clone_with_theta(theta)
+if eval_gradient:
+    (K, K_gradient) = kernel(self.X_train_, eval_gradient=True)
+else:
+    K = kernel(self.X_train_)
+K[numpy.diag_indices_from(K)] += self.alpha
+try:
+    L = cholesky(K, lower=True)
+except numpy.linalg.LinAlgError:
+    return (((- numpy.inf), numpy.zeros_like(theta)) if eval_gradient else (- numpy.inf))
+y_train = self.y_train_
+if (y_train.ndim == 1):
+    y_train = y_train[:, numpy.newaxis]
+alpha = cho_solve((L, True), y_train)
+tempResult = einsum('ik,ik->k', y_train, alpha)
+	
+===================================================================	
+GaussianProcessRegressor.log_marginal_likelihood: 144	
+----------------------------	
+
+'Returns log-marginal likelihood of theta for training data.\n\n        Parameters\n        ----------\n        theta : array-like, shape = (n_kernel_params,) or None\n            Kernel hyperparameters for which the log-marginal likelihood is\n            evaluated. If None, the precomputed log_marginal_likelihood\n            of ``self.kernel_.theta`` is returned.\n\n        eval_gradient : bool, default: False\n            If True, the gradient of the log-marginal likelihood with respect\n            to the kernel hyperparameters at position theta is returned\n            additionally. If True, theta must not be None.\n\n        Returns\n        -------\n        log_likelihood : float\n            Log-marginal likelihood of theta for training data.\n\n        log_likelihood_gradient : array, shape = (n_kernel_params,), optional\n            Gradient of the log-marginal likelihood with respect to the kernel\n            hyperparameters at position theta.\n            Only returned when eval_gradient is True.\n        '
+if (theta is None):
+    if eval_gradient:
+        raise ValueError('Gradient can only be evaluated for theta!=None')
+    return self.log_marginal_likelihood_value_
+kernel = self.kernel_.clone_with_theta(theta)
+if eval_gradient:
+    (K, K_gradient) = kernel(self.X_train_, eval_gradient=True)
+else:
+    K = kernel(self.X_train_)
+K[numpy.diag_indices_from(K)] += self.alpha
+try:
+    L = cholesky(K, lower=True)
+except numpy.linalg.LinAlgError:
+    return (((- numpy.inf), numpy.zeros_like(theta)) if eval_gradient else (- numpy.inf))
+y_train = self.y_train_
+if (y_train.ndim == 1):
+    y_train = y_train[:, numpy.newaxis]
+alpha = cho_solve((L, True), y_train)
+log_likelihood_dims = ((- 0.5) * numpy.einsum('ik,ik->k', y_train, alpha))
+log_likelihood_dims -= np.log(np.diag(L)).sum()
+log_likelihood_dims -= ((K.shape[0] / 2) * numpy.log((2 * numpy.pi)))
+log_likelihood = log_likelihood_dims.sum((- 1))
+if eval_gradient:
+    tempResult = einsum('ik,jk->ijk', alpha, alpha)
+	
+===================================================================	
+GaussianProcessRegressor.log_marginal_likelihood: 146	
+----------------------------	
+
+'Returns log-marginal likelihood of theta for training data.\n\n        Parameters\n        ----------\n        theta : array-like, shape = (n_kernel_params,) or None\n            Kernel hyperparameters for which the log-marginal likelihood is\n            evaluated. If None, the precomputed log_marginal_likelihood\n            of ``self.kernel_.theta`` is returned.\n\n        eval_gradient : bool, default: False\n            If True, the gradient of the log-marginal likelihood with respect\n            to the kernel hyperparameters at position theta is returned\n            additionally. If True, theta must not be None.\n\n        Returns\n        -------\n        log_likelihood : float\n            Log-marginal likelihood of theta for training data.\n\n        log_likelihood_gradient : array, shape = (n_kernel_params,), optional\n            Gradient of the log-marginal likelihood with respect to the kernel\n            hyperparameters at position theta.\n            Only returned when eval_gradient is True.\n        '
+if (theta is None):
+    if eval_gradient:
+        raise ValueError('Gradient can only be evaluated for theta!=None')
+    return self.log_marginal_likelihood_value_
+kernel = self.kernel_.clone_with_theta(theta)
+if eval_gradient:
+    (K, K_gradient) = kernel(self.X_train_, eval_gradient=True)
+else:
+    K = kernel(self.X_train_)
+K[numpy.diag_indices_from(K)] += self.alpha
+try:
+    L = cholesky(K, lower=True)
+except numpy.linalg.LinAlgError:
+    return (((- numpy.inf), numpy.zeros_like(theta)) if eval_gradient else (- numpy.inf))
+y_train = self.y_train_
+if (y_train.ndim == 1):
+    y_train = y_train[:, numpy.newaxis]
+alpha = cho_solve((L, True), y_train)
+log_likelihood_dims = ((- 0.5) * numpy.einsum('ik,ik->k', y_train, alpha))
+log_likelihood_dims -= np.log(np.diag(L)).sum()
+log_likelihood_dims -= ((K.shape[0] / 2) * numpy.log((2 * numpy.pi)))
+log_likelihood = log_likelihood_dims.sum((- 1))
+if eval_gradient:
+    tmp = numpy.einsum('ik,jk->ijk', alpha, alpha)
+    tmp -= cho_solve((L, True), numpy.eye(K.shape[0]))[:, :, numpy.newaxis]
+    tempResult = einsum('ijl,ijk->kl', tmp, K_gradient)
+	
+===================================================================	
+GaussianProcessRegressor.predict: 99	
+----------------------------	
+
+'Predict using the Gaussian process regression model\n\n        We can also predict based on an unfitted model by using the GP prior.\n        In addition to the mean of the predictive distribution, also its\n        standard deviation (return_std=True) or covariance (return_cov=True).\n        Note that at most one of the two can be requested.\n\n        Parameters\n        ----------\n        X : array-like, shape = (n_samples, n_features)\n            Query points where the GP is evaluated\n\n        return_std : bool, default: False\n            If True, the standard-deviation of the predictive distribution at\n            the query points is returned along with the mean.\n\n        return_cov : bool, default: False\n            If True, the covariance of the joint predictive distribution at\n            the query points is returned along with the mean\n\n        Returns\n        -------\n        y_mean : array, shape = (n_samples, [n_output_dims])\n            Mean of predictive distribution a query points\n\n        y_std : array, shape = (n_samples,), optional\n            Standard deviation of predictive distribution at query points.\n            Only returned when return_std is True.\n\n        y_cov : array, shape = (n_samples, n_samples), optional\n            Covariance of joint predictive distribution a query points.\n            Only returned when return_cov is True.\n        '
+if (return_std and return_cov):
+    raise RuntimeError('Not returning standard deviation of predictions when returning full covariance.')
+X = check_array(X)
+if (not hasattr(self, 'X_train_')):
+    y_mean = numpy.zeros(X.shape[0])
+    if return_cov:
+        y_cov = self.kernel(X)
+        return (y_mean, y_cov)
+    elif return_std:
+        y_var = self.kernel.diag(X)
+        return (y_mean, numpy.sqrt(y_var))
+    else:
+        return y_mean
+else:
+    K_trans = self.kernel_(X, self.X_train_)
+    y_mean = K_trans.dot(self.alpha_)
+    y_mean = (self.y_train_mean + y_mean)
+    if return_cov:
+        v = cho_solve((self.L_, True), K_trans.T)
+        y_cov = (self.kernel_(X) - K_trans.dot(v))
+        return (y_mean, y_cov)
+    elif return_std:
+        L_inv = solve_triangular(self.L_.T, numpy.eye(self.L_.shape[0]))
+        K_inv = L_inv.dot(L_inv.T)
+        y_var = self.kernel_.diag(X)
+        tempResult = einsum('ki,kj,ij->k', K_trans, K_trans, K_inv)
+	
+===================================================================	
+DotProduct.diag: 736	
+----------------------------	
+
+'Returns the diagonal of the kernel k(X, X).\n\n        The result of this method is identical to np.diag(self(X)); however,\n        it can be evaluated more efficiently since only the diagonal is\n        evaluated.\n\n        Parameters\n        ----------\n        X : array, shape (n_samples_X, n_features)\n            Left argument of the returned kernel k(X, Y)\n\n        Returns\n        -------\n        K_diag : array, shape (n_samples_X,)\n            Diagonal of kernel k(X, X)\n        '
+tempResult = einsum('ij,ij->i', X, X)
+	
+===================================================================	
+row_norms: 39	
+----------------------------	
+
+'Row-wise (squared) Euclidean norm of X.\n\n    Equivalent to np.sqrt((X * X).sum(axis=1)), but also supports sparse\n    matrices and does not create an X.shape-sized temporary.\n\n    Performs no input validation.\n    '
+if issparse(X):
+    if (not isinstance(X, csr_matrix)):
+        X = csr_matrix(X)
+    norms = csr_row_norms(X)
+else:
+    tempResult = einsum('ij,ij->i', X, X)
+	
+***************************************************	
+matplotlib_matplotlib-2.0.0: 0	
+***************************************************	
+ipython_ipython-6.1.0: 0	
+***************************************************	
+pandas_pandas-0.19.2: 0	
+***************************************************	
+dask_dask-0.7.0: 0	
+***************************************************	
+nengo_nengo-2.0.0: 0	
+***************************************************	
+sympy_sympy-1.0.0: 0	
+***************************************************	
+daducci_amico-dev: 0	
+***************************************************	
+aplpy_aplpy-1.1.1: 0	
+***************************************************	
+markovmodel_msmtools-1.0.2: 0	
+***************************************************	
+nilearn_nilearn-0.4.0: 0	
+***************************************************	
+poliastro_poliastro-0.8.0: 0	
+***************************************************	
+skimage_skimage-0.13.0: 1	
+===================================================================	
+_norm_along_axis: 17	
+----------------------------	
+
+'NumPy < 1.8 does not support the `axis` argument for `np.linalg.norm`.'
+tempResult = einsum('ij,ij->i', x, x)
+	
+***************************************************	
+sunpy_sunpy-0.8.0: 0	
+***************************************************	
+spacetelescope_synphot-0.1: 0	
+***************************************************	
+librosa_librosa-0.5.1: 0	
+***************************************************	
+mne_python-0.15.0: 29	
+===================================================================	
+_lin_pot_coeff: 68	
+----------------------------	
+
+'Compute the linear potential matrix element computations.'
+omega = numpy.zeros((len(fros), 3))
+v1 = (tri_rr[numpy.newaxis, 0, :] - fros)
+v2 = (tri_rr[numpy.newaxis, 1, :] - fros)
+v3 = (tri_rr[numpy.newaxis, 2, :] - fros)
+triples = _fast_cross_nd_sum(v1, v2, v3)
+l1 = numpy.linalg.norm(v1, axis=1)
+l2 = numpy.linalg.norm(v2, axis=1)
+l3 = numpy.linalg.norm(v3, axis=1)
+ss = ((l1 * l2) * l3)
+tempResult = einsum('ij,ij,i->i', v1, v2, l3)
+	
+===================================================================	
+_lin_pot_coeff: 69	
+----------------------------	
+
+'Compute the linear potential matrix element computations.'
+omega = numpy.zeros((len(fros), 3))
+v1 = (tri_rr[numpy.newaxis, 0, :] - fros)
+v2 = (tri_rr[numpy.newaxis, 1, :] - fros)
+v3 = (tri_rr[numpy.newaxis, 2, :] - fros)
+triples = _fast_cross_nd_sum(v1, v2, v3)
+l1 = numpy.linalg.norm(v1, axis=1)
+l2 = numpy.linalg.norm(v2, axis=1)
+l3 = numpy.linalg.norm(v3, axis=1)
+ss = ((l1 * l2) * l3)
+ss += numpy.einsum('ij,ij,i->i', v1, v2, l3)
+tempResult = einsum('ij,ij,i->i', v1, v3, l2)
+	
+===================================================================	
+_lin_pot_coeff: 70	
+----------------------------	
+
+'Compute the linear potential matrix element computations.'
+omega = numpy.zeros((len(fros), 3))
+v1 = (tri_rr[numpy.newaxis, 0, :] - fros)
+v2 = (tri_rr[numpy.newaxis, 1, :] - fros)
+v3 = (tri_rr[numpy.newaxis, 2, :] - fros)
+triples = _fast_cross_nd_sum(v1, v2, v3)
+l1 = numpy.linalg.norm(v1, axis=1)
+l2 = numpy.linalg.norm(v2, axis=1)
+l3 = numpy.linalg.norm(v3, axis=1)
+ss = ((l1 * l2) * l3)
+ss += numpy.einsum('ij,ij,i->i', v1, v2, l3)
+ss += numpy.einsum('ij,ij,i->i', v1, v3, l2)
+tempResult = einsum('ij,ij,i->i', v2, v3, l1)
+	
+===================================================================	
+VectorSourceEstimate.normal: 851	
+----------------------------	
+
+'Compute activity orthogonal to the cortex.\n\n        Parameters\n        ----------\n        src : instance of SourceSpaces\n            The source space for which this source estimate is specified.\n\n        Returns\n        -------\n        stc : instance of SourceEstimate\n            The source estimate only retaining the activity orthogonal to the\n            cortex.\n        '
+normals = numpy.vstack([s['nn'][v] for (s, v) in zip(src, self.vertices)])
+tempResult = einsum('ijk,ij->ik', self.data, normals)
+	
+===================================================================	
+_find_nearest_tri_pt: 579	
+----------------------------	
+
+'Find nearest point mapping to a set of triangles.\n\n    If run_all is False, if the point lies within a triangle, it stops.\n    If run_all is True, edges of other triangles are checked in case\n    those (somehow) are closer.\n    '
+if (pt_tris is None):
+    pt_tris = slice(len(tri_geom['r1']))
+rrs = (rr - tri_geom['r1'][pt_tris])
+tri_nn = tri_geom['nn'][pt_tris]
+tempResult = einsum('ijk,ik->ij', tri_geom['r1213'][pt_tris], rrs)
+	
+===================================================================	
+_find_nearest_tri_pt: 581	
+----------------------------	
+
+'Find nearest point mapping to a set of triangles.\n\n    If run_all is False, if the point lies within a triangle, it stops.\n    If run_all is True, edges of other triangles are checked in case\n    those (somehow) are closer.\n    '
+if (pt_tris is None):
+    pt_tris = slice(len(tri_geom['r1']))
+rrs = (rr - tri_geom['r1'][pt_tris])
+tri_nn = tri_geom['nn'][pt_tris]
+vect = numpy.einsum('ijk,ik->ij', tri_geom['r1213'][pt_tris], rrs)
+mats = tri_geom['mat'][pt_tris]
+tempResult = einsum('ijk,ik->ji', mats, vect)
+	
+===================================================================	
+_get_solids: 684	
+----------------------------	
+
+'Compute _sum_solids_div total angle in chunks.'
+tot_angle = numpy.zeros(len(fros))
+slices = numpy.r_[(numpy.arange(0, len(fros), 100), [len(fros)])]
+for (i1, i2) in zip(slices[:(- 1)], slices[1:]):
+    vs = (fros[numpy.newaxis, numpy.newaxis, i1:i2] - tri_rrs.transpose([1, 0, 2])[:, :, numpy.newaxis])
+    triples = _fast_cross_nd_sum(vs[0], vs[1], vs[2])
+    ls = numpy.linalg.norm(vs, axis=3)
+    ss = numpy.prod(ls, axis=0)
+    tempResult = einsum('ijk,ijk,ij->ij', vs[0], vs[1], ls[2])
+	
+===================================================================	
+_get_solids: 685	
+----------------------------	
+
+'Compute _sum_solids_div total angle in chunks.'
+tot_angle = numpy.zeros(len(fros))
+slices = numpy.r_[(numpy.arange(0, len(fros), 100), [len(fros)])]
+for (i1, i2) in zip(slices[:(- 1)], slices[1:]):
+    vs = (fros[numpy.newaxis, numpy.newaxis, i1:i2] - tri_rrs.transpose([1, 0, 2])[:, :, numpy.newaxis])
+    triples = _fast_cross_nd_sum(vs[0], vs[1], vs[2])
+    ls = numpy.linalg.norm(vs, axis=3)
+    ss = numpy.prod(ls, axis=0)
+    ss += numpy.einsum('ijk,ijk,ij->ij', vs[0], vs[1], ls[2])
+    tempResult = einsum('ijk,ijk,ij->ij', vs[0], vs[2], ls[1])
+	
+===================================================================	
+_get_solids: 686	
+----------------------------	
+
+'Compute _sum_solids_div total angle in chunks.'
+tot_angle = numpy.zeros(len(fros))
+slices = numpy.r_[(numpy.arange(0, len(fros), 100), [len(fros)])]
+for (i1, i2) in zip(slices[:(- 1)], slices[1:]):
+    vs = (fros[numpy.newaxis, numpy.newaxis, i1:i2] - tri_rrs.transpose([1, 0, 2])[:, :, numpy.newaxis])
+    triples = _fast_cross_nd_sum(vs[0], vs[1], vs[2])
+    ls = numpy.linalg.norm(vs, axis=3)
+    ss = numpy.prod(ls, axis=0)
+    ss += numpy.einsum('ijk,ijk,ij->ij', vs[0], vs[1], ls[2])
+    ss += numpy.einsum('ijk,ijk,ij->ij', vs[0], vs[2], ls[1])
+    tempResult = einsum('ijk,ijk,ij->ij', vs[1], vs[2], ls[0])
+	
+===================================================================	
+_get_tri_supp_geom: 525	
+----------------------------	
+
+'Create supplementary geometry information using tris and rrs.'
+r1 = surf['rr'][surf['tris'][:, 0], :]
+r12 = (surf['rr'][surf['tris'][:, 1], :] - r1)
+r13 = (surf['rr'][surf['tris'][:, 2], :] - r1)
+r1213 = np.array([r12, r13]).swapaxes(0, 1)
+tempResult = einsum('ij,ij->i', r12, r12)
+	
+===================================================================	
+_get_tri_supp_geom: 526	
+----------------------------	
+
+'Create supplementary geometry information using tris and rrs.'
+r1 = surf['rr'][surf['tris'][:, 0], :]
+r12 = (surf['rr'][surf['tris'][:, 1], :] - r1)
+r13 = (surf['rr'][surf['tris'][:, 2], :] - r1)
+r1213 = np.array([r12, r13]).swapaxes(0, 1)
+a = numpy.einsum('ij,ij->i', r12, r12)
+tempResult = einsum('ij,ij->i', r13, r13)
+	
+===================================================================	
+_get_tri_supp_geom: 527	
+----------------------------	
+
+'Create supplementary geometry information using tris and rrs.'
+r1 = surf['rr'][surf['tris'][:, 0], :]
+r12 = (surf['rr'][surf['tris'][:, 1], :] - r1)
+r13 = (surf['rr'][surf['tris'][:, 2], :] - r1)
+r1213 = np.array([r12, r13]).swapaxes(0, 1)
+a = numpy.einsum('ij,ij->i', r12, r12)
+b = numpy.einsum('ij,ij->i', r13, r13)
+tempResult = einsum('ij,ij->i', r12, r13)
+	
+===================================================================	
+_project_onto_surface: 139	
+----------------------------	
+
+'Project points onto (scalp) surface.'
+surf_geom = _get_tri_supp_geom(surf)
+coords = numpy.empty((len(rrs), 3))
+tri_idx = numpy.empty((len(rrs),), int)
+for (ri, rr) in enumerate(rrs):
+    tri_idx[ri] = _find_nearest_tri_pt(rr, surf_geom)[2]
+    coords[ri] = _triangle_coords(rr, surf_geom, tri_idx[ri])
+weights = numpy.array([((1.0 - coords[:, 0]) - coords[:, 1]), coords[:, 0], coords[:, 1]])
+out = (weights, tri_idx)
+if project_rrs:
+    tempResult = einsum('ij,jik->jk', weights, surf['rr'][surf['tris'][tri_idx]])
+	
+===================================================================	
+_sph_to_cart_partials: 326	
+----------------------------	
+
+"Convert spherical partial derivatives to cartesian coords.\n\n    Note: Because we are dealing with partial derivatives, this calculation is\n    not a static transformation. The transformation matrix itself is dependent\n    on azimuth and polar coord.\n\n    See the 'Spherical coordinate sytem' section here:\n    wikipedia.org/wiki/Vector_fields_in_cylindrical_and_spherical_coordinates\n\n    Parameters\n    ----------\n    az : ndarray, shape (n_points,)\n        Array containing spherical coordinates points (azimuth).\n    pol : ndarray, shape (n_points,)\n        Array containing spherical coordinates points (polar).\n    sph_grads : ndarray, shape (n_points, 3)\n        Array containing partial derivatives at each spherical coordinate\n        (radius, azimuth, polar).\n\n    Returns\n    -------\n    cart_grads : ndarray, shape (n_points, 3)\n        Array containing partial derivatives in Cartesian coordinates (x, y, z)\n    "
+sph_grads = numpy.c_[(g_rad, g_az, g_pol)]
+cart_grads = numpy.zeros_like(sph_grads)
+(c_as, s_as) = (numpy.cos(az), numpy.sin(az))
+(c_ps, s_ps) = (numpy.cos(pol), numpy.sin(pol))
+trans = numpy.array([[(c_as * s_ps), (- s_as), (c_as * c_ps)], [(s_as * s_ps), c_as, (c_ps * s_as)], [c_ps, numpy.zeros_like(c_as), (- s_ps)]])
+tempResult = einsum('ijk,kj->ki', trans, sph_grads)
+	
+===================================================================	
+_do_interp_dots: 42	
+----------------------------	
+
+'Dot product of channel mapping matrix to channel data.'
+from ..io.base import BaseRaw
+from ..epochs import BaseEpochs
+from ..evoked import Evoked
+if isinstance(inst, (BaseRaw, Evoked)):
+    inst._data[bads_idx] = interpolation.dot(inst._data[goods_idx])
+elif isinstance(inst, BaseEpochs):
+    tempResult = einsum('ij,xjy->xiy', interpolation, inst._data[:, goods_idx, :])
+	
+===================================================================	
+test_time_delaying_fast_calc: 214	
+----------------------------	
+
+'Test time delaying and fast calculations.'
+X = np.array([[1, 2, 3], [5, 7, 11]]).T
+(smin, smax) = (1, 2)
+X_del = _delay_time_series(X, smin, smax, 1.0)
+X_del.shape = (X.shape[0], (- 1))
+expected = np.array([[0, 1, 2], [0, 0, 1], [0, 5, 7], [0, 0, 5]]).T
+assert_allclose(X_del, expected)
+Xt_X = numpy.dot(X_del.T, X_del)
+expected = [[5, 2, 19, 10], [2, 1, 7, 5], [19, 7, 74, 35], [10, 5, 35, 25]]
+assert_allclose(Xt_X, expected)
+x_xt = _compute_corrs(X, numpy.zeros((X.shape[0], 1)), smin, (smax + 1))[0]
+assert_allclose(x_xt, expected)
+(smin, smax) = ((- 2), (- 1))
+X_del = _delay_time_series(X, smin, smax, 1.0)
+X_del.shape = (X.shape[0], (- 1))
+expected = np.array([[3, 0, 0], [2, 3, 0], [11, 0, 0], [7, 11, 0]]).T
+assert_allclose(X_del, expected)
+Xt_X = numpy.dot(X_del.T, X_del)
+expected = [[9, 6, 33, 21], [6, 13, 22, 47], [33, 22, 121, 77], [21, 47, 77, 170]]
+assert_allclose(Xt_X, expected)
+x_xt = _compute_corrs(X, numpy.zeros((X.shape[0], 1)), smin, (smax + 1))[0]
+assert_allclose(x_xt, expected)
+(smin, smax) = ((- 1), 1)
+X_del = _delay_time_series(X, smin, smax, 1.0)
+X_del.shape = (X.shape[0], (- 1))
+expected = np.array([[2, 3, 0], [1, 2, 3], [0, 1, 2], [7, 11, 0], [5, 7, 11], [0, 5, 7]]).T
+assert_allclose(X_del, expected)
+Xt_X = numpy.dot(X_del.T, X_del)
+expected = [[13, 8, 3, 47, 31, 15], [8, 14, 8, 29, 52, 31], [3, 8, 5, 11, 29, 19], [47, 29, 11, 170, 112, 55], [31, 52, 29, 112, 195, 112], [15, 31, 19, 55, 112, 74]]
+assert_allclose(Xt_X, expected)
+x_xt = _compute_corrs(X, numpy.zeros((X.shape[0], 1)), smin, (smax + 1))[0]
+assert_allclose(x_xt, expected)
+X = np.array([[1, 2, 3, 5]]).T
+(smin, smax) = (0, 3)
+X_del = _delay_time_series(X, smin, smax, 1.0)
+X_del.shape = (X.shape[0], (- 1))
+expected = np.array([[1, 2, 3, 5], [0, 1, 2, 3], [0, 0, 1, 2], [0, 0, 0, 1]]).T
+assert_allclose(X_del, expected)
+Xt_X = numpy.dot(X_del.T, X_del)
+expected = [[39, 23, 13, 5], [23, 14, 8, 3], [13, 8, 5, 2], [5, 3, 2, 1]]
+assert_allclose(Xt_X, expected)
+x_xt = _compute_corrs(X, numpy.zeros((X.shape[0], 1)), smin, (smax + 1))[0]
+assert_allclose(x_xt, expected)
+X = np.array([[1, 2, 3], [5, 7, 11]]).T
+(smin, smax) = (0, 2)
+X_del = _delay_time_series(X, smin, smax, 1.0)
+X_del.shape = (X.shape[0], (- 1))
+expected = np.array([[1, 2, 3], [0, 1, 2], [0, 0, 1], [5, 7, 11], [0, 5, 7], [0, 0, 5]]).T
+assert_allclose(X_del, expected)
+Xt_X = numpy.dot(X_del.T, X_del)
+expected = numpy.array([[14, 8, 3, 52, 31, 15], [8, 5, 2, 29, 19, 10], [3, 2, 1, 11, 7, 5], [52, 29, 11, 195, 112, 55], [31, 19, 7, 112, 74, 35], [15, 10, 5, 55, 35, 25]])
+assert_allclose(Xt_X, expected)
+x_xt = _compute_corrs(X, numpy.zeros((X.shape[0], 1)), smin, (smax + 1))[0]
+assert_allclose(x_xt, expected)
+rng = numpy.random.RandomState(0)
+X = rng.randn(25, 3)
+y = numpy.empty((25, 2))
+vals = (0, (- 1), 1, (- 2), 2, (- 11), 11)
+for smax in vals:
+    for smin in vals:
+        if (smin > smax):
+            continue
+        for ii in range(X.shape[1]):
+            kernel = rng.randn(((smax - smin) + 1))
+            kernel -= numpy.mean(kernel)
+            y[:, (ii % y.shape[(- 1)])] = numpy.convolve(X[:, ii], kernel, 'same')
+        (x_xt, x_yt, n_ch_x) = _compute_corrs(X, y, smin, (smax + 1))
+        X_del = _delay_time_series(X, smin, smax, 1.0, fill_mean=False)
+        tempResult = einsum('tfd,to->ofd', X_del, y)
+	
+===================================================================	
+_bem_specify_els: 93	
+----------------------------	
+
+'Set up for computing the solution at a set of EEG electrodes.\n\n    Parameters\n    ----------\n    bem : dict\n        BEM information\n    els : list of dict, len(n_EEG_sensors)\n        List of EEG sensor information dicts\n    mults: ndarray, shape (1, n_BEM_vertices)\n        Multiplier for every vertex in BEM\n\n    Returns\n    -------\n    sol : ndarray, shape (n_EEG_sensors, n_BEM_vertices)\n        EEG solution\n    '
+sol = numpy.zeros((len(els), bem['solution'].shape[1]))
+scalp = bem['surfs'][0]
+rrs = numpy.concatenate([apply_trans(bem['head_mri_t']['trans'], el['rmag']) for el in els], axis=0)
+ws = numpy.concatenate([el['w'] for el in els])
+(tri_weights, tri_idx) = _project_onto_surface(rrs, scalp)
+tri_weights *= ws
+tempResult = einsum('ij,jik->jk', tri_weights, bem['solution'][scalp['tris'][tri_idx]])
+	
+===================================================================	
+_bem_inf_pots: 127	
+----------------------------	
+
+'Compute the infinite medium potential in all 3 directions.\n\n    Parameters\n    ----------\n    mri_rr : ndarray, shape (n_dipole_vertices, 3)\n        Chunk of 3D dipole positions in MRI coordinates\n    bem_rr: ndarray, shape (n_BEM_vertices, 3)\n        3D vertex positions for one BEM surface\n    mri_Q : ndarray, shape (3, 3)\n        3x3 head -> MRI transform. I.e., head_mri_t.dot(np.eye(3))\n\n    Returns\n    -------\n    ndarray : shape(n_dipole_vertices, 3, n_BEM_vertices)\n    '
+diff = (bem_rr.T[numpy.newaxis, :, :] - mri_rr[:, :, numpy.newaxis])
+diff_norm = numpy.sum((diff * diff), axis=1)
+diff_norm *= numpy.sqrt(diff_norm)
+diff_norm[(diff_norm == 0)] = 1
+if (mri_Q is None):
+    return (diff / diff_norm[:, numpy.newaxis, :])
+else:
+    tempResult = einsum('ijk,mj->imk', diff, mri_Q)
+	
+===================================================================	
+_comp_sums_meg: 105	
+----------------------------	
+
+'Lead field dot products using Legendre polynomial (P_n) series.\n\n    Parameters\n    ----------\n    beta : array, shape (n_points * n_points, 1)\n        Coefficients of the integration.\n    ctheta : array, shape (n_points * n_points, 1)\n        Cosine of the angle between the sensor integration points.\n    lut_fun : callable\n        Look-up table for evaluating Legendre polynomials.\n    n_fact : array\n        Coefficients in the integration sum.\n    volume_integral : bool\n        If True, compute volume integral.\n\n    Returns\n    -------\n    sums : array, shape (4, n_points * n_points)\n        The results.\n    '
+sums = numpy.empty((n_fact.shape[1], len(beta)))
+n_chunk = (50000000 // ((8 * max(n_fact.shape)) * 2))
+lims = numpy.concatenate([numpy.arange(0, beta.size, n_chunk), [beta.size]])
+for (start, stop) in zip(lims[:(- 1)], lims[1:]):
+    bbeta = numpy.tile(beta[start:stop][numpy.newaxis], (n_fact.shape[0], 1))
+    bbeta[0] *= beta[start:stop]
+    numpy.cumprod(bbeta, axis=0, out=bbeta)
+    tempResult = einsum('ji,jk,ijk->ki', bbeta, n_fact, lut_fun(ctheta[start:stop]), out=sums[:, start:stop])
+	
+===================================================================	
+_fast_sphere_dot_r0: 122	
+----------------------------	
+
+"Lead field dot product computation for M/EEG in the sphere model.\n\n    Parameters\n    ----------\n    r : float\n        The integration radius. It is used to calculate beta as:\n        beta = (r * r) / (lr1 * lr2).\n    rr1 : array, shape (n_points x 3)\n        Normalized position vectors of integrations points in first sensor.\n    rr2s : list\n        Normalized position vector of integration points in second sensor.\n    lr1 : array, shape (n_points x 1)\n        Magnitude of position vector of integration points in first sensor.\n    lr2s : list\n        Magnitude of position vector of integration points in second sensor.\n    cosmags1 : array, shape (n_points x 1)\n        Direction of integration points in first sensor.\n    cosmags2s : list\n        Direction of integration points in second sensor.\n    w1 : array, shape (n_points x 1) | None\n        Weights of integration points in the first sensor.\n    w2s : list\n        Weights of integration points in the second sensor.\n    volume_integral : bool\n        If True, compute volume integral.\n    lut : callable\n        Look-up table for evaluating Legendre polynomials.\n    n_fact : array\n        Coefficients in the integration sum.\n    ch_type : str\n        The channel type. It can be 'meg' or 'eeg'.\n\n    Returns\n    -------\n    result : float\n        The integration sum.\n    "
+if (w1 is None):
+    out_shape = (len(rr2s), len(rr1_orig))
+    sum_axis = 1
+else:
+    out_shape = (len(rr2s),)
+    sum_axis = None
+out = numpy.empty(out_shape)
+rr2 = numpy.concatenate(rr2s)
+lr2 = numpy.concatenate(lr2s)
+cosmags2 = numpy.concatenate(cosmags2s)
+tempResult = einsum('ik,jk->ij', rr1_orig, rr2)
+	
+===================================================================	
+_fast_sphere_dot_r0: 131	
+----------------------------	
+
+"Lead field dot product computation for M/EEG in the sphere model.\n\n    Parameters\n    ----------\n    r : float\n        The integration radius. It is used to calculate beta as:\n        beta = (r * r) / (lr1 * lr2).\n    rr1 : array, shape (n_points x 3)\n        Normalized position vectors of integrations points in first sensor.\n    rr2s : list\n        Normalized position vector of integration points in second sensor.\n    lr1 : array, shape (n_points x 1)\n        Magnitude of position vector of integration points in first sensor.\n    lr2s : list\n        Magnitude of position vector of integration points in second sensor.\n    cosmags1 : array, shape (n_points x 1)\n        Direction of integration points in first sensor.\n    cosmags2s : list\n        Direction of integration points in second sensor.\n    w1 : array, shape (n_points x 1) | None\n        Weights of integration points in the first sensor.\n    w2s : list\n        Weights of integration points in the second sensor.\n    volume_integral : bool\n        If True, compute volume integral.\n    lut : callable\n        Look-up table for evaluating Legendre polynomials.\n    n_fact : array\n        Coefficients in the integration sum.\n    ch_type : str\n        The channel type. It can be 'meg' or 'eeg'.\n\n    Returns\n    -------\n    result : float\n        The integration sum.\n    "
+if (w1 is None):
+    out_shape = (len(rr2s), len(rr1_orig))
+    sum_axis = 1
+else:
+    out_shape = (len(rr2s),)
+    sum_axis = None
+out = numpy.empty(out_shape)
+rr2 = numpy.concatenate(rr2s)
+lr2 = numpy.concatenate(lr2s)
+cosmags2 = numpy.concatenate(cosmags2s)
+ct = numpy.einsum('ik,jk->ij', rr1_orig, rr2)
+numpy.clip(ct, (- 1), 1, ct)
+rr1 = rr1_orig[:, numpy.newaxis, :]
+rr2 = rr2[numpy.newaxis, :, :]
+lr1lr2 = (lr1[:, numpy.newaxis] * lr2[numpy.newaxis, :])
+beta = ((r * r) / lr1lr2)
+if (ch_type == 'meg'):
+    sums = _comp_sums_meg(beta.flatten(), ct.flatten(), lut, n_fact, volume_integral)
+    sums.shape = ((4,) + beta.shape)
+    tempResult = einsum('ik,ijk->ij', cosmags1, rr1)
+	
+===================================================================	
+_fast_sphere_dot_r0: 132	
+----------------------------	
+
+"Lead field dot product computation for M/EEG in the sphere model.\n\n    Parameters\n    ----------\n    r : float\n        The integration radius. It is used to calculate beta as:\n        beta = (r * r) / (lr1 * lr2).\n    rr1 : array, shape (n_points x 3)\n        Normalized position vectors of integrations points in first sensor.\n    rr2s : list\n        Normalized position vector of integration points in second sensor.\n    lr1 : array, shape (n_points x 1)\n        Magnitude of position vector of integration points in first sensor.\n    lr2s : list\n        Magnitude of position vector of integration points in second sensor.\n    cosmags1 : array, shape (n_points x 1)\n        Direction of integration points in first sensor.\n    cosmags2s : list\n        Direction of integration points in second sensor.\n    w1 : array, shape (n_points x 1) | None\n        Weights of integration points in the first sensor.\n    w2s : list\n        Weights of integration points in the second sensor.\n    volume_integral : bool\n        If True, compute volume integral.\n    lut : callable\n        Look-up table for evaluating Legendre polynomials.\n    n_fact : array\n        Coefficients in the integration sum.\n    ch_type : str\n        The channel type. It can be 'meg' or 'eeg'.\n\n    Returns\n    -------\n    result : float\n        The integration sum.\n    "
+if (w1 is None):
+    out_shape = (len(rr2s), len(rr1_orig))
+    sum_axis = 1
+else:
+    out_shape = (len(rr2s),)
+    sum_axis = None
+out = numpy.empty(out_shape)
+rr2 = numpy.concatenate(rr2s)
+lr2 = numpy.concatenate(lr2s)
+cosmags2 = numpy.concatenate(cosmags2s)
+ct = numpy.einsum('ik,jk->ij', rr1_orig, rr2)
+numpy.clip(ct, (- 1), 1, ct)
+rr1 = rr1_orig[:, numpy.newaxis, :]
+rr2 = rr2[numpy.newaxis, :, :]
+lr1lr2 = (lr1[:, numpy.newaxis] * lr2[numpy.newaxis, :])
+beta = ((r * r) / lr1lr2)
+if (ch_type == 'meg'):
+    sums = _comp_sums_meg(beta.flatten(), ct.flatten(), lut, n_fact, volume_integral)
+    sums.shape = ((4,) + beta.shape)
+    n1c1 = numpy.einsum('ik,ijk->ij', cosmags1, rr1)
+    tempResult = einsum('ik,ijk->ij', cosmags1, rr2)
+	
+===================================================================	
+_fast_sphere_dot_r0: 133	
+----------------------------	
+
+"Lead field dot product computation for M/EEG in the sphere model.\n\n    Parameters\n    ----------\n    r : float\n        The integration radius. It is used to calculate beta as:\n        beta = (r * r) / (lr1 * lr2).\n    rr1 : array, shape (n_points x 3)\n        Normalized position vectors of integrations points in first sensor.\n    rr2s : list\n        Normalized position vector of integration points in second sensor.\n    lr1 : array, shape (n_points x 1)\n        Magnitude of position vector of integration points in first sensor.\n    lr2s : list\n        Magnitude of position vector of integration points in second sensor.\n    cosmags1 : array, shape (n_points x 1)\n        Direction of integration points in first sensor.\n    cosmags2s : list\n        Direction of integration points in second sensor.\n    w1 : array, shape (n_points x 1) | None\n        Weights of integration points in the first sensor.\n    w2s : list\n        Weights of integration points in the second sensor.\n    volume_integral : bool\n        If True, compute volume integral.\n    lut : callable\n        Look-up table for evaluating Legendre polynomials.\n    n_fact : array\n        Coefficients in the integration sum.\n    ch_type : str\n        The channel type. It can be 'meg' or 'eeg'.\n\n    Returns\n    -------\n    result : float\n        The integration sum.\n    "
+if (w1 is None):
+    out_shape = (len(rr2s), len(rr1_orig))
+    sum_axis = 1
+else:
+    out_shape = (len(rr2s),)
+    sum_axis = None
+out = numpy.empty(out_shape)
+rr2 = numpy.concatenate(rr2s)
+lr2 = numpy.concatenate(lr2s)
+cosmags2 = numpy.concatenate(cosmags2s)
+ct = numpy.einsum('ik,jk->ij', rr1_orig, rr2)
+numpy.clip(ct, (- 1), 1, ct)
+rr1 = rr1_orig[:, numpy.newaxis, :]
+rr2 = rr2[numpy.newaxis, :, :]
+lr1lr2 = (lr1[:, numpy.newaxis] * lr2[numpy.newaxis, :])
+beta = ((r * r) / lr1lr2)
+if (ch_type == 'meg'):
+    sums = _comp_sums_meg(beta.flatten(), ct.flatten(), lut, n_fact, volume_integral)
+    sums.shape = ((4,) + beta.shape)
+    n1c1 = numpy.einsum('ik,ijk->ij', cosmags1, rr1)
+    n1c2 = numpy.einsum('ik,ijk->ij', cosmags1, rr2)
+    tempResult = einsum('jk,ijk->ij', cosmags2, rr1)
+	
+===================================================================	
+_fast_sphere_dot_r0: 134	
+----------------------------	
+
+"Lead field dot product computation for M/EEG in the sphere model.\n\n    Parameters\n    ----------\n    r : float\n        The integration radius. It is used to calculate beta as:\n        beta = (r * r) / (lr1 * lr2).\n    rr1 : array, shape (n_points x 3)\n        Normalized position vectors of integrations points in first sensor.\n    rr2s : list\n        Normalized position vector of integration points in second sensor.\n    lr1 : array, shape (n_points x 1)\n        Magnitude of position vector of integration points in first sensor.\n    lr2s : list\n        Magnitude of position vector of integration points in second sensor.\n    cosmags1 : array, shape (n_points x 1)\n        Direction of integration points in first sensor.\n    cosmags2s : list\n        Direction of integration points in second sensor.\n    w1 : array, shape (n_points x 1) | None\n        Weights of integration points in the first sensor.\n    w2s : list\n        Weights of integration points in the second sensor.\n    volume_integral : bool\n        If True, compute volume integral.\n    lut : callable\n        Look-up table for evaluating Legendre polynomials.\n    n_fact : array\n        Coefficients in the integration sum.\n    ch_type : str\n        The channel type. It can be 'meg' or 'eeg'.\n\n    Returns\n    -------\n    result : float\n        The integration sum.\n    "
+if (w1 is None):
+    out_shape = (len(rr2s), len(rr1_orig))
+    sum_axis = 1
+else:
+    out_shape = (len(rr2s),)
+    sum_axis = None
+out = numpy.empty(out_shape)
+rr2 = numpy.concatenate(rr2s)
+lr2 = numpy.concatenate(lr2s)
+cosmags2 = numpy.concatenate(cosmags2s)
+ct = numpy.einsum('ik,jk->ij', rr1_orig, rr2)
+numpy.clip(ct, (- 1), 1, ct)
+rr1 = rr1_orig[:, numpy.newaxis, :]
+rr2 = rr2[numpy.newaxis, :, :]
+lr1lr2 = (lr1[:, numpy.newaxis] * lr2[numpy.newaxis, :])
+beta = ((r * r) / lr1lr2)
+if (ch_type == 'meg'):
+    sums = _comp_sums_meg(beta.flatten(), ct.flatten(), lut, n_fact, volume_integral)
+    sums.shape = ((4,) + beta.shape)
+    n1c1 = numpy.einsum('ik,ijk->ij', cosmags1, rr1)
+    n1c2 = numpy.einsum('ik,ijk->ij', cosmags1, rr2)
+    n2c1 = numpy.einsum('jk,ijk->ij', cosmags2, rr1)
+    tempResult = einsum('jk,ijk->ij', cosmags2, rr2)
+	
+===================================================================	
+_fast_sphere_dot_r0: 135	
+----------------------------	
+
+"Lead field dot product computation for M/EEG in the sphere model.\n\n    Parameters\n    ----------\n    r : float\n        The integration radius. It is used to calculate beta as:\n        beta = (r * r) / (lr1 * lr2).\n    rr1 : array, shape (n_points x 3)\n        Normalized position vectors of integrations points in first sensor.\n    rr2s : list\n        Normalized position vector of integration points in second sensor.\n    lr1 : array, shape (n_points x 1)\n        Magnitude of position vector of integration points in first sensor.\n    lr2s : list\n        Magnitude of position vector of integration points in second sensor.\n    cosmags1 : array, shape (n_points x 1)\n        Direction of integration points in first sensor.\n    cosmags2s : list\n        Direction of integration points in second sensor.\n    w1 : array, shape (n_points x 1) | None\n        Weights of integration points in the first sensor.\n    w2s : list\n        Weights of integration points in the second sensor.\n    volume_integral : bool\n        If True, compute volume integral.\n    lut : callable\n        Look-up table for evaluating Legendre polynomials.\n    n_fact : array\n        Coefficients in the integration sum.\n    ch_type : str\n        The channel type. It can be 'meg' or 'eeg'.\n\n    Returns\n    -------\n    result : float\n        The integration sum.\n    "
+if (w1 is None):
+    out_shape = (len(rr2s), len(rr1_orig))
+    sum_axis = 1
+else:
+    out_shape = (len(rr2s),)
+    sum_axis = None
+out = numpy.empty(out_shape)
+rr2 = numpy.concatenate(rr2s)
+lr2 = numpy.concatenate(lr2s)
+cosmags2 = numpy.concatenate(cosmags2s)
+ct = numpy.einsum('ik,jk->ij', rr1_orig, rr2)
+numpy.clip(ct, (- 1), 1, ct)
+rr1 = rr1_orig[:, numpy.newaxis, :]
+rr2 = rr2[numpy.newaxis, :, :]
+lr1lr2 = (lr1[:, numpy.newaxis] * lr2[numpy.newaxis, :])
+beta = ((r * r) / lr1lr2)
+if (ch_type == 'meg'):
+    sums = _comp_sums_meg(beta.flatten(), ct.flatten(), lut, n_fact, volume_integral)
+    sums.shape = ((4,) + beta.shape)
+    n1c1 = numpy.einsum('ik,ijk->ij', cosmags1, rr1)
+    n1c2 = numpy.einsum('ik,ijk->ij', cosmags1, rr2)
+    n2c1 = numpy.einsum('jk,ijk->ij', cosmags2, rr1)
+    n2c2 = numpy.einsum('jk,ijk->ij', cosmags2, rr2)
+    tempResult = einsum('ik,jk->ij', cosmags1, cosmags2)
+	
+===================================================================	
+_sss_basis_basic: 556	
+----------------------------	
+
+'Compute SSS basis using non-optimized (but more readable) algorithms.'
+(int_order, ext_order) = (exp['int_order'], exp['ext_order'])
+origin = exp['origin']
+if (method == 'standard'):
+    (rmags, cosmags, ws, bins) = _concatenate_coils(coils)
+    rmags -= origin
+    (rad, az, pol) = _cart_to_sph(rmags).T
+    cosmags *= ws[:, numpy.newaxis]
+    del rmags, ws
+    out_type = numpy.float64
+else:
+    (rs, wcoils, ezs, bins) = _concatenate_sph_coils(coils)
+    rs -= origin
+    (rad, az, pol) = _cart_to_sph(rs).T
+    ezs *= wcoils[:, numpy.newaxis]
+    del rs, wcoils
+    out_type = numpy.complex128
+del origin
+(n_in, n_out) = _get_n_moments([int_order, ext_order])
+S_tot = numpy.empty((len(coils), (n_in + n_out)), out_type)
+S_in = S_tot[:, :n_in]
+S_out = S_tot[:, n_in:]
+coil_scale = numpy.ones((len(coils), 1))
+coil_scale[_get_mag_mask(coils)] = mag_scale
+for degree in range(1, (max(int_order, ext_order) + 1)):
+    for order in range((degree + 1)):
+        S_in_out = list()
+        grads_in_out = list()
+        sph = _get_sph_harm()(order, degree, az, pol)
+        sph_norm = _sph_harm_norm(order, degree)
+        az_factor = (((1j * order) * sph) / numpy.sin(numpy.maximum(pol, 1e-16)))
+        pol_factor = ((((- sph_norm) * numpy.sin(pol)) * numpy.exp(((1j * order) * az))) * _alegendre_deriv(order, degree, numpy.cos(pol)))
+        if (degree <= int_order):
+            S_in_out.append(S_in)
+            in_norm = (_mu_0 * (rad ** (- (degree + 2))))
+            g_rad = (in_norm * ((- (degree + 1.0)) * sph))
+            g_az = (in_norm * az_factor)
+            g_pol = (in_norm * pol_factor)
+            grads_in_out.append(_sph_to_cart_partials(az, pol, g_rad, g_az, g_pol))
+        if (degree <= ext_order):
+            S_in_out.append(S_out)
+            out_norm = (_mu_0 * (rad ** (degree - 1)))
+            g_rad = ((out_norm * degree) * sph)
+            g_az = (out_norm * az_factor)
+            g_pol = (out_norm * pol_factor)
+            grads_in_out.append(_sph_to_cart_partials(az, pol, g_rad, g_az, g_pol))
+        for (spc, grads) in zip(S_in_out, grads_in_out):
+            if (method == 'standard'):
+                grads_pos_neg = [_sh_complex_to_real(grads, order)]
+                orders_pos_neg = [order]
+                if (order > 0):
+                    grads_pos_neg.append(_sh_complex_to_real(_sh_negate(grads, order), (- order)))
+                    orders_pos_neg.append((- order))
+                for (gr, oo) in zip(grads_pos_neg, orders_pos_neg):
+                    tempResult = einsum('ij,ij->i', gr, cosmags)
+	
+===================================================================	
+_sss_basis_basic: 560	
+----------------------------	
+
+'Compute SSS basis using non-optimized (but more readable) algorithms.'
+(int_order, ext_order) = (exp['int_order'], exp['ext_order'])
+origin = exp['origin']
+if (method == 'standard'):
+    (rmags, cosmags, ws, bins) = _concatenate_coils(coils)
+    rmags -= origin
+    (rad, az, pol) = _cart_to_sph(rmags).T
+    cosmags *= ws[:, numpy.newaxis]
+    del rmags, ws
+    out_type = numpy.float64
+else:
+    (rs, wcoils, ezs, bins) = _concatenate_sph_coils(coils)
+    rs -= origin
+    (rad, az, pol) = _cart_to_sph(rs).T
+    ezs *= wcoils[:, numpy.newaxis]
+    del rs, wcoils
+    out_type = numpy.complex128
+del origin
+(n_in, n_out) = _get_n_moments([int_order, ext_order])
+S_tot = numpy.empty((len(coils), (n_in + n_out)), out_type)
+S_in = S_tot[:, :n_in]
+S_out = S_tot[:, n_in:]
+coil_scale = numpy.ones((len(coils), 1))
+coil_scale[_get_mag_mask(coils)] = mag_scale
+for degree in range(1, (max(int_order, ext_order) + 1)):
+    for order in range((degree + 1)):
+        S_in_out = list()
+        grads_in_out = list()
+        sph = _get_sph_harm()(order, degree, az, pol)
+        sph_norm = _sph_harm_norm(order, degree)
+        az_factor = (((1j * order) * sph) / numpy.sin(numpy.maximum(pol, 1e-16)))
+        pol_factor = ((((- sph_norm) * numpy.sin(pol)) * numpy.exp(((1j * order) * az))) * _alegendre_deriv(order, degree, numpy.cos(pol)))
+        if (degree <= int_order):
+            S_in_out.append(S_in)
+            in_norm = (_mu_0 * (rad ** (- (degree + 2))))
+            g_rad = (in_norm * ((- (degree + 1.0)) * sph))
+            g_az = (in_norm * az_factor)
+            g_pol = (in_norm * pol_factor)
+            grads_in_out.append(_sph_to_cart_partials(az, pol, g_rad, g_az, g_pol))
+        if (degree <= ext_order):
+            S_in_out.append(S_out)
+            out_norm = (_mu_0 * (rad ** (degree - 1)))
+            g_rad = ((out_norm * degree) * sph)
+            g_az = (out_norm * az_factor)
+            g_pol = (out_norm * pol_factor)
+            grads_in_out.append(_sph_to_cart_partials(az, pol, g_rad, g_az, g_pol))
+        for (spc, grads) in zip(S_in_out, grads_in_out):
+            if (method == 'standard'):
+                grads_pos_neg = [_sh_complex_to_real(grads, order)]
+                orders_pos_neg = [order]
+                if (order > 0):
+                    grads_pos_neg.append(_sh_complex_to_real(_sh_negate(grads, order), (- order)))
+                    orders_pos_neg.append((- order))
+                for (gr, oo) in zip(grads_pos_neg, orders_pos_neg):
+                    gr = numpy.einsum('ij,ij->i', gr, cosmags)
+                    vals = numpy.bincount(bins, gr, len(coils))
+                    spc[:, _deg_ord_idx(degree, oo)] = (- vals)
+            else:
+                tempResult = einsum('ij,ij->i', grads, ezs)
+	
+===================================================================	
+_integrate_points: 654	
+----------------------------	
+
+'Integrate points in spherical coords.'
+grads = _sp_to_cart(cos_az, sin_az, cos_pol, sin_pol, b_r, b_az, b_pol).T
+tempResult = einsum('ij,ij->i', grads, cosmags)
+	
+===================================================================	
+plot_head_positions: 57	
+----------------------------	
+
+'Plot head positions.\n\n    Parameters\n    ----------\n    pos : ndarray, shape (n_pos, 10)\n        The head position data.\n    mode : str\n        Can be \'traces\' (default) to show position and quaternion traces,\n        or \'field\' to show the position as a vector field over time.\n        The \'field\' mode requires matplotlib 1.4+.\n    cmap : matplotlib Colormap\n        Colormap to use for the trace plot, default is "viridis".\n    direction : str\n        Can be any combination of "x", "y", or "z" (default: "z") to show\n        directional axes in "field" mode.\n    show : bool\n        Show figure if True. Defaults to True.\n\n    Returns\n    -------\n    fig : Instance of matplotlib.figure.Figure\n        The figure.\n    '
+from ..chpi import head_pos_to_trans_rot_t
+import matplotlib.pyplot as plt
+from matplotlib.colors import Normalize
+from mpl_toolkits.mplot3d.art3d import Line3DCollection
+from mpl_toolkits.mplot3d import axes3d
+if ((not isinstance(mode, string_types)) or (mode not in ('traces', 'field'))):
+    raise ValueError(('mode must be "traces" or "field", got %s' % (mode,)))
+(trans, rot, t) = head_pos_to_trans_rot_t(pos)
+tempResult = einsum('ijk,ik->ij', rot[:, :3, :3].transpose([0, 2, 1]), (- trans))
+	
+***************************************************	

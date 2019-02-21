@@ -1,0 +1,119 @@
+astropy_astropy-1.3.0: 0	
+***************************************************	
+scipy_scipy-0.19.0: 5	
+===================================================================	
+cauchy: 119	
+----------------------------	
+
+tempResult = log1p(z)
+	
+===================================================================	
+xfunc1: 2591	
+----------------------------	
+
+if ((x == 0) and (not numpy.isnan(y))):
+    return x
+else:
+    tempResult = log1p(y)
+	
+===================================================================	
+test_boxcox1p_basic: 36	
+----------------------------	
+
+x = numpy.array([(- 0.25), (- 1e-20), 0, 1e-20, 0.25, 1, 3])
+y = boxcox1p(x, 0)
+tempResult = log1p(x)
+	
+===================================================================	
+test_boxcox1p_underflow: 49	
+----------------------------	
+
+x = numpy.array([1e-15, 1e-306])
+lmbda = numpy.array([1e-306, 1e-18])
+y = boxcox1p(x, lmbda)
+tempResult = log1p(x)
+	
+===================================================================	
+TestGeom.test_logcdf_logsf: 254	
+----------------------------	
+
+vals = scipy.stats.geom.logcdf([1, 2, 3], 0.5)
+vals_sf = scipy.stats.geom.logsf([1, 2, 3], 0.5)
+expected = array([0.5, 0.75, 0.875])
+assert_array_almost_equal(vals, numpy.log(expected))
+tempResult = log1p((- expected))
+	
+***************************************************	
+sklearn_sklearn-0.18.0: 1	
+===================================================================	
+test_np_log: 32	
+----------------------------	
+
+X = np.arange(10).reshape((5, 2))
+tempResult = log1p(X)
+	
+***************************************************	
+matplotlib_matplotlib-2.0.0: 0	
+***************************************************	
+ipython_ipython-6.1.0: 0	
+***************************************************	
+pandas_pandas-0.19.2: 0	
+***************************************************	
+dask_dask-0.7.0: 0	
+***************************************************	
+nengo_nengo-2.0.0: 1	
+===================================================================	
+LIFRate.step_math: 148	
+----------------------------	
+
+'Compute rates in Hz for input current (incl. bias)'
+j = (J - 1)
+output[:] = 0
+tempResult = log1p((1.0 / j[(j > 0)]))
+	
+***************************************************	
+sympy_sympy-1.0.0: 0	
+***************************************************	
+daducci_amico-dev: 0	
+***************************************************	
+aplpy_aplpy-1.1.1: 0	
+***************************************************	
+markovmodel_msmtools-1.0.2: 0	
+***************************************************	
+nilearn_nilearn-0.4.0: 2	
+===================================================================	
+_logistic: 91	
+----------------------------	
+
+'Compute the logistic function of the data: sum(sigmoid(yXw))\n\n    Parameters\n    ----------\n    X : ndarray, shape (n_samples, n_features)\n        Design matrix.\n\n    y : ndarray, shape (n_samples,)\n        Target / response vector. Each entry must be +1 or -1.\n\n    w : ndarray, shape (n_features,)\n        Unmasked, ravelized input map.\n\n    Returns\n    -------\n    energy : float\n        Energy contribution due to logistic data-fit term.\n    '
+z = (numpy.dot(X, w[:(- 1)]) + w[(- 1)])
+yz = (y * z)
+idx = (yz > 0)
+out = numpy.empty_like(yz)
+tempResult = log1p(numpy.exp((- yz[idx])))
+	
+===================================================================	
+_logistic: 92	
+----------------------------	
+
+'Compute the logistic function of the data: sum(sigmoid(yXw))\n\n    Parameters\n    ----------\n    X : ndarray, shape (n_samples, n_features)\n        Design matrix.\n\n    y : ndarray, shape (n_samples,)\n        Target / response vector. Each entry must be +1 or -1.\n\n    w : ndarray, shape (n_features,)\n        Unmasked, ravelized input map.\n\n    Returns\n    -------\n    energy : float\n        Energy contribution due to logistic data-fit term.\n    '
+z = (numpy.dot(X, w[:(- 1)]) + w[(- 1)])
+yz = (y * z)
+idx = (yz > 0)
+out = numpy.empty_like(yz)
+out[idx] = numpy.log1p(numpy.exp((- yz[idx])))
+tempResult = log1p(numpy.exp(yz[(~ idx)]))
+	
+***************************************************	
+poliastro_poliastro-0.8.0: 0	
+***************************************************	
+skimage_skimage-0.13.0: 0	
+***************************************************	
+sunpy_sunpy-0.8.0: 0	
+***************************************************	
+spacetelescope_synphot-0.1: 0	
+***************************************************	
+librosa_librosa-0.5.1: 0	
+***************************************************	
+mne_python-0.15.0: 0	
+***************************************************	

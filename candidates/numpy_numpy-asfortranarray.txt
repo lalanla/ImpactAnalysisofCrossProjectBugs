@@ -1,0 +1,1596 @@
+astropy_astropy-1.3.0: 0	
+***************************************************	
+scipy_scipy-0.19.0: 28	
+===================================================================	
+solve: 29	
+----------------------------	
+
+"\n    Solves the linear equation set ``a * x = b`` for the unknown ``x``\n    for square ``a`` matrix.\n\n    If the data matrix is known to be a particular type then supplying the\n    corresponding string to ``assume_a`` key chooses the dedicated solver.\n    The available options are\n\n    ===================  ========\n     generic matrix       'gen'\n     symmetric            'sym'\n     hermitian            'her'\n     positive definite    'pos'\n    ===================  ========\n\n    If omitted, ``'gen'`` is the default structure.\n\n    The datatype of the arrays define which solver is called regardless\n    of the values. In other words, even when the complex array entries have\n    precisely zero imaginary parts, the complex solver will be called based\n    on the data type of the array.\n\n    Parameters\n    ----------\n    a : (N, N) array_like\n        Square input data\n    b : (N, NRHS) array_like\n        Input data for the right hand side.\n    sym_pos : bool, optional\n        Assume `a` is symmetric and positive definite. This key is deprecated\n        and assume_a = 'pos' keyword is recommended instead. The functionality\n        is the same. It will be removed in the future.\n    lower : bool, optional\n        If True, only the data contained in the lower triangle of `a`. Default\n        is to use upper triangle. (ignored for ``'gen'``)\n    overwrite_a : bool, optional\n        Allow overwriting data in `a` (may enhance performance).\n        Default is False.\n    overwrite_b : bool, optional\n        Allow overwriting data in `b` (may enhance performance).\n        Default is False.\n    check_finite : bool, optional\n        Whether to check that the input matrices contain only finite numbers.\n        Disabling may give a performance gain, but may result in problems\n        (crashes, non-termination) if the inputs do contain infinities or NaNs.\n    assume_a : str, optional\n        Valid entries are explained above.\n    transposed: bool, optional\n        If True, depending on the data type ``a^T x = b`` or ``a^H x = b`` is\n        solved (only taken into account for ``'gen'``).\n\n    Returns\n    -------\n    x : (N, NRHS) ndarray\n        The solution array.\n\n    Raises\n    ------\n    ValueError\n        If size mismatches detected or input a is not square.\n    LinAlgError\n        If the matrix is singular.\n    RuntimeWarning\n        If an ill-conditioned input a is detected.\n\n    Examples\n    --------\n    Given `a` and `b`, solve for `x`:\n\n    >>> a = np.array([[3, 2, 0], [1, -1, 0], [0, 5, 1]])\n    >>> b = np.array([2, 4, -1])\n    >>> from scipy import linalg\n    >>> x = linalg.solve(a, b)\n    >>> x\n    array([ 2., -2.,  9.])\n    >>> np.dot(a, x) == b\n    array([ True,  True,  True], dtype=bool)\n\n    Notes\n    -----\n    If the input b matrix is a 1D array with N elements, when supplied\n    together with an NxN input a, it is assumed as a valid column vector\n    despite the apparent size mismatch. This is compatible with the\n    numpy.dot() behavior and the returned result is still 1D array.\n\n    The generic, symmetric, hermitian and positive definite solutions are\n    obtained via calling ?GESVX, ?SYSVX, ?HESVX, and ?POSVX routines of\n    LAPACK respectively.\n    "
+b_is_1D = False
+b_is_ND = False
+a1 = atleast_2d(_asarray_validated(a, check_finite=check_finite))
+b1 = atleast_1d(_asarray_validated(b, check_finite=check_finite))
+n = a1.shape[0]
+overwrite_a = (overwrite_a or _datacopied(a1, a))
+overwrite_b = (overwrite_b or _datacopied(b1, b))
+if (a1.shape[0] != a1.shape[1]):
+    raise ValueError('Input a needs to be a square matrix.')
+if (n != b1.shape[0]):
+    if (not ((n == 1) and (b1.size != 0))):
+        raise ValueError('Input b has to have same number of rows as input a')
+if (b1.size == 0):
+    tempResult = asfortranarray(b1.copy())
+	
+===================================================================	
+seed: 24	
+----------------------------	
+
+"\n    Seed the internal random number generator used in this ID package.\n\n    The generator is a lagged Fibonacci method with 55-element internal state.\n\n    Parameters\n    ----------\n    seed : int, sequence, 'default', optional\n        If 'default', the random seed is reset to a default value.\n\n        If `seed` is a sequence containing 55 floating-point numbers\n        in range [0,1], these are used to set the internal state of\n        the generator.\n\n        If the value is an integer, the internal state is obtained\n        from `numpy.random.RandomState` (MT19937) with the integer\n        used as the initial seed.\n\n        If `seed` is omitted (None), `numpy.random` is used to\n        initialize the generator.\n\n    "
+if (isinstance(seed, str) and (seed == 'default')):
+    scipy.linalg._interpolative_backend.id_srando()
+elif hasattr(seed, '__len__'):
+    tempResult = asfortranarray(seed, dtype=float)
+	
+===================================================================	
+iddp_svd: 96	
+----------------------------	
+
+'\n    Compute SVD of a real matrix to a specified relative precision.\n\n    :param eps:\n        Relative precision.\n    :type eps: float\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n\n    :return:\n        Left singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Right singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Singular values.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idd_id2svd: 71	
+----------------------------	
+
+'\n    Convert real ID to SVD.\n\n    :param B:\n        Skeleton matrix.\n    :type B: :class:`numpy.ndarray`\n    :param idx:\n        Column index array.\n    :type idx: :class:`numpy.ndarray`\n    :param proj:\n        Interpolation coefficients.\n    :type proj: :class:`numpy.ndarray`\n\n    :return:\n        Left singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Right singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Singular values.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(B)
+	
+===================================================================	
+idd_copycols: 66	
+----------------------------	
+
+'\n    Reconstruct skeleton matrix from real ID.\n\n    :param A:\n        Original matrix.\n    :type A: :class:`numpy.ndarray`\n    :param k:\n        Rank of ID.\n    :type k: int\n    :param idx:\n        Column index array.\n    :type idx: :class:`numpy.ndarray`\n\n    :return:\n        Skeleton matrix.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idzr_aid: 353	
+----------------------------	
+
+'\n    Compute ID of a complex matrix to a specified rank using random sampling.\n\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n    :param k:\n        Rank of ID.\n    :type k: int\n\n    :return:\n        Column index array.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Interpolation coefficients.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+iddp_asvd: 127	
+----------------------------	
+
+'\n    Compute SVD of a real matrix to a specified relative precision using random\n    sampling.\n\n    :param eps:\n        Relative precision.\n    :type eps: float\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n\n    :return:\n        Left singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Right singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Singular values.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+iddr_aid: 167	
+----------------------------	
+
+'\n    Compute ID of a real matrix to a specified rank using random sampling.\n\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n    :param k:\n        Rank of ID.\n    :type k: int\n\n    :return:\n        Column index array.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Interpolation coefficients.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idd_reconid: 54	
+----------------------------	
+
+'\n    Reconstruct matrix from real ID.\n\n    :param B:\n        Skeleton matrix.\n    :type B: :class:`numpy.ndarray`\n    :param idx:\n        Column index array.\n    :type idx: :class:`numpy.ndarray`\n    :param proj:\n        Interpolation coefficients.\n    :type proj: :class:`numpy.ndarray`\n\n    :return:\n        Reconstructed matrix.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(B)
+	
+===================================================================	
+idzr_svd: 274	
+----------------------------	
+
+'\n    Compute SVD of a complex matrix to a specified rank.\n\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n    :param k:\n        Rank of SVD.\n    :type k: int\n\n    :return:\n        Left singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Right singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Singular values.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+iddp_id: 38	
+----------------------------	
+
+'\n    Compute ID of a real matrix to a specified relative precision.\n\n    :param eps:\n        Relative precision.\n    :type eps: float\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n\n    :return:\n        Rank of ID.\n    :rtype: int\n    :return:\n        Column index array.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Interpolation coefficients.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idz_estrank: 304	
+----------------------------	
+
+'\n    Estimate rank of a complex matrix to a specified relative precision using\n    random sampling.\n\n    The output rank is typically about 8 higher than the actual rank.\n\n    :param eps:\n        Relative precision.\n    :type eps: float\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n\n    :return:\n        Rank estimate.\n    :rtype: int\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idz_id2svd: 257	
+----------------------------	
+
+'\n    Convert complex ID to SVD.\n\n    :param B:\n        Skeleton matrix.\n    :type B: :class:`numpy.ndarray`\n    :param idx:\n        Column index array.\n    :type idx: :class:`numpy.ndarray`\n    :param proj:\n        Interpolation coefficients.\n    :type proj: :class:`numpy.ndarray`\n\n    :return:\n        Left singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Right singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Singular values.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(B)
+	
+===================================================================	
+iddp_aid: 108	
+----------------------------	
+
+'\n    Compute ID of a real matrix to a specified relative precision using random\n    sampling.\n\n    :param eps:\n        Relative precision.\n    :type eps: float\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n\n    :return:\n        Rank of ID.\n    :rtype: int\n    :return:\n        Column index array.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Interpolation coefficients.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idzp_aid: 294	
+----------------------------	
+
+'\n    Compute ID of a complex matrix to a specified relative precision using\n    random sampling.\n\n    :param eps:\n        Relative precision.\n    :type eps: float\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n\n    :return:\n        Rank of ID.\n    :rtype: int\n    :return:\n        Column index array.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Interpolation coefficients.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idzp_id: 224	
+----------------------------	
+
+'\n    Compute ID of a complex matrix to a specified relative precision.\n\n    :param eps:\n        Relative precision.\n    :type eps: float\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n\n    :return:\n        Rank of ID.\n    :rtype: int\n    :return:\n        Column index array.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Interpolation coefficients.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idz_copycols: 252	
+----------------------------	
+
+'\n    Reconstruct skeleton matrix from complex ID.\n\n    :param A:\n        Original matrix.\n    :type A: :class:`numpy.ndarray`\n    :param k:\n        Rank of ID.\n    :type k: int\n    :param idx:\n        Column index array.\n    :type idx: :class:`numpy.ndarray`\n\n    :return:\n        Skeleton matrix.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idz_reconid: 240	
+----------------------------	
+
+'\n    Reconstruct matrix from complex ID.\n\n    :param B:\n        Skeleton matrix.\n    :type B: :class:`numpy.ndarray`\n    :param idx:\n        Column index array.\n    :type idx: :class:`numpy.ndarray`\n    :param proj:\n        Interpolation coefficients.\n    :type proj: :class:`numpy.ndarray`\n\n    :return:\n        Reconstructed matrix.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(B)
+	
+===================================================================	
+iddr_svd: 88	
+----------------------------	
+
+'\n    Compute SVD of a real matrix to a specified rank.\n\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n    :param k:\n        Rank of SVD.\n    :type k: int\n\n    :return:\n        Left singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Right singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Singular values.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idzp_asvd: 313	
+----------------------------	
+
+'\n    Compute SVD of a complex matrix to a specified relative precision using\n    random sampling.\n\n    :param eps:\n        Relative precision.\n    :type eps: float\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n\n    :return:\n        Left singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Right singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Singular values.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+iddr_id: 46	
+----------------------------	
+
+'\n    Compute ID of a real matrix to a specified rank.\n\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n    :param k:\n        Rank of ID.\n    :type k: int\n\n    :return:\n        Column index array.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Interpolation coefficients.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+iddr_asvd: 183	
+----------------------------	
+
+'\n    Compute SVD of a real matrix to a specified rank using random sampling.\n\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n    :param k:\n        Rank of SVD.\n    :type k: int\n\n    :return:\n        Left singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Right singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Singular values.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+id_srandi: 13	
+----------------------------	
+
+'\n    Initialize seed values for :func:`id_srand` (any appropriately random\n    numbers will do).\n\n    :param t:\n        Array of 55 seed values.\n    :type t: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(t)
+	
+===================================================================	
+idzr_id: 232	
+----------------------------	
+
+'\n    Compute ID of a complex matrix to a specified rank.\n\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n    :param k:\n        Rank of ID.\n    :type k: int\n\n    :return:\n        Column index array.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Interpolation coefficients.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idd_estrank: 118	
+----------------------------	
+
+'\n    Estimate rank of a real matrix to a specified relative precision using\n    random sampling.\n\n    The output rank is typically about 8 higher than the actual rank.\n\n    :param eps:\n        Relative precision.\n    :type eps: float\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n\n    :return:\n        Rank estimate.\n    :rtype: int\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idzr_asvd: 369	
+----------------------------	
+
+'\n    Compute SVD of a complex matrix to a specified rank using random sampling.\n\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n    :param k:\n        Rank of SVD.\n    :type k: int\n\n    :return:\n        Left singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Right singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Singular values.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idzp_svd: 282	
+----------------------------	
+
+'\n    Compute SVD of a complex matrix to a specified relative precision.\n\n    :param eps:\n        Relative precision.\n    :type eps: float\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n\n    :return:\n        Left singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Right singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Singular values.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+TestTRMM.test_b_overwrites: 519	
+----------------------------	
+
+f = getattr(fblas, 'dtrmm', None)
+if (f is not None):
+    for overwr in [True, False]:
+        bcopy = self.b.copy()
+        result = f(1.0, self.a, bcopy, overwrite_b=overwr)
+        assert_(((bcopy.flags.f_contiguous is False) and (numpy.may_share_memory(bcopy, result) is False)))
+        assert_equal(bcopy, self.b)
+    tempResult = asfortranarray(self.b.copy())
+	
+***************************************************	
+sklearn_sklearn-0.18.0: 18	
+===================================================================	
+test_k_means_fortran_aligned_data: 189	
+----------------------------	
+
+tempResult = asfortranarray([[0, 0], [0, 1], [0, 1]])
+	
+===================================================================	
+_update_dict: 101	
+----------------------------	
+
+'Update the dense dictionary factor in place.\n\n    Parameters\n    ----------\n    dictionary: array of shape (n_features, n_components)\n        Value of the dictionary at the previous iteration.\n\n    Y: array of shape (n_features, n_samples)\n        Data matrix.\n\n    code: array of shape (n_components, n_samples)\n        Sparse coding of the data against which to optimize the dictionary.\n\n    verbose:\n        Degree of output the procedure will print.\n\n    return_r2: bool\n        Whether to compute and return the residual sum of squares corresponding\n        to the computed solution.\n\n    random_state: int or RandomState\n        Pseudo number generator state used for random sampling.\n\n    Returns\n    -------\n    dictionary: array of shape (n_features, n_components)\n        Updated dictionary.\n\n    '
+n_components = len(code)
+n_samples = Y.shape[0]
+random_state = check_random_state(random_state)
+R = (- numpy.dot(dictionary, code))
+R += Y
+tempResult = asfortranarray(R)
+	
+===================================================================	
+BaseGradientBoosting.fit: 668	
+----------------------------	
+
+'Fit the gradient boosting model.\n\n        Parameters\n        ----------\n        X : array-like, shape = [n_samples, n_features]\n            Training vectors, where n_samples is the number of samples\n            and n_features is the number of features.\n\n        y : array-like, shape = [n_samples]\n            Target values (integers in classification, real numbers in\n            regression)\n            For classification, labels must correspond to classes.\n\n        sample_weight : array-like, shape = [n_samples] or None\n            Sample weights. If None, then samples are equally weighted. Splits\n            that would create child nodes with net zero or negative weight are\n            ignored while searching for a split in each node. In the case of\n            classification, splits are also ignored if they would result in any\n            single class carrying a negative weight in either child node.\n\n        monitor : callable, optional\n            The monitor is called after each iteration with the current\n            iteration, a reference to the estimator and the local variables of\n            ``_fit_stages`` as keyword arguments ``callable(i, self,\n            locals())``. If the callable returns ``True`` the fitting procedure\n            is stopped. The monitor can be used for various things such as\n            computing held-out estimates, early stopping, model introspect, and\n            snapshoting.\n\n        Returns\n        -------\n        self : object\n            Returns self.\n        '
+if (not self.warm_start):
+    self._clear_state()
+(X, y) = check_X_y(X, y, accept_sparse=['csr', 'csc', 'coo'], dtype=DTYPE)
+(n_samples, self.n_features) = X.shape
+if (sample_weight is None):
+    sample_weight = numpy.ones(n_samples, dtype=numpy.float32)
+else:
+    sample_weight = column_or_1d(sample_weight, warn=True)
+check_consistent_length(X, y, sample_weight)
+y = self._validate_y(y)
+random_state = check_random_state(self.random_state)
+self._check_params()
+if (not self._is_initialized()):
+    self._init_state()
+    self.init_.fit(X, y, sample_weight)
+    y_pred = self.init_.predict(X)
+    begin_at_stage = 0
+else:
+    if (self.n_estimators < self.estimators_.shape[0]):
+        raise ValueError(('n_estimators=%d must be larger or equal to estimators_.shape[0]=%d when warm_start==True' % (self.n_estimators, self.estimators_.shape[0])))
+    begin_at_stage = self.estimators_.shape[0]
+    y_pred = self._decision_function(X)
+    self._resize_state()
+X_idx_sorted = None
+presort = self.presort
+if ((presort == 'auto') and issparse(X)):
+    presort = False
+elif (presort == 'auto'):
+    presort = True
+if (presort == True):
+    if issparse(X):
+        raise ValueError('Presorting is not supported for sparse matrices.')
+    else:
+        tempResult = asfortranarray(numpy.argsort(X, axis=0), dtype=numpy.int32)
+	
+===================================================================	
+test_mem_layout: 352	
+----------------------------	
+
+tempResult = asfortranarray(X)
+	
+===================================================================	
+test_mem_layout: 369	
+----------------------------	
+
+X_ = numpy.asfortranarray(X)
+clf = GradientBoostingClassifier(n_estimators=100, random_state=1)
+clf.fit(X_, y)
+assert_array_equal(clf.predict(T), true_result)
+assert_equal(100, len(clf.estimators_))
+X_ = numpy.ascontiguousarray(X)
+clf = GradientBoostingClassifier(n_estimators=100, random_state=1)
+clf.fit(X_, y)
+assert_array_equal(clf.predict(T), true_result)
+assert_equal(100, len(clf.estimators_))
+y_ = numpy.asarray(y, dtype=numpy.int32)
+y_ = numpy.ascontiguousarray(y_)
+clf = GradientBoostingClassifier(n_estimators=100, random_state=1)
+clf.fit(X, y_)
+assert_array_equal(clf.predict(T), true_result)
+assert_equal(100, len(clf.estimators_))
+y_ = numpy.asarray(y, dtype=numpy.int32)
+tempResult = asfortranarray(y_)
+	
+===================================================================	
+MultiTaskElasticNet.fit: 448	
+----------------------------	
+
+'Fit MultiTaskLasso model with coordinate descent\n\n        Parameters\n        -----------\n        X : ndarray, shape (n_samples, n_features)\n            Data\n        y : ndarray, shape (n_samples, n_tasks)\n            Target\n\n        Notes\n        -----\n\n        Coordinate descent is an algorithm that considers each column of\n        data at a time hence it will automatically convert the X input\n        as a Fortran-contiguous numpy array if necessary.\n\n        To avoid memory re-allocation it is advised to allocate the\n        initial data in memory directly using that format.\n        '
+X = check_array(X, dtype=numpy.float64, order='F', copy=(self.copy_X and self.fit_intercept))
+y = check_array(y, dtype=numpy.float64, ensure_2d=False)
+if hasattr(self, 'l1_ratio'):
+    model_str = 'ElasticNet'
+else:
+    model_str = 'Lasso'
+if (y.ndim == 1):
+    raise ValueError(('For mono-task outputs, use %s' % model_str))
+(n_samples, n_features) = X.shape
+(_, n_tasks) = y.shape
+if (n_samples != y.shape[0]):
+    raise ValueError(('X and y have inconsistent dimensions (%d != %d)' % (n_samples, y.shape[0])))
+(X, y, X_offset, y_offset, X_scale) = _preprocess_data(X, y, self.fit_intercept, self.normalize, copy=False)
+if ((not self.warm_start) or (self.coef_ is None)):
+    self.coef_ = numpy.zeros((n_tasks, n_features), dtype=numpy.float64, order='F')
+l1_reg = ((self.alpha * self.l1_ratio) * n_samples)
+l2_reg = ((self.alpha * (1.0 - self.l1_ratio)) * n_samples)
+tempResult = asfortranarray(self.coef_)
+	
+===================================================================	
+enet_path: 93	
+----------------------------	
+
+"Compute elastic net path with coordinate descent\n\n    The elastic net optimization function varies for mono and multi-outputs.\n\n    For mono-output tasks it is::\n\n        1 / (2 * n_samples) * ||y - Xw||^2_2\n        + alpha * l1_ratio * ||w||_1\n        + 0.5 * alpha * (1 - l1_ratio) * ||w||^2_2\n\n    For multi-output tasks it is::\n\n        (1 / (2 * n_samples)) * ||Y - XW||^Fro_2\n        + alpha * l1_ratio * ||W||_21\n        + 0.5 * alpha * (1 - l1_ratio) * ||W||_Fro^2\n\n    Where::\n\n        ||W||_21 = \\sum_i \\sqrt{\\sum_j w_{ij}^2}\n\n    i.e. the sum of norm of each row.\n\n    Read more in the :ref:`User Guide <elastic_net>`.\n\n    Parameters\n    ----------\n    X : {array-like}, shape (n_samples, n_features)\n        Training data. Pass directly as Fortran-contiguous data to avoid\n        unnecessary memory duplication. If ``y`` is mono-output then ``X``\n        can be sparse.\n\n    y : ndarray, shape (n_samples,) or (n_samples, n_outputs)\n        Target values\n\n    l1_ratio : float, optional\n        float between 0 and 1 passed to elastic net (scaling between\n        l1 and l2 penalties). ``l1_ratio=1`` corresponds to the Lasso\n\n    eps : float\n        Length of the path. ``eps=1e-3`` means that\n        ``alpha_min / alpha_max = 1e-3``\n\n    n_alphas : int, optional\n        Number of alphas along the regularization path\n\n    alphas : ndarray, optional\n        List of alphas where to compute the models.\n        If None alphas are set automatically\n\n    precompute : True | False | 'auto' | array-like\n        Whether to use a precomputed Gram matrix to speed up\n        calculations. If set to ``'auto'`` let us decide. The Gram\n        matrix can also be passed as argument.\n\n    Xy : array-like, optional\n        Xy = np.dot(X.T, y) that can be precomputed. It is useful\n        only when the Gram matrix is precomputed.\n\n    copy_X : boolean, optional, default True\n        If ``True``, X will be copied; else, it may be overwritten.\n\n    coef_init : array, shape (n_features, ) | None\n        The initial values of the coefficients.\n\n    verbose : bool or integer\n        Amount of verbosity.\n\n    params : kwargs\n        keyword arguments passed to the coordinate descent solver.\n\n    return_n_iter : bool\n        whether to return the number of iterations or not.\n\n    positive : bool, default False\n        If set to True, forces coefficients to be positive.\n\n    check_input : bool, default True\n        Skip input validation checks, including the Gram matrix when provided\n        assuming there are handled by the caller when check_input=False.\n\n    Returns\n    -------\n    alphas : array, shape (n_alphas,)\n        The alphas along the path where models are computed.\n\n    coefs : array, shape (n_features, n_alphas) or             (n_outputs, n_features, n_alphas)\n        Coefficients along the path.\n\n    dual_gaps : array, shape (n_alphas,)\n        The dual gaps at the end of the optimization for each alpha.\n\n    n_iters : array-like, shape (n_alphas,)\n        The number of iterations taken by the coordinate descent optimizer to\n        reach the specified tolerance for each alpha.\n        (Is returned when ``return_n_iter`` is set to True).\n\n    Notes\n    -----\n    See examples/linear_model/plot_lasso_coordinate_descent_path.py for an example.\n\n    See also\n    --------\n    MultiTaskElasticNet\n    MultiTaskElasticNetCV\n    ElasticNet\n    ElasticNetCV\n    "
+if check_input:
+    X = check_array(X, 'csc', dtype=[numpy.float64, numpy.float32], order='F', copy=copy_X)
+    y = check_array(y, 'csc', dtype=X.dtype.type, order='F', copy=False, ensure_2d=False)
+    if (Xy is not None):
+        Xy = check_array(Xy, dtype=X.dtype.type, order='C', copy=False, ensure_2d=False)
+(n_samples, n_features) = X.shape
+multi_output = False
+if (y.ndim != 1):
+    multi_output = True
+    (_, n_outputs) = y.shape
+if ((not multi_output) and scipy.sparse.isspmatrix(X)):
+    if ('X_offset' in params):
+        X_sparse_scaling = (params['X_offset'] / params['X_scale'])
+        X_sparse_scaling = numpy.asarray(X_sparse_scaling, dtype=X.dtype)
+    else:
+        X_sparse_scaling = numpy.zeros(n_features, dtype=X.dtype)
+if check_input:
+    (X, y, X_offset, y_offset, X_scale, precompute, Xy) = _pre_fit(X, y, Xy, precompute, normalize=False, fit_intercept=False, copy=False)
+if (alphas is None):
+    alphas = _alpha_grid(X, y, Xy=Xy, l1_ratio=l1_ratio, fit_intercept=False, eps=eps, n_alphas=n_alphas, normalize=False, copy_X=False)
+else:
+    alphas = numpy.sort(alphas)[::(- 1)]
+n_alphas = len(alphas)
+tol = params.get('tol', 0.0001)
+max_iter = params.get('max_iter', 1000)
+dual_gaps = numpy.empty(n_alphas)
+n_iters = []
+rng = check_random_state(params.get('random_state', None))
+selection = params.get('selection', 'cyclic')
+if (selection not in ['random', 'cyclic']):
+    raise ValueError('selection should be either random or cyclic.')
+random = (selection == 'random')
+if (not multi_output):
+    coefs = numpy.empty((n_features, n_alphas), dtype=X.dtype)
+else:
+    coefs = numpy.empty((n_outputs, n_features, n_alphas), dtype=X.dtype)
+if (coef_init is None):
+    tempResult = asfortranarray(numpy.zeros(coefs.shape[:(- 1)], dtype=X.dtype))
+	
+===================================================================	
+enet_path: 95	
+----------------------------	
+
+"Compute elastic net path with coordinate descent\n\n    The elastic net optimization function varies for mono and multi-outputs.\n\n    For mono-output tasks it is::\n\n        1 / (2 * n_samples) * ||y - Xw||^2_2\n        + alpha * l1_ratio * ||w||_1\n        + 0.5 * alpha * (1 - l1_ratio) * ||w||^2_2\n\n    For multi-output tasks it is::\n\n        (1 / (2 * n_samples)) * ||Y - XW||^Fro_2\n        + alpha * l1_ratio * ||W||_21\n        + 0.5 * alpha * (1 - l1_ratio) * ||W||_Fro^2\n\n    Where::\n\n        ||W||_21 = \\sum_i \\sqrt{\\sum_j w_{ij}^2}\n\n    i.e. the sum of norm of each row.\n\n    Read more in the :ref:`User Guide <elastic_net>`.\n\n    Parameters\n    ----------\n    X : {array-like}, shape (n_samples, n_features)\n        Training data. Pass directly as Fortran-contiguous data to avoid\n        unnecessary memory duplication. If ``y`` is mono-output then ``X``\n        can be sparse.\n\n    y : ndarray, shape (n_samples,) or (n_samples, n_outputs)\n        Target values\n\n    l1_ratio : float, optional\n        float between 0 and 1 passed to elastic net (scaling between\n        l1 and l2 penalties). ``l1_ratio=1`` corresponds to the Lasso\n\n    eps : float\n        Length of the path. ``eps=1e-3`` means that\n        ``alpha_min / alpha_max = 1e-3``\n\n    n_alphas : int, optional\n        Number of alphas along the regularization path\n\n    alphas : ndarray, optional\n        List of alphas where to compute the models.\n        If None alphas are set automatically\n\n    precompute : True | False | 'auto' | array-like\n        Whether to use a precomputed Gram matrix to speed up\n        calculations. If set to ``'auto'`` let us decide. The Gram\n        matrix can also be passed as argument.\n\n    Xy : array-like, optional\n        Xy = np.dot(X.T, y) that can be precomputed. It is useful\n        only when the Gram matrix is precomputed.\n\n    copy_X : boolean, optional, default True\n        If ``True``, X will be copied; else, it may be overwritten.\n\n    coef_init : array, shape (n_features, ) | None\n        The initial values of the coefficients.\n\n    verbose : bool or integer\n        Amount of verbosity.\n\n    params : kwargs\n        keyword arguments passed to the coordinate descent solver.\n\n    return_n_iter : bool\n        whether to return the number of iterations or not.\n\n    positive : bool, default False\n        If set to True, forces coefficients to be positive.\n\n    check_input : bool, default True\n        Skip input validation checks, including the Gram matrix when provided\n        assuming there are handled by the caller when check_input=False.\n\n    Returns\n    -------\n    alphas : array, shape (n_alphas,)\n        The alphas along the path where models are computed.\n\n    coefs : array, shape (n_features, n_alphas) or             (n_outputs, n_features, n_alphas)\n        Coefficients along the path.\n\n    dual_gaps : array, shape (n_alphas,)\n        The dual gaps at the end of the optimization for each alpha.\n\n    n_iters : array-like, shape (n_alphas,)\n        The number of iterations taken by the coordinate descent optimizer to\n        reach the specified tolerance for each alpha.\n        (Is returned when ``return_n_iter`` is set to True).\n\n    Notes\n    -----\n    See examples/linear_model/plot_lasso_coordinate_descent_path.py for an example.\n\n    See also\n    --------\n    MultiTaskElasticNet\n    MultiTaskElasticNetCV\n    ElasticNet\n    ElasticNetCV\n    "
+if check_input:
+    X = check_array(X, 'csc', dtype=[numpy.float64, numpy.float32], order='F', copy=copy_X)
+    y = check_array(y, 'csc', dtype=X.dtype.type, order='F', copy=False, ensure_2d=False)
+    if (Xy is not None):
+        Xy = check_array(Xy, dtype=X.dtype.type, order='C', copy=False, ensure_2d=False)
+(n_samples, n_features) = X.shape
+multi_output = False
+if (y.ndim != 1):
+    multi_output = True
+    (_, n_outputs) = y.shape
+if ((not multi_output) and scipy.sparse.isspmatrix(X)):
+    if ('X_offset' in params):
+        X_sparse_scaling = (params['X_offset'] / params['X_scale'])
+        X_sparse_scaling = numpy.asarray(X_sparse_scaling, dtype=X.dtype)
+    else:
+        X_sparse_scaling = numpy.zeros(n_features, dtype=X.dtype)
+if check_input:
+    (X, y, X_offset, y_offset, X_scale, precompute, Xy) = _pre_fit(X, y, Xy, precompute, normalize=False, fit_intercept=False, copy=False)
+if (alphas is None):
+    alphas = _alpha_grid(X, y, Xy=Xy, l1_ratio=l1_ratio, fit_intercept=False, eps=eps, n_alphas=n_alphas, normalize=False, copy_X=False)
+else:
+    alphas = numpy.sort(alphas)[::(- 1)]
+n_alphas = len(alphas)
+tol = params.get('tol', 0.0001)
+max_iter = params.get('max_iter', 1000)
+dual_gaps = numpy.empty(n_alphas)
+n_iters = []
+rng = check_random_state(params.get('random_state', None))
+selection = params.get('selection', 'cyclic')
+if (selection not in ['random', 'cyclic']):
+    raise ValueError('selection should be either random or cyclic.')
+random = (selection == 'random')
+if (not multi_output):
+    coefs = numpy.empty((n_features, n_alphas), dtype=X.dtype)
+else:
+    coefs = numpy.empty((n_outputs, n_features, n_alphas), dtype=X.dtype)
+if (coef_init is None):
+    coef_ = numpy.asfortranarray(numpy.zeros(coefs.shape[:(- 1)], dtype=X.dtype))
+else:
+    tempResult = asfortranarray(coef_init, dtype=X.dtype)
+	
+===================================================================	
+_gram_omp: 73	
+----------------------------	
+
+'Orthogonal Matching Pursuit step on a precomputed Gram matrix.\n\n    This function uses the Cholesky decomposition method.\n\n    Parameters\n    ----------\n    Gram : array, shape (n_features, n_features)\n        Gram matrix of the input data matrix\n\n    Xy : array, shape (n_features,)\n        Input targets\n\n    n_nonzero_coefs : int\n        Targeted number of non-zero elements\n\n    tol_0 : float\n        Squared norm of y, required if tol is not None.\n\n    tol : float\n        Targeted squared error, if not None overrides n_nonzero_coefs.\n\n    copy_Gram : bool, optional\n        Whether the gram matrix must be copied by the algorithm. A false\n        value is only helpful if it is already Fortran-ordered, otherwise a\n        copy is made anyway.\n\n    copy_Xy : bool, optional\n        Whether the covariance vector Xy must be copied by the algorithm.\n        If False, it may be overwritten.\n\n    return_path : bool, optional. Default: False\n        Whether to return every value of the nonzero coefficients along the\n        forward path. Useful for cross-validation.\n\n    Returns\n    -------\n    gamma : array, shape (n_nonzero_coefs,)\n        Non-zero elements of the solution\n\n    idx : array, shape (n_nonzero_coefs,)\n        Indices of the positions of the elements in gamma within the solution\n        vector\n\n    coefs : array, shape (n_features, n_nonzero_coefs)\n        The first k values of column k correspond to the coefficient value\n        for the active features at that step. The lower left triangle contains\n        garbage. Only returned if ``return_path=True``.\n\n    n_active : int\n        Number of active features at convergence.\n    '
+tempResult = asfortranarray(Gram)
+	
+===================================================================	
+orthogonal_mp: 150	
+----------------------------	
+
+"Orthogonal Matching Pursuit (OMP)\n\n    Solves n_targets Orthogonal Matching Pursuit problems.\n    An instance of the problem has the form:\n\n    When parametrized by the number of non-zero coefficients using\n    `n_nonzero_coefs`:\n    argmin ||y - X\\gamma||^2 subject to ||\\gamma||_0 <= n_{nonzero coefs}\n\n    When parametrized by error using the parameter `tol`:\n    argmin ||\\gamma||_0 subject to ||y - X\\gamma||^2 <= tol\n\n    Read more in the :ref:`User Guide <omp>`.\n\n    Parameters\n    ----------\n    X : array, shape (n_samples, n_features)\n        Input data. Columns are assumed to have unit norm.\n\n    y : array, shape (n_samples,) or (n_samples, n_targets)\n        Input targets\n\n    n_nonzero_coefs : int\n        Desired number of non-zero entries in the solution. If None (by\n        default) this value is set to 10% of n_features.\n\n    tol : float\n        Maximum norm of the residual. If not None, overrides n_nonzero_coefs.\n\n    precompute : {True, False, 'auto'},\n        Whether to perform precomputations. Improves performance when n_targets\n        or n_samples is very large.\n\n    copy_X : bool, optional\n        Whether the design matrix X must be copied by the algorithm. A false\n        value is only helpful if X is already Fortran-ordered, otherwise a\n        copy is made anyway.\n\n    return_path : bool, optional. Default: False\n        Whether to return every value of the nonzero coefficients along the\n        forward path. Useful for cross-validation.\n\n    return_n_iter : bool, optional default False\n        Whether or not to return the number of iterations.\n\n    Returns\n    -------\n    coef : array, shape (n_features,) or (n_features, n_targets)\n        Coefficients of the OMP solution. If `return_path=True`, this contains\n        the whole coefficient path. In this case its shape is\n        (n_features, n_features) or (n_features, n_targets, n_features) and\n        iterating over the last axis yields coefficients in increasing order\n        of active features.\n\n    n_iters : array-like or int\n        Number of active features across every target. Returned only if\n        `return_n_iter` is set to True.\n\n    See also\n    --------\n    OrthogonalMatchingPursuit\n    orthogonal_mp_gram\n    lars_path\n    decomposition.sparse_encode\n\n    Notes\n    -----\n    Orthogonal matching pursuit was introduced in G. Mallat, Z. Zhang,\n    Matching pursuits with time-frequency dictionaries, IEEE Transactions on\n    Signal Processing, Vol. 41, No. 12. (December 1993), pp. 3397-3415.\n    (http://blanche.polytechnique.fr/~mallat/papiers/MallatPursuit93.pdf)\n\n    This implementation is based on Rubinstein, R., Zibulevsky, M. and Elad,\n    M., Efficient Implementation of the K-SVD Algorithm using Batch Orthogonal\n    Matching Pursuit Technical Report - CS Technion, April 2008.\n    http://www.cs.technion.ac.il/~ronrubin/Publications/KSVD-OMP-v2.pdf\n\n    "
+X = check_array(X, order='F', copy=copy_X)
+copy_X = False
+if (y.ndim == 1):
+    y = y.reshape((- 1), 1)
+y = check_array(y)
+if (y.shape[1] > 1):
+    copy_X = True
+if ((n_nonzero_coefs is None) and (tol is None)):
+    n_nonzero_coefs = max(int((0.1 * X.shape[1])), 1)
+if ((tol is not None) and (tol < 0)):
+    raise ValueError('Epsilon cannot be negative')
+if ((tol is None) and (n_nonzero_coefs <= 0)):
+    raise ValueError('The number of atoms must be positive')
+if ((tol is None) and (n_nonzero_coefs > X.shape[1])):
+    raise ValueError('The number of atoms cannot be more than the number of features')
+if (precompute == 'auto'):
+    precompute = (X.shape[0] > X.shape[1])
+if precompute:
+    G = numpy.dot(X.T, X)
+    tempResult = asfortranarray(G)
+	
+===================================================================	
+_cholesky_omp: 24	
+----------------------------	
+
+'Orthogonal Matching Pursuit step using the Cholesky decomposition.\n\n    Parameters\n    ----------\n    X : array, shape (n_samples, n_features)\n        Input dictionary. Columns are assumed to have unit norm.\n\n    y : array, shape (n_samples,)\n        Input targets\n\n    n_nonzero_coefs : int\n        Targeted number of non-zero elements\n\n    tol : float\n        Targeted squared error, if not None overrides n_nonzero_coefs.\n\n    copy_X : bool, optional\n        Whether the design matrix X must be copied by the algorithm. A false\n        value is only helpful if X is already Fortran-ordered, otherwise a\n        copy is made anyway.\n\n    return_path : bool, optional. Default: False\n        Whether to return every value of the nonzero coefficients along the\n        forward path. Useful for cross-validation.\n\n    Returns\n    -------\n    gamma : array, shape (n_nonzero_coefs,)\n        Non-zero elements of the solution\n\n    idx : array, shape (n_nonzero_coefs,)\n        Indices of the positions of the elements in gamma within the solution\n        vector\n\n    coef : array, shape (n_features, n_nonzero_coefs)\n        The first k values of column k correspond to the coefficient value\n        for the active features at that step. The lower left triangle contains\n        garbage. Only returned if ``return_path=True``.\n\n    n_active : int\n        Number of active features at convergence.\n    '
+if copy_X:
+    X = X.copy('F')
+else:
+    tempResult = asfortranarray(X)
+	
+===================================================================	
+test_bad_input: 293	
+----------------------------	
+
+assert_raises(ValueError, svm.SVC(C=(- 1)).fit, X, Y)
+clf = sklearn.svm.NuSVC(nu=0.0)
+assert_raises(ValueError, clf.fit, X, Y)
+Y2 = Y[:(- 1)]
+assert_raises(ValueError, clf.fit, X, Y2)
+for clf in (sklearn.svm.SVC(), sklearn.svm.LinearSVC(random_state=0)):
+    tempResult = asfortranarray(X)
+	
+===================================================================	
+BaseDecisionTree.fit: 171	
+----------------------------	
+
+"Build a decision tree from the training set (X, y).\n\n        Parameters\n        ----------\n        X : array-like or sparse matrix, shape = [n_samples, n_features]\n            The training input samples. Internally, it will be converted to\n            ``dtype=np.float32`` and if a sparse matrix is provided\n            to a sparse ``csc_matrix``.\n\n        y : array-like, shape = [n_samples] or [n_samples, n_outputs]\n            The target values (class labels in classification, real numbers in\n            regression). In the regression case, use ``dtype=np.float64`` and\n            ``order='C'`` for maximum efficiency.\n\n        sample_weight : array-like, shape = [n_samples] or None\n            Sample weights. If None, then samples are equally weighted. Splits\n            that would create child nodes with net zero or negative weight are\n            ignored while searching for a split in each node. In the case of\n            classification, splits are also ignored if they would result in any\n            single class carrying a negative weight in either child node.\n\n        check_input : boolean, (default=True)\n            Allow to bypass several input checking.\n            Don't use this parameter unless you know what you do.\n\n        X_idx_sorted : array-like, shape = [n_samples, n_features], optional\n            The indexes of the sorted training input samples. If many tree\n            are grown on the same dataset, this allows the ordering to be\n            cached between trees. If None, the data will be sorted here.\n            Don't use this parameter unless you know what to do.\n\n        Returns\n        -------\n        self : object\n            Returns self.\n        "
+random_state = check_random_state(self.random_state)
+if check_input:
+    X = check_array(X, dtype=DTYPE, accept_sparse='csc')
+    y = check_array(y, ensure_2d=False, dtype=None)
+    if issparse(X):
+        X.sort_indices()
+        if ((X.indices.dtype != numpy.intc) or (X.indptr.dtype != numpy.intc)):
+            raise ValueError('No support for np.int64 index based sparse matrices')
+(n_samples, self.n_features_) = X.shape
+is_classification = isinstance(self, ClassifierMixin)
+y = numpy.atleast_1d(y)
+expanded_class_weight = None
+if (y.ndim == 1):
+    y = numpy.reshape(y, ((- 1), 1))
+self.n_outputs_ = y.shape[1]
+if is_classification:
+    check_classification_targets(y)
+    y = numpy.copy(y)
+    self.classes_ = []
+    self.n_classes_ = []
+    if (self.class_weight is not None):
+        y_original = numpy.copy(y)
+    y_encoded = numpy.zeros(y.shape, dtype=numpy.int)
+    for k in range(self.n_outputs_):
+        (classes_k, y_encoded[:, k]) = numpy.unique(y[:, k], return_inverse=True)
+        self.classes_.append(classes_k)
+        self.n_classes_.append(classes_k.shape[0])
+    y = y_encoded
+    if (self.class_weight is not None):
+        expanded_class_weight = compute_sample_weight(self.class_weight, y_original)
+else:
+    self.classes_ = ([None] * self.n_outputs_)
+    self.n_classes_ = ([1] * self.n_outputs_)
+self.n_classes_ = numpy.array(self.n_classes_, dtype=numpy.intp)
+if ((getattr(y, 'dtype', None) != DOUBLE) or (not y.flags.contiguous)):
+    y = numpy.ascontiguousarray(y, dtype=DOUBLE)
+max_depth = (((2 ** 31) - 1) if (self.max_depth is None) else self.max_depth)
+max_leaf_nodes = ((- 1) if (self.max_leaf_nodes is None) else self.max_leaf_nodes)
+if isinstance(self.min_samples_leaf, (numbers.Integral, numpy.integer)):
+    min_samples_leaf = self.min_samples_leaf
+else:
+    min_samples_leaf = int(ceil((self.min_samples_leaf * n_samples)))
+if isinstance(self.min_samples_split, (numbers.Integral, numpy.integer)):
+    min_samples_split = self.min_samples_split
+else:
+    min_samples_split = int(ceil((self.min_samples_split * n_samples)))
+    min_samples_split = max(2, min_samples_split)
+min_samples_split = max(min_samples_split, (2 * min_samples_leaf))
+if isinstance(self.max_features, externals.six.string_types):
+    if (self.max_features == 'auto'):
+        if is_classification:
+            max_features = max(1, int(numpy.sqrt(self.n_features_)))
+        else:
+            max_features = self.n_features_
+    elif (self.max_features == 'sqrt'):
+        max_features = max(1, int(numpy.sqrt(self.n_features_)))
+    elif (self.max_features == 'log2'):
+        max_features = max(1, int(numpy.log2(self.n_features_)))
+    else:
+        raise ValueError('Invalid value for max_features. Allowed string values are "auto", "sqrt" or "log2".')
+elif (self.max_features is None):
+    max_features = self.n_features_
+elif isinstance(self.max_features, (numbers.Integral, numpy.integer)):
+    max_features = self.max_features
+elif (self.max_features > 0.0):
+    max_features = max(1, int((self.max_features * self.n_features_)))
+else:
+    max_features = 0
+self.max_features_ = max_features
+if (len(y) != n_samples):
+    raise ValueError(('Number of labels=%d does not match number of samples=%d' % (len(y), n_samples)))
+if (not ((0.0 < self.min_samples_split <= 1.0) or (2 <= self.min_samples_split))):
+    raise ValueError(('min_samples_split must be in at least 2 or in (0, 1], got %s' % min_samples_split))
+if (not ((0.0 < self.min_samples_leaf <= 0.5) or (1 <= self.min_samples_leaf))):
+    raise ValueError(('min_samples_leaf must be at least than 1 or in (0, 0.5], got %s' % min_samples_leaf))
+if (not (0 <= self.min_weight_fraction_leaf <= 0.5)):
+    raise ValueError('min_weight_fraction_leaf must in [0, 0.5]')
+if (max_depth <= 0):
+    raise ValueError('max_depth must be greater than zero. ')
+if (not (0 < max_features <= self.n_features_)):
+    raise ValueError('max_features must be in (0, n_features]')
+if (not isinstance(max_leaf_nodes, (numbers.Integral, numpy.integer))):
+    raise ValueError(('max_leaf_nodes must be integral number but was %r' % max_leaf_nodes))
+if ((- 1) < max_leaf_nodes < 2):
+    raise ValueError('max_leaf_nodes {0} must be either smaller than 0 or larger than 1'.format(max_leaf_nodes))
+if (sample_weight is not None):
+    if ((getattr(sample_weight, 'dtype', None) != DOUBLE) or (not sample_weight.flags.contiguous)):
+        sample_weight = numpy.ascontiguousarray(sample_weight, dtype=DOUBLE)
+    if (len(sample_weight.shape) > 1):
+        raise ValueError(('Sample weights array has more than one dimension: %d' % len(sample_weight.shape)))
+    if (len(sample_weight) != n_samples):
+        raise ValueError(('Number of weights=%d does not match number of samples=%d' % (len(sample_weight), n_samples)))
+if (expanded_class_weight is not None):
+    if (sample_weight is not None):
+        sample_weight = (sample_weight * expanded_class_weight)
+    else:
+        sample_weight = expanded_class_weight
+if ((self.min_weight_fraction_leaf != 0.0) and (sample_weight is not None)):
+    min_weight_leaf = (self.min_weight_fraction_leaf * numpy.sum(sample_weight))
+else:
+    min_weight_leaf = 0.0
+if (self.min_impurity_split < 0.0):
+    raise ValueError('min_impurity_split must be greater than or equal to 0')
+presort = self.presort
+if ((self.presort == 'auto') and issparse(X)):
+    presort = False
+elif (self.presort == 'auto'):
+    presort = True
+if ((presort is True) and issparse(X)):
+    raise ValueError('Presorting is not supported for sparse matrices.')
+if ((X_idx_sorted is None) and presort):
+    tempResult = asfortranarray(numpy.argsort(X, axis=0), dtype=numpy.int32)
+	
+===================================================================	
+test_min_samples_split: 314	
+----------------------------	
+
+'Test min_samples_split parameter'
+tempResult = asfortranarray(iris.data.astype(sklearn.tree._tree.DTYPE))
+	
+===================================================================	
+test_error: 291	
+----------------------------	
+
+for (name, TreeEstimator) in CLF_TREES.items():
+    est = TreeEstimator()
+    assert_raises(NotFittedError, est.predict_proba, X)
+    est.fit(X, y)
+    X2 = [[(- 2), (- 1), 1]]
+    assert_raises(ValueError, est.predict_proba, X2)
+for (name, TreeEstimator) in ALL_TREES.items():
+    assert_raises(ValueError, TreeEstimator(min_samples_leaf=(- 1)).fit, X, y)
+    assert_raises(ValueError, TreeEstimator(min_samples_leaf=0.6).fit, X, y)
+    assert_raises(ValueError, TreeEstimator(min_samples_leaf=0.0).fit, X, y)
+    assert_raises(ValueError, TreeEstimator(min_weight_fraction_leaf=(- 1)).fit, X, y)
+    assert_raises(ValueError, TreeEstimator(min_weight_fraction_leaf=0.51).fit, X, y)
+    assert_raises(ValueError, TreeEstimator(min_samples_split=(- 1)).fit, X, y)
+    assert_raises(ValueError, TreeEstimator(min_samples_split=0.0).fit, X, y)
+    assert_raises(ValueError, TreeEstimator(min_samples_split=1.1).fit, X, y)
+    assert_raises(ValueError, TreeEstimator(max_depth=(- 1)).fit, X, y)
+    assert_raises(ValueError, TreeEstimator(max_features=42).fit, X, y)
+    assert_raises(ValueError, TreeEstimator(min_impurity_split=(- 1.0)).fit, X, y)
+    est = TreeEstimator()
+    y2 = y[:(- 1)]
+    assert_raises(ValueError, est.fit, X, y2)
+    tempResult = asfortranarray(X)
+	
+===================================================================	
+test_min_impurity_split: 373	
+----------------------------	
+
+tempResult = asfortranarray(iris.data.astype(sklearn.tree._tree.DTYPE))
+	
+===================================================================	
+test_min_samples_leaf: 328	
+----------------------------	
+
+tempResult = asfortranarray(iris.data.astype(sklearn.tree._tree.DTYPE))
+	
+===================================================================	
+test_as_float_array: 41	
+----------------------------	
+
+X = numpy.ones((3, 10), dtype=numpy.int32)
+X = (X + numpy.arange(10, dtype=numpy.int32))
+X2 = as_float_array(X, copy=False)
+numpy.testing.assert_equal(X2.dtype, numpy.float32)
+X = X.astype(numpy.int64)
+X2 = as_float_array(X, copy=True)
+assert_true((as_float_array(X, False) is not X))
+numpy.testing.assert_equal(X2.dtype, numpy.float64)
+X = numpy.ones((3, 2), dtype=numpy.float32)
+assert_true((as_float_array(X, copy=False) is X))
+tempResult = asfortranarray(X)
+	
+***************************************************	
+matplotlib_matplotlib-2.0.0: 0	
+***************************************************	
+ipython_ipython-6.1.0: 0	
+***************************************************	
+pandas_pandas-0.19.2: 0	
+***************************************************	
+dask_dask-0.7.0: 0	
+***************************************************	
+nengo_nengo-2.0.0: 0	
+***************************************************	
+sympy_sympy-1.0.0: 0	
+***************************************************	
+daducci_amico-dev: 0	
+***************************************************	
+aplpy_aplpy-1.1.1: 0	
+***************************************************	
+markovmodel_msmtools-1.0.2: 0	
+***************************************************	
+nilearn_nilearn-0.4.0: 2	
+===================================================================	
+_permuted_ols_on_chunk: 58	
+----------------------------	
+
+'Massively univariate group analysis with permuted OLS on a data chunk.\n\n    To be used in a parallel computing context.\n\n    Parameters\n    ----------\n    scores_original_data : array-like, shape=(n_descriptors, n_regressors)\n      t-scores obtained for the original (non-permuted) data.\n\n    tested_vars : array-like, shape=(n_samples, n_regressors)\n      Explanatory variates.\n\n    target_vars : array-like, shape=(n_samples, n_targets)\n      fMRI data. F-ordered for efficient computations.\n\n    confounding_vars : array-like, shape=(n_samples, n_covars)\n      Clinical data (covariates).\n\n    n_perm_chunk : int,\n      Number of permutations to be performed.\n\n    intercept_test : boolean,\n      Change the permutation scheme (swap signs for intercept,\n      switch labels otherwise). See [1]\n\n    two_sided_test : boolean,\n      If True, performs an unsigned t-test. Both positive and negative\n      effects are considered; the null hypothesis is that the effect is zero.\n      If False, only positive effects are considered as relevant. The null\n      hypothesis is that the effect is zero or negative.\n\n    random_state : int or None,\n      Seed for random number generator, to have the same permutations\n      in each computing units.\n\n    Returns\n    -------\n    h0_fmax_part : array-like, shape=(n_perm_chunk, )\n      Distribution of the (max) t-statistic under the null hypothesis\n      (limited to this permutation chunk).\n\n    References\n    ----------\n    [1] Fisher, R. A. (1935). The design of experiments.\n\n    '
+rng = check_random_state(random_state)
+(n_samples, n_regressors) = tested_vars.shape
+n_descriptors = target_vars.shape[1]
+h0_fmax_part = numpy.empty((n_perm_chunk, n_regressors))
+scores_as_ranks_part = numpy.zeros((n_regressors, n_descriptors))
+for i in range(n_perm_chunk):
+    if intercept_test:
+        target_vars = (target_vars * ((rng.randint(2, size=(n_samples, 1)) * 2) - 1))
+    else:
+        shuffle_idx = rng.permutation(n_samples)
+        tested_vars = tested_vars[shuffle_idx]
+        if (confounding_vars is not None):
+            confounding_vars = confounding_vars[shuffle_idx]
+    tempResult = asfortranarray(_t_score_with_covars_and_normalized_design(tested_vars, target_vars, confounding_vars))
+	
+===================================================================	
+permuted_ols: 76	
+----------------------------	
+
+'Massively univariate group analysis with permuted OLS.\n\n    Tested variates are independently fitted to target variates descriptors\n    (e.g. brain imaging signal) according to a linear model solved with an\n    Ordinary Least Squares criterion.\n    Confounding variates may be included in the model.\n    Permutation testing is used to assess the significance of the relationship\n    between the tested variates and the target variates [1, 2]. A max-type\n    procedure is used to obtain family-wise corrected p-values.\n\n    The specific permutation scheme implemented here is the one of\n    Freedman & Lane [3]. Its has been demonstrated in [1] that this scheme\n    conveys more sensitivity than alternative schemes. This holds for\n    neuroimaging applications, as discussed in details in [2].\n\n    Permutations are performed on parallel computing units. Each of them\n    performs a fraction of permutations on the whole dataset. Thus, the max\n    t-score amongst data descriptors can be computed directly, which avoids\n    storing all the computed t-scores.\n\n    The variates should be given C-contiguous. target_vars are fortran-ordered\n    automatically to speed-up computations.\n\n    Parameters\n    ----------\n    tested_vars : array-like, shape=(n_samples, n_regressors)\n      Explanatory variates, fitted and tested independently from each others.\n\n    target_vars : array-like, shape=(n_samples, n_descriptors)\n      fMRI data, trying to be explained by explanatory and confounding\n      variates.\n\n    confounding_vars : array-like, shape=(n_samples, n_covars)\n      Confounding variates (covariates), fitted but not tested.\n      If None, no confounding variate is added to the model\n      (except maybe a constant column according to the value of\n      `model_intercept`)\n\n    model_intercept : bool,\n      If True, a constant column is added to the confounding variates\n      unless the tested variate is already the intercept.\n\n    n_perm : int,\n      Number of permutations to perform.\n      Permutations are costly but the more are performed, the more precision\n      one gets in the p-values estimation.\n\n    two_sided_test : boolean,\n      If True, performs an unsigned t-test. Both positive and negative\n      effects are considered; the null hypothesis is that the effect is zero.\n      If False, only positive effects are considered as relevant. The null\n      hypothesis is that the effect is zero or negative.\n\n    random_state : int or None,\n      Seed for random number generator, to have the same permutations\n      in each computing units.\n\n    n_jobs : int,\n      Number of parallel workers.\n      If 0 is provided, all CPUs are used.\n      A negative number indicates that all the CPUs except (abs(n_jobs) - 1)\n      ones will be used.\n\n    verbose: int, optional\n        verbosity level (0 means no message).\n\n    Returns\n    -------\n    pvals : array-like, shape=(n_regressors, n_descriptors)\n      Negative log10 p-values associated with the significance test of the\n      n_regressors explanatory variates against the n_descriptors target\n      variates. Family-wise corrected p-values.\n\n    score_orig_data : numpy.ndarray, shape=(n_regressors, n_descriptors)\n      t-statistic associated with the significance test of the n_regressors\n      explanatory variates against the n_descriptors target variates.\n      The ranks of the scores into the h0 distribution correspond to the\n      p-values.\n\n    h0_fmax : array-like, shape=(n_perm, )\n      Distribution of the (max) t-statistic under the null hypothesis\n      (obtained from the permutations). Array is sorted.\n\n    References\n    ----------\n    [1] Anderson, M. J. & Robinson, J. (2001).\n        Permutation tests for linear models.\n        Australian & New Zealand Journal of Statistics, 43(1), 75-88.\n    [2] Winkler, A. M. et al. (2014).\n        Permutation inference for the general linear model.\n        Neuroimage.\n    [3] Freedman, D. & Lane, D. (1983).\n        A nonstochastic interpretation of reported significance levels.\n        J. Bus. Econ. Stats., 1(4), 292-298\n\n    '
+rng = check_random_state(random_state)
+if (n_jobs == 0):
+    raise ValueError("'n_jobs == 0' is not a valid choice. Please provide a positive number of CPUs, or -1 for all CPUs, or a negative number (-i) for 'all but (i-1)' CPUs (joblib conventions).")
+elif (n_jobs < 0):
+    n_jobs = max(1, ((sklearn.externals.joblib.cpu_count() - int(n_jobs)) + 1))
+else:
+    n_jobs = min(n_jobs, sklearn.externals.joblib.cpu_count())
+if (target_vars.ndim != 2):
+    raise ValueError(("'target_vars' should be a 2D array. An array with %d dimension%s was passed" % (target_vars.ndim, ('s' if (target_vars.ndim > 1) else ''))))
+tempResult = asfortranarray(target_vars)
+	
+***************************************************	
+poliastro_poliastro-0.8.0: 0	
+***************************************************	
+skimage_skimage-0.13.0: 1	
+===================================================================	
+test_memory_order: 25	
+----------------------------	
+
+contours = find_contours(numpy.ascontiguousarray(r), 0.5)
+assert (len(contours) == 1)
+tempResult = asfortranarray(r)
+	
+***************************************************	
+sunpy_sunpy-0.8.0: 0	
+***************************************************	
+spacetelescope_synphot-0.1: 0	
+***************************************************	
+librosa_librosa-0.5.1: 0	
+***************************************************	
+mne_python-0.15.0: 4	
+===================================================================	
+_mixed_norm_solver_bcd: 161	
+----------------------------	
+
+'Solve L21 inverse problem with block coordinate descent.'
+tempResult = asfortranarray(G)
+	
+===================================================================	
+mixed_norm_solver: 239	
+----------------------------	
+
+'Solve L1/L2 mixed-norm inverse problem with active set strategy.\n\n    Parameters\n    ----------\n    M : array, shape (n_sensors, n_times)\n        The data.\n    G : array, shape (n_sensors, n_dipoles)\n        The gain matrix a.k.a. lead field.\n    alpha : float\n        The regularization parameter. It should be between 0 and 100.\n        A value of 100 will lead to an empty active set (no active source).\n    maxit : int\n        The number of iterations.\n    tol : float\n        Tolerance on dual gap for convergence checking.\n    verbose : bool, str, int, or None\n        If not None, override default verbose level (see :func:`mne.verbose`\n        and :ref:`Logging documentation <tut_logging>` for more).\n    active_set_size : int\n        Size of active set increase at each iteration.\n    debias : bool\n        Debias source estimates.\n    n_orient : int\n        The number of orientation (1 : fixed or 3 : free or loose).\n    solver : \'prox\' | \'cd\' | \'bcd\' | \'auto\'\n        The algorithm to use for the optimization.\n    return_gap : bool\n        Return final duality gap.\n\n    Returns\n    -------\n    X : array, shape (n_active, n_times)\n        The source estimates.\n    active_set : array\n        The mask of active sources.\n    E : list\n        The value of the objective function over the iterations.\n    gap : float\n        Final duality gap. Returned only if return_gap is True.\n\n    References\n    ----------\n    .. [1] A. Gramfort, M. Kowalski, M. Hamalainen,\n       "Mixed-norm estimates for the M/EEG inverse problem using accelerated\n       gradient methods", Physics in Medicine and Biology, 2012.\n       http://dx.doi.org/10.1088/0031-9155/57/7/1937\n\n    .. [2] D. Strohmeier, Y. Bekhti, J. Haueisen, A. Gramfort,\n       "The Iterative Reweighted Mixed-Norm Estimate for Spatio-Temporal\n       MEG/EEG Source Reconstruction", IEEE Transactions of Medical Imaging,\n       Volume 35 (10), pp. 2218-2228, 15 April 2013.\n    '
+n_dipoles = G.shape[1]
+n_positions = (n_dipoles // n_orient)
+(n_sensors, n_times) = M.shape
+alpha_max = norm_l2inf(numpy.dot(G.T, M), n_orient, copy=False)
+utils.logger.info(('-- ALPHA MAX : %s' % alpha_max))
+alpha = float(alpha)
+has_sklearn = True
+try:
+    from sklearn.linear_model.coordinate_descent import MultiTaskLasso
+except ImportError:
+    has_sklearn = False
+if (solver == 'auto'):
+    if (has_sklearn and (n_orient == 1)):
+        solver = 'cd'
+    else:
+        solver = 'bcd'
+if (solver == 'cd'):
+    if ((n_orient == 1) and (not has_sklearn)):
+        warn('Scikit-learn >= 0.12 cannot be found. Using block coordinate descent instead of coordinate descent.')
+        solver = 'bcd'
+    if (n_orient > 1):
+        warn('Coordinate descent is only available for fixed orientation. Using block coordinate descent instead of coordinate descent')
+        solver = 'bcd'
+if (solver == 'cd'):
+    utils.logger.info('Using coordinate descent')
+    l21_solver = _mixed_norm_solver_cd
+    lc = None
+elif (solver == 'bcd'):
+    utils.logger.info('Using block coordinate descent')
+    l21_solver = _mixed_norm_solver_bcd
+    tempResult = asfortranarray(G)
+	
+===================================================================	
+_tf_mixed_norm_solver_bcd_: 451	
+----------------------------	
+
+tempResult = asfortranarray(G)
+	
+===================================================================	
+_single_epoch_tfr: 92	
+----------------------------	
+
+'Compute single trial TFRs, either ITC, power or raw TFR.'
+tfr_e = numpy.zeros(shape, dtype=numpy.float)
+plv_e = (numpy.zeros(shape, dtype=numpy.complex) if with_plv else None)
+(n_sources, _, n_times) = shape
+for (f, w) in enumerate(Ws):
+    tfr_ = cwt(data, [w], use_fft=use_fft, decim=decim)
+    tempResult = asfortranarray(tfr_.reshape(len(data), (- 1)))
+	
+***************************************************	
+astropy_astropy-1.3.0: 0	
+***************************************************	
+scipy_scipy-0.19.0: 28	
+===================================================================	
+solve: 29	
+----------------------------	
+
+"\n    Solves the linear equation set ``a * x = b`` for the unknown ``x``\n    for square ``a`` matrix.\n\n    If the data matrix is known to be a particular type then supplying the\n    corresponding string to ``assume_a`` key chooses the dedicated solver.\n    The available options are\n\n    ===================  ========\n     generic matrix       'gen'\n     symmetric            'sym'\n     hermitian            'her'\n     positive definite    'pos'\n    ===================  ========\n\n    If omitted, ``'gen'`` is the default structure.\n\n    The datatype of the arrays define which solver is called regardless\n    of the values. In other words, even when the complex array entries have\n    precisely zero imaginary parts, the complex solver will be called based\n    on the data type of the array.\n\n    Parameters\n    ----------\n    a : (N, N) array_like\n        Square input data\n    b : (N, NRHS) array_like\n        Input data for the right hand side.\n    sym_pos : bool, optional\n        Assume `a` is symmetric and positive definite. This key is deprecated\n        and assume_a = 'pos' keyword is recommended instead. The functionality\n        is the same. It will be removed in the future.\n    lower : bool, optional\n        If True, only the data contained in the lower triangle of `a`. Default\n        is to use upper triangle. (ignored for ``'gen'``)\n    overwrite_a : bool, optional\n        Allow overwriting data in `a` (may enhance performance).\n        Default is False.\n    overwrite_b : bool, optional\n        Allow overwriting data in `b` (may enhance performance).\n        Default is False.\n    check_finite : bool, optional\n        Whether to check that the input matrices contain only finite numbers.\n        Disabling may give a performance gain, but may result in problems\n        (crashes, non-termination) if the inputs do contain infinities or NaNs.\n    assume_a : str, optional\n        Valid entries are explained above.\n    transposed: bool, optional\n        If True, depending on the data type ``a^T x = b`` or ``a^H x = b`` is\n        solved (only taken into account for ``'gen'``).\n\n    Returns\n    -------\n    x : (N, NRHS) ndarray\n        The solution array.\n\n    Raises\n    ------\n    ValueError\n        If size mismatches detected or input a is not square.\n    LinAlgError\n        If the matrix is singular.\n    RuntimeWarning\n        If an ill-conditioned input a is detected.\n\n    Examples\n    --------\n    Given `a` and `b`, solve for `x`:\n\n    >>> a = np.array([[3, 2, 0], [1, -1, 0], [0, 5, 1]])\n    >>> b = np.array([2, 4, -1])\n    >>> from scipy import linalg\n    >>> x = linalg.solve(a, b)\n    >>> x\n    array([ 2., -2.,  9.])\n    >>> np.dot(a, x) == b\n    array([ True,  True,  True], dtype=bool)\n\n    Notes\n    -----\n    If the input b matrix is a 1D array with N elements, when supplied\n    together with an NxN input a, it is assumed as a valid column vector\n    despite the apparent size mismatch. This is compatible with the\n    numpy.dot() behavior and the returned result is still 1D array.\n\n    The generic, symmetric, hermitian and positive definite solutions are\n    obtained via calling ?GESVX, ?SYSVX, ?HESVX, and ?POSVX routines of\n    LAPACK respectively.\n    "
+b_is_1D = False
+b_is_ND = False
+a1 = atleast_2d(_asarray_validated(a, check_finite=check_finite))
+b1 = atleast_1d(_asarray_validated(b, check_finite=check_finite))
+n = a1.shape[0]
+overwrite_a = (overwrite_a or _datacopied(a1, a))
+overwrite_b = (overwrite_b or _datacopied(b1, b))
+if (a1.shape[0] != a1.shape[1]):
+    raise ValueError('Input a needs to be a square matrix.')
+if (n != b1.shape[0]):
+    if (not ((n == 1) and (b1.size != 0))):
+        raise ValueError('Input b has to have same number of rows as input a')
+if (b1.size == 0):
+    tempResult = asfortranarray(b1.copy())
+	
+===================================================================	
+seed: 24	
+----------------------------	
+
+"\n    Seed the internal random number generator used in this ID package.\n\n    The generator is a lagged Fibonacci method with 55-element internal state.\n\n    Parameters\n    ----------\n    seed : int, sequence, 'default', optional\n        If 'default', the random seed is reset to a default value.\n\n        If `seed` is a sequence containing 55 floating-point numbers\n        in range [0,1], these are used to set the internal state of\n        the generator.\n\n        If the value is an integer, the internal state is obtained\n        from `numpy.random.RandomState` (MT19937) with the integer\n        used as the initial seed.\n\n        If `seed` is omitted (None), `numpy.random` is used to\n        initialize the generator.\n\n    "
+if (isinstance(seed, str) and (seed == 'default')):
+    scipy.linalg._interpolative_backend.id_srando()
+elif hasattr(seed, '__len__'):
+    tempResult = asfortranarray(seed, dtype=float)
+	
+===================================================================	
+iddp_svd: 96	
+----------------------------	
+
+'\n    Compute SVD of a real matrix to a specified relative precision.\n\n    :param eps:\n        Relative precision.\n    :type eps: float\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n\n    :return:\n        Left singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Right singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Singular values.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idd_id2svd: 71	
+----------------------------	
+
+'\n    Convert real ID to SVD.\n\n    :param B:\n        Skeleton matrix.\n    :type B: :class:`numpy.ndarray`\n    :param idx:\n        Column index array.\n    :type idx: :class:`numpy.ndarray`\n    :param proj:\n        Interpolation coefficients.\n    :type proj: :class:`numpy.ndarray`\n\n    :return:\n        Left singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Right singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Singular values.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(B)
+	
+===================================================================	
+idd_copycols: 66	
+----------------------------	
+
+'\n    Reconstruct skeleton matrix from real ID.\n\n    :param A:\n        Original matrix.\n    :type A: :class:`numpy.ndarray`\n    :param k:\n        Rank of ID.\n    :type k: int\n    :param idx:\n        Column index array.\n    :type idx: :class:`numpy.ndarray`\n\n    :return:\n        Skeleton matrix.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idzr_aid: 353	
+----------------------------	
+
+'\n    Compute ID of a complex matrix to a specified rank using random sampling.\n\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n    :param k:\n        Rank of ID.\n    :type k: int\n\n    :return:\n        Column index array.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Interpolation coefficients.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+iddp_asvd: 127	
+----------------------------	
+
+'\n    Compute SVD of a real matrix to a specified relative precision using random\n    sampling.\n\n    :param eps:\n        Relative precision.\n    :type eps: float\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n\n    :return:\n        Left singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Right singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Singular values.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+iddr_aid: 167	
+----------------------------	
+
+'\n    Compute ID of a real matrix to a specified rank using random sampling.\n\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n    :param k:\n        Rank of ID.\n    :type k: int\n\n    :return:\n        Column index array.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Interpolation coefficients.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idd_reconid: 54	
+----------------------------	
+
+'\n    Reconstruct matrix from real ID.\n\n    :param B:\n        Skeleton matrix.\n    :type B: :class:`numpy.ndarray`\n    :param idx:\n        Column index array.\n    :type idx: :class:`numpy.ndarray`\n    :param proj:\n        Interpolation coefficients.\n    :type proj: :class:`numpy.ndarray`\n\n    :return:\n        Reconstructed matrix.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(B)
+	
+===================================================================	
+idzr_svd: 274	
+----------------------------	
+
+'\n    Compute SVD of a complex matrix to a specified rank.\n\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n    :param k:\n        Rank of SVD.\n    :type k: int\n\n    :return:\n        Left singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Right singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Singular values.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+iddp_id: 38	
+----------------------------	
+
+'\n    Compute ID of a real matrix to a specified relative precision.\n\n    :param eps:\n        Relative precision.\n    :type eps: float\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n\n    :return:\n        Rank of ID.\n    :rtype: int\n    :return:\n        Column index array.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Interpolation coefficients.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idz_estrank: 304	
+----------------------------	
+
+'\n    Estimate rank of a complex matrix to a specified relative precision using\n    random sampling.\n\n    The output rank is typically about 8 higher than the actual rank.\n\n    :param eps:\n        Relative precision.\n    :type eps: float\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n\n    :return:\n        Rank estimate.\n    :rtype: int\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idz_id2svd: 257	
+----------------------------	
+
+'\n    Convert complex ID to SVD.\n\n    :param B:\n        Skeleton matrix.\n    :type B: :class:`numpy.ndarray`\n    :param idx:\n        Column index array.\n    :type idx: :class:`numpy.ndarray`\n    :param proj:\n        Interpolation coefficients.\n    :type proj: :class:`numpy.ndarray`\n\n    :return:\n        Left singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Right singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Singular values.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(B)
+	
+===================================================================	
+iddp_aid: 108	
+----------------------------	
+
+'\n    Compute ID of a real matrix to a specified relative precision using random\n    sampling.\n\n    :param eps:\n        Relative precision.\n    :type eps: float\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n\n    :return:\n        Rank of ID.\n    :rtype: int\n    :return:\n        Column index array.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Interpolation coefficients.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idzp_aid: 294	
+----------------------------	
+
+'\n    Compute ID of a complex matrix to a specified relative precision using\n    random sampling.\n\n    :param eps:\n        Relative precision.\n    :type eps: float\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n\n    :return:\n        Rank of ID.\n    :rtype: int\n    :return:\n        Column index array.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Interpolation coefficients.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idzp_id: 224	
+----------------------------	
+
+'\n    Compute ID of a complex matrix to a specified relative precision.\n\n    :param eps:\n        Relative precision.\n    :type eps: float\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n\n    :return:\n        Rank of ID.\n    :rtype: int\n    :return:\n        Column index array.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Interpolation coefficients.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idz_copycols: 252	
+----------------------------	
+
+'\n    Reconstruct skeleton matrix from complex ID.\n\n    :param A:\n        Original matrix.\n    :type A: :class:`numpy.ndarray`\n    :param k:\n        Rank of ID.\n    :type k: int\n    :param idx:\n        Column index array.\n    :type idx: :class:`numpy.ndarray`\n\n    :return:\n        Skeleton matrix.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idz_reconid: 240	
+----------------------------	
+
+'\n    Reconstruct matrix from complex ID.\n\n    :param B:\n        Skeleton matrix.\n    :type B: :class:`numpy.ndarray`\n    :param idx:\n        Column index array.\n    :type idx: :class:`numpy.ndarray`\n    :param proj:\n        Interpolation coefficients.\n    :type proj: :class:`numpy.ndarray`\n\n    :return:\n        Reconstructed matrix.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(B)
+	
+===================================================================	
+iddr_svd: 88	
+----------------------------	
+
+'\n    Compute SVD of a real matrix to a specified rank.\n\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n    :param k:\n        Rank of SVD.\n    :type k: int\n\n    :return:\n        Left singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Right singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Singular values.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idzp_asvd: 313	
+----------------------------	
+
+'\n    Compute SVD of a complex matrix to a specified relative precision using\n    random sampling.\n\n    :param eps:\n        Relative precision.\n    :type eps: float\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n\n    :return:\n        Left singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Right singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Singular values.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+iddr_id: 46	
+----------------------------	
+
+'\n    Compute ID of a real matrix to a specified rank.\n\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n    :param k:\n        Rank of ID.\n    :type k: int\n\n    :return:\n        Column index array.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Interpolation coefficients.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+iddr_asvd: 183	
+----------------------------	
+
+'\n    Compute SVD of a real matrix to a specified rank using random sampling.\n\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n    :param k:\n        Rank of SVD.\n    :type k: int\n\n    :return:\n        Left singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Right singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Singular values.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+id_srandi: 13	
+----------------------------	
+
+'\n    Initialize seed values for :func:`id_srand` (any appropriately random\n    numbers will do).\n\n    :param t:\n        Array of 55 seed values.\n    :type t: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(t)
+	
+===================================================================	
+idzr_id: 232	
+----------------------------	
+
+'\n    Compute ID of a complex matrix to a specified rank.\n\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n    :param k:\n        Rank of ID.\n    :type k: int\n\n    :return:\n        Column index array.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Interpolation coefficients.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idd_estrank: 118	
+----------------------------	
+
+'\n    Estimate rank of a real matrix to a specified relative precision using\n    random sampling.\n\n    The output rank is typically about 8 higher than the actual rank.\n\n    :param eps:\n        Relative precision.\n    :type eps: float\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n\n    :return:\n        Rank estimate.\n    :rtype: int\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idzr_asvd: 369	
+----------------------------	
+
+'\n    Compute SVD of a complex matrix to a specified rank using random sampling.\n\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n    :param k:\n        Rank of SVD.\n    :type k: int\n\n    :return:\n        Left singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Right singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Singular values.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+idzp_svd: 282	
+----------------------------	
+
+'\n    Compute SVD of a complex matrix to a specified relative precision.\n\n    :param eps:\n        Relative precision.\n    :type eps: float\n    :param A:\n        Matrix.\n    :type A: :class:`numpy.ndarray`\n\n    :return:\n        Left singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Right singular vectors.\n    :rtype: :class:`numpy.ndarray`\n    :return:\n        Singular values.\n    :rtype: :class:`numpy.ndarray`\n    '
+tempResult = asfortranarray(A)
+	
+===================================================================	
+TestTRMM.test_b_overwrites: 519	
+----------------------------	
+
+f = getattr(fblas, 'dtrmm', None)
+if (f is not None):
+    for overwr in [True, False]:
+        bcopy = self.b.copy()
+        result = f(1.0, self.a, bcopy, overwrite_b=overwr)
+        assert_(((bcopy.flags.f_contiguous is False) and (numpy.may_share_memory(bcopy, result) is False)))
+        assert_equal(bcopy, self.b)
+    tempResult = asfortranarray(self.b.copy())
+	
+***************************************************	
+sklearn_sklearn-0.18.0: 18	
+===================================================================	
+test_k_means_fortran_aligned_data: 189	
+----------------------------	
+
+tempResult = asfortranarray([[0, 0], [0, 1], [0, 1]])
+	
+===================================================================	
+_update_dict: 101	
+----------------------------	
+
+'Update the dense dictionary factor in place.\n\n    Parameters\n    ----------\n    dictionary: array of shape (n_features, n_components)\n        Value of the dictionary at the previous iteration.\n\n    Y: array of shape (n_features, n_samples)\n        Data matrix.\n\n    code: array of shape (n_components, n_samples)\n        Sparse coding of the data against which to optimize the dictionary.\n\n    verbose:\n        Degree of output the procedure will print.\n\n    return_r2: bool\n        Whether to compute and return the residual sum of squares corresponding\n        to the computed solution.\n\n    random_state: int or RandomState\n        Pseudo number generator state used for random sampling.\n\n    Returns\n    -------\n    dictionary: array of shape (n_features, n_components)\n        Updated dictionary.\n\n    '
+n_components = len(code)
+n_samples = Y.shape[0]
+random_state = check_random_state(random_state)
+R = (- numpy.dot(dictionary, code))
+R += Y
+tempResult = asfortranarray(R)
+	
+===================================================================	
+BaseGradientBoosting.fit: 668	
+----------------------------	
+
+'Fit the gradient boosting model.\n\n        Parameters\n        ----------\n        X : array-like, shape = [n_samples, n_features]\n            Training vectors, where n_samples is the number of samples\n            and n_features is the number of features.\n\n        y : array-like, shape = [n_samples]\n            Target values (integers in classification, real numbers in\n            regression)\n            For classification, labels must correspond to classes.\n\n        sample_weight : array-like, shape = [n_samples] or None\n            Sample weights. If None, then samples are equally weighted. Splits\n            that would create child nodes with net zero or negative weight are\n            ignored while searching for a split in each node. In the case of\n            classification, splits are also ignored if they would result in any\n            single class carrying a negative weight in either child node.\n\n        monitor : callable, optional\n            The monitor is called after each iteration with the current\n            iteration, a reference to the estimator and the local variables of\n            ``_fit_stages`` as keyword arguments ``callable(i, self,\n            locals())``. If the callable returns ``True`` the fitting procedure\n            is stopped. The monitor can be used for various things such as\n            computing held-out estimates, early stopping, model introspect, and\n            snapshoting.\n\n        Returns\n        -------\n        self : object\n            Returns self.\n        '
+if (not self.warm_start):
+    self._clear_state()
+(X, y) = check_X_y(X, y, accept_sparse=['csr', 'csc', 'coo'], dtype=DTYPE)
+(n_samples, self.n_features) = X.shape
+if (sample_weight is None):
+    sample_weight = numpy.ones(n_samples, dtype=numpy.float32)
+else:
+    sample_weight = column_or_1d(sample_weight, warn=True)
+check_consistent_length(X, y, sample_weight)
+y = self._validate_y(y)
+random_state = check_random_state(self.random_state)
+self._check_params()
+if (not self._is_initialized()):
+    self._init_state()
+    self.init_.fit(X, y, sample_weight)
+    y_pred = self.init_.predict(X)
+    begin_at_stage = 0
+else:
+    if (self.n_estimators < self.estimators_.shape[0]):
+        raise ValueError(('n_estimators=%d must be larger or equal to estimators_.shape[0]=%d when warm_start==True' % (self.n_estimators, self.estimators_.shape[0])))
+    begin_at_stage = self.estimators_.shape[0]
+    y_pred = self._decision_function(X)
+    self._resize_state()
+X_idx_sorted = None
+presort = self.presort
+if ((presort == 'auto') and issparse(X)):
+    presort = False
+elif (presort == 'auto'):
+    presort = True
+if (presort == True):
+    if issparse(X):
+        raise ValueError('Presorting is not supported for sparse matrices.')
+    else:
+        tempResult = asfortranarray(numpy.argsort(X, axis=0), dtype=numpy.int32)
+	
+===================================================================	
+test_mem_layout: 352	
+----------------------------	
+
+tempResult = asfortranarray(X)
+	
+===================================================================	
+test_mem_layout: 369	
+----------------------------	
+
+X_ = numpy.asfortranarray(X)
+clf = GradientBoostingClassifier(n_estimators=100, random_state=1)
+clf.fit(X_, y)
+assert_array_equal(clf.predict(T), true_result)
+assert_equal(100, len(clf.estimators_))
+X_ = numpy.ascontiguousarray(X)
+clf = GradientBoostingClassifier(n_estimators=100, random_state=1)
+clf.fit(X_, y)
+assert_array_equal(clf.predict(T), true_result)
+assert_equal(100, len(clf.estimators_))
+y_ = numpy.asarray(y, dtype=numpy.int32)
+y_ = numpy.ascontiguousarray(y_)
+clf = GradientBoostingClassifier(n_estimators=100, random_state=1)
+clf.fit(X, y_)
+assert_array_equal(clf.predict(T), true_result)
+assert_equal(100, len(clf.estimators_))
+y_ = numpy.asarray(y, dtype=numpy.int32)
+tempResult = asfortranarray(y_)
+	
+===================================================================	
+MultiTaskElasticNet.fit: 448	
+----------------------------	
+
+'Fit MultiTaskLasso model with coordinate descent\n\n        Parameters\n        -----------\n        X : ndarray, shape (n_samples, n_features)\n            Data\n        y : ndarray, shape (n_samples, n_tasks)\n            Target\n\n        Notes\n        -----\n\n        Coordinate descent is an algorithm that considers each column of\n        data at a time hence it will automatically convert the X input\n        as a Fortran-contiguous numpy array if necessary.\n\n        To avoid memory re-allocation it is advised to allocate the\n        initial data in memory directly using that format.\n        '
+X = check_array(X, dtype=numpy.float64, order='F', copy=(self.copy_X and self.fit_intercept))
+y = check_array(y, dtype=numpy.float64, ensure_2d=False)
+if hasattr(self, 'l1_ratio'):
+    model_str = 'ElasticNet'
+else:
+    model_str = 'Lasso'
+if (y.ndim == 1):
+    raise ValueError(('For mono-task outputs, use %s' % model_str))
+(n_samples, n_features) = X.shape
+(_, n_tasks) = y.shape
+if (n_samples != y.shape[0]):
+    raise ValueError(('X and y have inconsistent dimensions (%d != %d)' % (n_samples, y.shape[0])))
+(X, y, X_offset, y_offset, X_scale) = _preprocess_data(X, y, self.fit_intercept, self.normalize, copy=False)
+if ((not self.warm_start) or (self.coef_ is None)):
+    self.coef_ = numpy.zeros((n_tasks, n_features), dtype=numpy.float64, order='F')
+l1_reg = ((self.alpha * self.l1_ratio) * n_samples)
+l2_reg = ((self.alpha * (1.0 - self.l1_ratio)) * n_samples)
+tempResult = asfortranarray(self.coef_)
+	
+===================================================================	
+enet_path: 93	
+----------------------------	
+
+"Compute elastic net path with coordinate descent\n\n    The elastic net optimization function varies for mono and multi-outputs.\n\n    For mono-output tasks it is::\n\n        1 / (2 * n_samples) * ||y - Xw||^2_2\n        + alpha * l1_ratio * ||w||_1\n        + 0.5 * alpha * (1 - l1_ratio) * ||w||^2_2\n\n    For multi-output tasks it is::\n\n        (1 / (2 * n_samples)) * ||Y - XW||^Fro_2\n        + alpha * l1_ratio * ||W||_21\n        + 0.5 * alpha * (1 - l1_ratio) * ||W||_Fro^2\n\n    Where::\n\n        ||W||_21 = \\sum_i \\sqrt{\\sum_j w_{ij}^2}\n\n    i.e. the sum of norm of each row.\n\n    Read more in the :ref:`User Guide <elastic_net>`.\n\n    Parameters\n    ----------\n    X : {array-like}, shape (n_samples, n_features)\n        Training data. Pass directly as Fortran-contiguous data to avoid\n        unnecessary memory duplication. If ``y`` is mono-output then ``X``\n        can be sparse.\n\n    y : ndarray, shape (n_samples,) or (n_samples, n_outputs)\n        Target values\n\n    l1_ratio : float, optional\n        float between 0 and 1 passed to elastic net (scaling between\n        l1 and l2 penalties). ``l1_ratio=1`` corresponds to the Lasso\n\n    eps : float\n        Length of the path. ``eps=1e-3`` means that\n        ``alpha_min / alpha_max = 1e-3``\n\n    n_alphas : int, optional\n        Number of alphas along the regularization path\n\n    alphas : ndarray, optional\n        List of alphas where to compute the models.\n        If None alphas are set automatically\n\n    precompute : True | False | 'auto' | array-like\n        Whether to use a precomputed Gram matrix to speed up\n        calculations. If set to ``'auto'`` let us decide. The Gram\n        matrix can also be passed as argument.\n\n    Xy : array-like, optional\n        Xy = np.dot(X.T, y) that can be precomputed. It is useful\n        only when the Gram matrix is precomputed.\n\n    copy_X : boolean, optional, default True\n        If ``True``, X will be copied; else, it may be overwritten.\n\n    coef_init : array, shape (n_features, ) | None\n        The initial values of the coefficients.\n\n    verbose : bool or integer\n        Amount of verbosity.\n\n    params : kwargs\n        keyword arguments passed to the coordinate descent solver.\n\n    return_n_iter : bool\n        whether to return the number of iterations or not.\n\n    positive : bool, default False\n        If set to True, forces coefficients to be positive.\n\n    check_input : bool, default True\n        Skip input validation checks, including the Gram matrix when provided\n        assuming there are handled by the caller when check_input=False.\n\n    Returns\n    -------\n    alphas : array, shape (n_alphas,)\n        The alphas along the path where models are computed.\n\n    coefs : array, shape (n_features, n_alphas) or             (n_outputs, n_features, n_alphas)\n        Coefficients along the path.\n\n    dual_gaps : array, shape (n_alphas,)\n        The dual gaps at the end of the optimization for each alpha.\n\n    n_iters : array-like, shape (n_alphas,)\n        The number of iterations taken by the coordinate descent optimizer to\n        reach the specified tolerance for each alpha.\n        (Is returned when ``return_n_iter`` is set to True).\n\n    Notes\n    -----\n    See examples/linear_model/plot_lasso_coordinate_descent_path.py for an example.\n\n    See also\n    --------\n    MultiTaskElasticNet\n    MultiTaskElasticNetCV\n    ElasticNet\n    ElasticNetCV\n    "
+if check_input:
+    X = check_array(X, 'csc', dtype=[numpy.float64, numpy.float32], order='F', copy=copy_X)
+    y = check_array(y, 'csc', dtype=X.dtype.type, order='F', copy=False, ensure_2d=False)
+    if (Xy is not None):
+        Xy = check_array(Xy, dtype=X.dtype.type, order='C', copy=False, ensure_2d=False)
+(n_samples, n_features) = X.shape
+multi_output = False
+if (y.ndim != 1):
+    multi_output = True
+    (_, n_outputs) = y.shape
+if ((not multi_output) and scipy.sparse.isspmatrix(X)):
+    if ('X_offset' in params):
+        X_sparse_scaling = (params['X_offset'] / params['X_scale'])
+        X_sparse_scaling = numpy.asarray(X_sparse_scaling, dtype=X.dtype)
+    else:
+        X_sparse_scaling = numpy.zeros(n_features, dtype=X.dtype)
+if check_input:
+    (X, y, X_offset, y_offset, X_scale, precompute, Xy) = _pre_fit(X, y, Xy, precompute, normalize=False, fit_intercept=False, copy=False)
+if (alphas is None):
+    alphas = _alpha_grid(X, y, Xy=Xy, l1_ratio=l1_ratio, fit_intercept=False, eps=eps, n_alphas=n_alphas, normalize=False, copy_X=False)
+else:
+    alphas = numpy.sort(alphas)[::(- 1)]
+n_alphas = len(alphas)
+tol = params.get('tol', 0.0001)
+max_iter = params.get('max_iter', 1000)
+dual_gaps = numpy.empty(n_alphas)
+n_iters = []
+rng = check_random_state(params.get('random_state', None))
+selection = params.get('selection', 'cyclic')
+if (selection not in ['random', 'cyclic']):
+    raise ValueError('selection should be either random or cyclic.')
+random = (selection == 'random')
+if (not multi_output):
+    coefs = numpy.empty((n_features, n_alphas), dtype=X.dtype)
+else:
+    coefs = numpy.empty((n_outputs, n_features, n_alphas), dtype=X.dtype)
+if (coef_init is None):
+    tempResult = asfortranarray(numpy.zeros(coefs.shape[:(- 1)], dtype=X.dtype))
+	
+===================================================================	
+enet_path: 95	
+----------------------------	
+
+"Compute elastic net path with coordinate descent\n\n    The elastic net optimization function varies for mono and multi-outputs.\n\n    For mono-output tasks it is::\n\n        1 / (2 * n_samples) * ||y - Xw||^2_2\n        + alpha * l1_ratio * ||w||_1\n        + 0.5 * alpha * (1 - l1_ratio) * ||w||^2_2\n\n    For multi-output tasks it is::\n\n        (1 / (2 * n_samples)) * ||Y - XW||^Fro_2\n        + alpha * l1_ratio * ||W||_21\n        + 0.5 * alpha * (1 - l1_ratio) * ||W||_Fro^2\n\n    Where::\n\n        ||W||_21 = \\sum_i \\sqrt{\\sum_j w_{ij}^2}\n\n    i.e. the sum of norm of each row.\n\n    Read more in the :ref:`User Guide <elastic_net>`.\n\n    Parameters\n    ----------\n    X : {array-like}, shape (n_samples, n_features)\n        Training data. Pass directly as Fortran-contiguous data to avoid\n        unnecessary memory duplication. If ``y`` is mono-output then ``X``\n        can be sparse.\n\n    y : ndarray, shape (n_samples,) or (n_samples, n_outputs)\n        Target values\n\n    l1_ratio : float, optional\n        float between 0 and 1 passed to elastic net (scaling between\n        l1 and l2 penalties). ``l1_ratio=1`` corresponds to the Lasso\n\n    eps : float\n        Length of the path. ``eps=1e-3`` means that\n        ``alpha_min / alpha_max = 1e-3``\n\n    n_alphas : int, optional\n        Number of alphas along the regularization path\n\n    alphas : ndarray, optional\n        List of alphas where to compute the models.\n        If None alphas are set automatically\n\n    precompute : True | False | 'auto' | array-like\n        Whether to use a precomputed Gram matrix to speed up\n        calculations. If set to ``'auto'`` let us decide. The Gram\n        matrix can also be passed as argument.\n\n    Xy : array-like, optional\n        Xy = np.dot(X.T, y) that can be precomputed. It is useful\n        only when the Gram matrix is precomputed.\n\n    copy_X : boolean, optional, default True\n        If ``True``, X will be copied; else, it may be overwritten.\n\n    coef_init : array, shape (n_features, ) | None\n        The initial values of the coefficients.\n\n    verbose : bool or integer\n        Amount of verbosity.\n\n    params : kwargs\n        keyword arguments passed to the coordinate descent solver.\n\n    return_n_iter : bool\n        whether to return the number of iterations or not.\n\n    positive : bool, default False\n        If set to True, forces coefficients to be positive.\n\n    check_input : bool, default True\n        Skip input validation checks, including the Gram matrix when provided\n        assuming there are handled by the caller when check_input=False.\n\n    Returns\n    -------\n    alphas : array, shape (n_alphas,)\n        The alphas along the path where models are computed.\n\n    coefs : array, shape (n_features, n_alphas) or             (n_outputs, n_features, n_alphas)\n        Coefficients along the path.\n\n    dual_gaps : array, shape (n_alphas,)\n        The dual gaps at the end of the optimization for each alpha.\n\n    n_iters : array-like, shape (n_alphas,)\n        The number of iterations taken by the coordinate descent optimizer to\n        reach the specified tolerance for each alpha.\n        (Is returned when ``return_n_iter`` is set to True).\n\n    Notes\n    -----\n    See examples/linear_model/plot_lasso_coordinate_descent_path.py for an example.\n\n    See also\n    --------\n    MultiTaskElasticNet\n    MultiTaskElasticNetCV\n    ElasticNet\n    ElasticNetCV\n    "
+if check_input:
+    X = check_array(X, 'csc', dtype=[numpy.float64, numpy.float32], order='F', copy=copy_X)
+    y = check_array(y, 'csc', dtype=X.dtype.type, order='F', copy=False, ensure_2d=False)
+    if (Xy is not None):
+        Xy = check_array(Xy, dtype=X.dtype.type, order='C', copy=False, ensure_2d=False)
+(n_samples, n_features) = X.shape
+multi_output = False
+if (y.ndim != 1):
+    multi_output = True
+    (_, n_outputs) = y.shape
+if ((not multi_output) and scipy.sparse.isspmatrix(X)):
+    if ('X_offset' in params):
+        X_sparse_scaling = (params['X_offset'] / params['X_scale'])
+        X_sparse_scaling = numpy.asarray(X_sparse_scaling, dtype=X.dtype)
+    else:
+        X_sparse_scaling = numpy.zeros(n_features, dtype=X.dtype)
+if check_input:
+    (X, y, X_offset, y_offset, X_scale, precompute, Xy) = _pre_fit(X, y, Xy, precompute, normalize=False, fit_intercept=False, copy=False)
+if (alphas is None):
+    alphas = _alpha_grid(X, y, Xy=Xy, l1_ratio=l1_ratio, fit_intercept=False, eps=eps, n_alphas=n_alphas, normalize=False, copy_X=False)
+else:
+    alphas = numpy.sort(alphas)[::(- 1)]
+n_alphas = len(alphas)
+tol = params.get('tol', 0.0001)
+max_iter = params.get('max_iter', 1000)
+dual_gaps = numpy.empty(n_alphas)
+n_iters = []
+rng = check_random_state(params.get('random_state', None))
+selection = params.get('selection', 'cyclic')
+if (selection not in ['random', 'cyclic']):
+    raise ValueError('selection should be either random or cyclic.')
+random = (selection == 'random')
+if (not multi_output):
+    coefs = numpy.empty((n_features, n_alphas), dtype=X.dtype)
+else:
+    coefs = numpy.empty((n_outputs, n_features, n_alphas), dtype=X.dtype)
+if (coef_init is None):
+    coef_ = numpy.asfortranarray(numpy.zeros(coefs.shape[:(- 1)], dtype=X.dtype))
+else:
+    tempResult = asfortranarray(coef_init, dtype=X.dtype)
+	
+===================================================================	
+_gram_omp: 73	
+----------------------------	
+
+'Orthogonal Matching Pursuit step on a precomputed Gram matrix.\n\n    This function uses the Cholesky decomposition method.\n\n    Parameters\n    ----------\n    Gram : array, shape (n_features, n_features)\n        Gram matrix of the input data matrix\n\n    Xy : array, shape (n_features,)\n        Input targets\n\n    n_nonzero_coefs : int\n        Targeted number of non-zero elements\n\n    tol_0 : float\n        Squared norm of y, required if tol is not None.\n\n    tol : float\n        Targeted squared error, if not None overrides n_nonzero_coefs.\n\n    copy_Gram : bool, optional\n        Whether the gram matrix must be copied by the algorithm. A false\n        value is only helpful if it is already Fortran-ordered, otherwise a\n        copy is made anyway.\n\n    copy_Xy : bool, optional\n        Whether the covariance vector Xy must be copied by the algorithm.\n        If False, it may be overwritten.\n\n    return_path : bool, optional. Default: False\n        Whether to return every value of the nonzero coefficients along the\n        forward path. Useful for cross-validation.\n\n    Returns\n    -------\n    gamma : array, shape (n_nonzero_coefs,)\n        Non-zero elements of the solution\n\n    idx : array, shape (n_nonzero_coefs,)\n        Indices of the positions of the elements in gamma within the solution\n        vector\n\n    coefs : array, shape (n_features, n_nonzero_coefs)\n        The first k values of column k correspond to the coefficient value\n        for the active features at that step. The lower left triangle contains\n        garbage. Only returned if ``return_path=True``.\n\n    n_active : int\n        Number of active features at convergence.\n    '
+tempResult = asfortranarray(Gram)
+	
+===================================================================	
+orthogonal_mp: 150	
+----------------------------	
+
+"Orthogonal Matching Pursuit (OMP)\n\n    Solves n_targets Orthogonal Matching Pursuit problems.\n    An instance of the problem has the form:\n\n    When parametrized by the number of non-zero coefficients using\n    `n_nonzero_coefs`:\n    argmin ||y - X\\gamma||^2 subject to ||\\gamma||_0 <= n_{nonzero coefs}\n\n    When parametrized by error using the parameter `tol`:\n    argmin ||\\gamma||_0 subject to ||y - X\\gamma||^2 <= tol\n\n    Read more in the :ref:`User Guide <omp>`.\n\n    Parameters\n    ----------\n    X : array, shape (n_samples, n_features)\n        Input data. Columns are assumed to have unit norm.\n\n    y : array, shape (n_samples,) or (n_samples, n_targets)\n        Input targets\n\n    n_nonzero_coefs : int\n        Desired number of non-zero entries in the solution. If None (by\n        default) this value is set to 10% of n_features.\n\n    tol : float\n        Maximum norm of the residual. If not None, overrides n_nonzero_coefs.\n\n    precompute : {True, False, 'auto'},\n        Whether to perform precomputations. Improves performance when n_targets\n        or n_samples is very large.\n\n    copy_X : bool, optional\n        Whether the design matrix X must be copied by the algorithm. A false\n        value is only helpful if X is already Fortran-ordered, otherwise a\n        copy is made anyway.\n\n    return_path : bool, optional. Default: False\n        Whether to return every value of the nonzero coefficients along the\n        forward path. Useful for cross-validation.\n\n    return_n_iter : bool, optional default False\n        Whether or not to return the number of iterations.\n\n    Returns\n    -------\n    coef : array, shape (n_features,) or (n_features, n_targets)\n        Coefficients of the OMP solution. If `return_path=True`, this contains\n        the whole coefficient path. In this case its shape is\n        (n_features, n_features) or (n_features, n_targets, n_features) and\n        iterating over the last axis yields coefficients in increasing order\n        of active features.\n\n    n_iters : array-like or int\n        Number of active features across every target. Returned only if\n        `return_n_iter` is set to True.\n\n    See also\n    --------\n    OrthogonalMatchingPursuit\n    orthogonal_mp_gram\n    lars_path\n    decomposition.sparse_encode\n\n    Notes\n    -----\n    Orthogonal matching pursuit was introduced in G. Mallat, Z. Zhang,\n    Matching pursuits with time-frequency dictionaries, IEEE Transactions on\n    Signal Processing, Vol. 41, No. 12. (December 1993), pp. 3397-3415.\n    (http://blanche.polytechnique.fr/~mallat/papiers/MallatPursuit93.pdf)\n\n    This implementation is based on Rubinstein, R., Zibulevsky, M. and Elad,\n    M., Efficient Implementation of the K-SVD Algorithm using Batch Orthogonal\n    Matching Pursuit Technical Report - CS Technion, April 2008.\n    http://www.cs.technion.ac.il/~ronrubin/Publications/KSVD-OMP-v2.pdf\n\n    "
+X = check_array(X, order='F', copy=copy_X)
+copy_X = False
+if (y.ndim == 1):
+    y = y.reshape((- 1), 1)
+y = check_array(y)
+if (y.shape[1] > 1):
+    copy_X = True
+if ((n_nonzero_coefs is None) and (tol is None)):
+    n_nonzero_coefs = max(int((0.1 * X.shape[1])), 1)
+if ((tol is not None) and (tol < 0)):
+    raise ValueError('Epsilon cannot be negative')
+if ((tol is None) and (n_nonzero_coefs <= 0)):
+    raise ValueError('The number of atoms must be positive')
+if ((tol is None) and (n_nonzero_coefs > X.shape[1])):
+    raise ValueError('The number of atoms cannot be more than the number of features')
+if (precompute == 'auto'):
+    precompute = (X.shape[0] > X.shape[1])
+if precompute:
+    G = numpy.dot(X.T, X)
+    tempResult = asfortranarray(G)
+	
+===================================================================	
+_cholesky_omp: 24	
+----------------------------	
+
+'Orthogonal Matching Pursuit step using the Cholesky decomposition.\n\n    Parameters\n    ----------\n    X : array, shape (n_samples, n_features)\n        Input dictionary. Columns are assumed to have unit norm.\n\n    y : array, shape (n_samples,)\n        Input targets\n\n    n_nonzero_coefs : int\n        Targeted number of non-zero elements\n\n    tol : float\n        Targeted squared error, if not None overrides n_nonzero_coefs.\n\n    copy_X : bool, optional\n        Whether the design matrix X must be copied by the algorithm. A false\n        value is only helpful if X is already Fortran-ordered, otherwise a\n        copy is made anyway.\n\n    return_path : bool, optional. Default: False\n        Whether to return every value of the nonzero coefficients along the\n        forward path. Useful for cross-validation.\n\n    Returns\n    -------\n    gamma : array, shape (n_nonzero_coefs,)\n        Non-zero elements of the solution\n\n    idx : array, shape (n_nonzero_coefs,)\n        Indices of the positions of the elements in gamma within the solution\n        vector\n\n    coef : array, shape (n_features, n_nonzero_coefs)\n        The first k values of column k correspond to the coefficient value\n        for the active features at that step. The lower left triangle contains\n        garbage. Only returned if ``return_path=True``.\n\n    n_active : int\n        Number of active features at convergence.\n    '
+if copy_X:
+    X = X.copy('F')
+else:
+    tempResult = asfortranarray(X)
+	
+===================================================================	
+test_bad_input: 293	
+----------------------------	
+
+assert_raises(ValueError, svm.SVC(C=(- 1)).fit, X, Y)
+clf = sklearn.svm.NuSVC(nu=0.0)
+assert_raises(ValueError, clf.fit, X, Y)
+Y2 = Y[:(- 1)]
+assert_raises(ValueError, clf.fit, X, Y2)
+for clf in (sklearn.svm.SVC(), sklearn.svm.LinearSVC(random_state=0)):
+    tempResult = asfortranarray(X)
+	
+===================================================================	
+BaseDecisionTree.fit: 171	
+----------------------------	
+
+"Build a decision tree from the training set (X, y).\n\n        Parameters\n        ----------\n        X : array-like or sparse matrix, shape = [n_samples, n_features]\n            The training input samples. Internally, it will be converted to\n            ``dtype=np.float32`` and if a sparse matrix is provided\n            to a sparse ``csc_matrix``.\n\n        y : array-like, shape = [n_samples] or [n_samples, n_outputs]\n            The target values (class labels in classification, real numbers in\n            regression). In the regression case, use ``dtype=np.float64`` and\n            ``order='C'`` for maximum efficiency.\n\n        sample_weight : array-like, shape = [n_samples] or None\n            Sample weights. If None, then samples are equally weighted. Splits\n            that would create child nodes with net zero or negative weight are\n            ignored while searching for a split in each node. In the case of\n            classification, splits are also ignored if they would result in any\n            single class carrying a negative weight in either child node.\n\n        check_input : boolean, (default=True)\n            Allow to bypass several input checking.\n            Don't use this parameter unless you know what you do.\n\n        X_idx_sorted : array-like, shape = [n_samples, n_features], optional\n            The indexes of the sorted training input samples. If many tree\n            are grown on the same dataset, this allows the ordering to be\n            cached between trees. If None, the data will be sorted here.\n            Don't use this parameter unless you know what to do.\n\n        Returns\n        -------\n        self : object\n            Returns self.\n        "
+random_state = check_random_state(self.random_state)
+if check_input:
+    X = check_array(X, dtype=DTYPE, accept_sparse='csc')
+    y = check_array(y, ensure_2d=False, dtype=None)
+    if issparse(X):
+        X.sort_indices()
+        if ((X.indices.dtype != numpy.intc) or (X.indptr.dtype != numpy.intc)):
+            raise ValueError('No support for np.int64 index based sparse matrices')
+(n_samples, self.n_features_) = X.shape
+is_classification = isinstance(self, ClassifierMixin)
+y = numpy.atleast_1d(y)
+expanded_class_weight = None
+if (y.ndim == 1):
+    y = numpy.reshape(y, ((- 1), 1))
+self.n_outputs_ = y.shape[1]
+if is_classification:
+    check_classification_targets(y)
+    y = numpy.copy(y)
+    self.classes_ = []
+    self.n_classes_ = []
+    if (self.class_weight is not None):
+        y_original = numpy.copy(y)
+    y_encoded = numpy.zeros(y.shape, dtype=numpy.int)
+    for k in range(self.n_outputs_):
+        (classes_k, y_encoded[:, k]) = numpy.unique(y[:, k], return_inverse=True)
+        self.classes_.append(classes_k)
+        self.n_classes_.append(classes_k.shape[0])
+    y = y_encoded
+    if (self.class_weight is not None):
+        expanded_class_weight = compute_sample_weight(self.class_weight, y_original)
+else:
+    self.classes_ = ([None] * self.n_outputs_)
+    self.n_classes_ = ([1] * self.n_outputs_)
+self.n_classes_ = numpy.array(self.n_classes_, dtype=numpy.intp)
+if ((getattr(y, 'dtype', None) != DOUBLE) or (not y.flags.contiguous)):
+    y = numpy.ascontiguousarray(y, dtype=DOUBLE)
+max_depth = (((2 ** 31) - 1) if (self.max_depth is None) else self.max_depth)
+max_leaf_nodes = ((- 1) if (self.max_leaf_nodes is None) else self.max_leaf_nodes)
+if isinstance(self.min_samples_leaf, (numbers.Integral, numpy.integer)):
+    min_samples_leaf = self.min_samples_leaf
+else:
+    min_samples_leaf = int(ceil((self.min_samples_leaf * n_samples)))
+if isinstance(self.min_samples_split, (numbers.Integral, numpy.integer)):
+    min_samples_split = self.min_samples_split
+else:
+    min_samples_split = int(ceil((self.min_samples_split * n_samples)))
+    min_samples_split = max(2, min_samples_split)
+min_samples_split = max(min_samples_split, (2 * min_samples_leaf))
+if isinstance(self.max_features, externals.six.string_types):
+    if (self.max_features == 'auto'):
+        if is_classification:
+            max_features = max(1, int(numpy.sqrt(self.n_features_)))
+        else:
+            max_features = self.n_features_
+    elif (self.max_features == 'sqrt'):
+        max_features = max(1, int(numpy.sqrt(self.n_features_)))
+    elif (self.max_features == 'log2'):
+        max_features = max(1, int(numpy.log2(self.n_features_)))
+    else:
+        raise ValueError('Invalid value for max_features. Allowed string values are "auto", "sqrt" or "log2".')
+elif (self.max_features is None):
+    max_features = self.n_features_
+elif isinstance(self.max_features, (numbers.Integral, numpy.integer)):
+    max_features = self.max_features
+elif (self.max_features > 0.0):
+    max_features = max(1, int((self.max_features * self.n_features_)))
+else:
+    max_features = 0
+self.max_features_ = max_features
+if (len(y) != n_samples):
+    raise ValueError(('Number of labels=%d does not match number of samples=%d' % (len(y), n_samples)))
+if (not ((0.0 < self.min_samples_split <= 1.0) or (2 <= self.min_samples_split))):
+    raise ValueError(('min_samples_split must be in at least 2 or in (0, 1], got %s' % min_samples_split))
+if (not ((0.0 < self.min_samples_leaf <= 0.5) or (1 <= self.min_samples_leaf))):
+    raise ValueError(('min_samples_leaf must be at least than 1 or in (0, 0.5], got %s' % min_samples_leaf))
+if (not (0 <= self.min_weight_fraction_leaf <= 0.5)):
+    raise ValueError('min_weight_fraction_leaf must in [0, 0.5]')
+if (max_depth <= 0):
+    raise ValueError('max_depth must be greater than zero. ')
+if (not (0 < max_features <= self.n_features_)):
+    raise ValueError('max_features must be in (0, n_features]')
+if (not isinstance(max_leaf_nodes, (numbers.Integral, numpy.integer))):
+    raise ValueError(('max_leaf_nodes must be integral number but was %r' % max_leaf_nodes))
+if ((- 1) < max_leaf_nodes < 2):
+    raise ValueError('max_leaf_nodes {0} must be either smaller than 0 or larger than 1'.format(max_leaf_nodes))
+if (sample_weight is not None):
+    if ((getattr(sample_weight, 'dtype', None) != DOUBLE) or (not sample_weight.flags.contiguous)):
+        sample_weight = numpy.ascontiguousarray(sample_weight, dtype=DOUBLE)
+    if (len(sample_weight.shape) > 1):
+        raise ValueError(('Sample weights array has more than one dimension: %d' % len(sample_weight.shape)))
+    if (len(sample_weight) != n_samples):
+        raise ValueError(('Number of weights=%d does not match number of samples=%d' % (len(sample_weight), n_samples)))
+if (expanded_class_weight is not None):
+    if (sample_weight is not None):
+        sample_weight = (sample_weight * expanded_class_weight)
+    else:
+        sample_weight = expanded_class_weight
+if ((self.min_weight_fraction_leaf != 0.0) and (sample_weight is not None)):
+    min_weight_leaf = (self.min_weight_fraction_leaf * numpy.sum(sample_weight))
+else:
+    min_weight_leaf = 0.0
+if (self.min_impurity_split < 0.0):
+    raise ValueError('min_impurity_split must be greater than or equal to 0')
+presort = self.presort
+if ((self.presort == 'auto') and issparse(X)):
+    presort = False
+elif (self.presort == 'auto'):
+    presort = True
+if ((presort is True) and issparse(X)):
+    raise ValueError('Presorting is not supported for sparse matrices.')
+if ((X_idx_sorted is None) and presort):
+    tempResult = asfortranarray(numpy.argsort(X, axis=0), dtype=numpy.int32)
+	
+===================================================================	
+test_min_samples_split: 314	
+----------------------------	
+
+'Test min_samples_split parameter'
+tempResult = asfortranarray(iris.data.astype(sklearn.tree._tree.DTYPE))
+	
+===================================================================	
+test_error: 291	
+----------------------------	
+
+for (name, TreeEstimator) in CLF_TREES.items():
+    est = TreeEstimator()
+    assert_raises(NotFittedError, est.predict_proba, X)
+    est.fit(X, y)
+    X2 = [[(- 2), (- 1), 1]]
+    assert_raises(ValueError, est.predict_proba, X2)
+for (name, TreeEstimator) in ALL_TREES.items():
+    assert_raises(ValueError, TreeEstimator(min_samples_leaf=(- 1)).fit, X, y)
+    assert_raises(ValueError, TreeEstimator(min_samples_leaf=0.6).fit, X, y)
+    assert_raises(ValueError, TreeEstimator(min_samples_leaf=0.0).fit, X, y)
+    assert_raises(ValueError, TreeEstimator(min_weight_fraction_leaf=(- 1)).fit, X, y)
+    assert_raises(ValueError, TreeEstimator(min_weight_fraction_leaf=0.51).fit, X, y)
+    assert_raises(ValueError, TreeEstimator(min_samples_split=(- 1)).fit, X, y)
+    assert_raises(ValueError, TreeEstimator(min_samples_split=0.0).fit, X, y)
+    assert_raises(ValueError, TreeEstimator(min_samples_split=1.1).fit, X, y)
+    assert_raises(ValueError, TreeEstimator(max_depth=(- 1)).fit, X, y)
+    assert_raises(ValueError, TreeEstimator(max_features=42).fit, X, y)
+    assert_raises(ValueError, TreeEstimator(min_impurity_split=(- 1.0)).fit, X, y)
+    est = TreeEstimator()
+    y2 = y[:(- 1)]
+    assert_raises(ValueError, est.fit, X, y2)
+    tempResult = asfortranarray(X)
+	
+===================================================================	
+test_min_impurity_split: 373	
+----------------------------	
+
+tempResult = asfortranarray(iris.data.astype(sklearn.tree._tree.DTYPE))
+	
+===================================================================	
+test_min_samples_leaf: 328	
+----------------------------	
+
+tempResult = asfortranarray(iris.data.astype(sklearn.tree._tree.DTYPE))
+	
+===================================================================	
+test_as_float_array: 41	
+----------------------------	
+
+X = numpy.ones((3, 10), dtype=numpy.int32)
+X = (X + numpy.arange(10, dtype=numpy.int32))
+X2 = as_float_array(X, copy=False)
+numpy.testing.assert_equal(X2.dtype, numpy.float32)
+X = X.astype(numpy.int64)
+X2 = as_float_array(X, copy=True)
+assert_true((as_float_array(X, False) is not X))
+numpy.testing.assert_equal(X2.dtype, numpy.float64)
+X = numpy.ones((3, 2), dtype=numpy.float32)
+assert_true((as_float_array(X, copy=False) is X))
+tempResult = asfortranarray(X)
+	
+***************************************************	
+matplotlib_matplotlib-2.0.0: 0	
+***************************************************	
+ipython_ipython-6.1.0: 0	
+***************************************************	
+pandas_pandas-0.19.2: 0	
+***************************************************	
+dask_dask-0.7.0: 0	
+***************************************************	
+nengo_nengo-2.0.0: 0	
+***************************************************	
+sympy_sympy-1.0.0: 0	
+***************************************************	
+daducci_amico-dev: 0	
+***************************************************	
+aplpy_aplpy-1.1.1: 0	
+***************************************************	
+markovmodel_msmtools-1.0.2: 0	
+***************************************************	
+nilearn_nilearn-0.4.0: 2	
+===================================================================	
+_permuted_ols_on_chunk: 58	
+----------------------------	
+
+'Massively univariate group analysis with permuted OLS on a data chunk.\n\n    To be used in a parallel computing context.\n\n    Parameters\n    ----------\n    scores_original_data : array-like, shape=(n_descriptors, n_regressors)\n      t-scores obtained for the original (non-permuted) data.\n\n    tested_vars : array-like, shape=(n_samples, n_regressors)\n      Explanatory variates.\n\n    target_vars : array-like, shape=(n_samples, n_targets)\n      fMRI data. F-ordered for efficient computations.\n\n    confounding_vars : array-like, shape=(n_samples, n_covars)\n      Clinical data (covariates).\n\n    n_perm_chunk : int,\n      Number of permutations to be performed.\n\n    intercept_test : boolean,\n      Change the permutation scheme (swap signs for intercept,\n      switch labels otherwise). See [1]\n\n    two_sided_test : boolean,\n      If True, performs an unsigned t-test. Both positive and negative\n      effects are considered; the null hypothesis is that the effect is zero.\n      If False, only positive effects are considered as relevant. The null\n      hypothesis is that the effect is zero or negative.\n\n    random_state : int or None,\n      Seed for random number generator, to have the same permutations\n      in each computing units.\n\n    Returns\n    -------\n    h0_fmax_part : array-like, shape=(n_perm_chunk, )\n      Distribution of the (max) t-statistic under the null hypothesis\n      (limited to this permutation chunk).\n\n    References\n    ----------\n    [1] Fisher, R. A. (1935). The design of experiments.\n\n    '
+rng = check_random_state(random_state)
+(n_samples, n_regressors) = tested_vars.shape
+n_descriptors = target_vars.shape[1]
+h0_fmax_part = numpy.empty((n_perm_chunk, n_regressors))
+scores_as_ranks_part = numpy.zeros((n_regressors, n_descriptors))
+for i in range(n_perm_chunk):
+    if intercept_test:
+        target_vars = (target_vars * ((rng.randint(2, size=(n_samples, 1)) * 2) - 1))
+    else:
+        shuffle_idx = rng.permutation(n_samples)
+        tested_vars = tested_vars[shuffle_idx]
+        if (confounding_vars is not None):
+            confounding_vars = confounding_vars[shuffle_idx]
+    tempResult = asfortranarray(_t_score_with_covars_and_normalized_design(tested_vars, target_vars, confounding_vars))
+	
+===================================================================	
+permuted_ols: 76	
+----------------------------	
+
+'Massively univariate group analysis with permuted OLS.\n\n    Tested variates are independently fitted to target variates descriptors\n    (e.g. brain imaging signal) according to a linear model solved with an\n    Ordinary Least Squares criterion.\n    Confounding variates may be included in the model.\n    Permutation testing is used to assess the significance of the relationship\n    between the tested variates and the target variates [1, 2]. A max-type\n    procedure is used to obtain family-wise corrected p-values.\n\n    The specific permutation scheme implemented here is the one of\n    Freedman & Lane [3]. Its has been demonstrated in [1] that this scheme\n    conveys more sensitivity than alternative schemes. This holds for\n    neuroimaging applications, as discussed in details in [2].\n\n    Permutations are performed on parallel computing units. Each of them\n    performs a fraction of permutations on the whole dataset. Thus, the max\n    t-score amongst data descriptors can be computed directly, which avoids\n    storing all the computed t-scores.\n\n    The variates should be given C-contiguous. target_vars are fortran-ordered\n    automatically to speed-up computations.\n\n    Parameters\n    ----------\n    tested_vars : array-like, shape=(n_samples, n_regressors)\n      Explanatory variates, fitted and tested independently from each others.\n\n    target_vars : array-like, shape=(n_samples, n_descriptors)\n      fMRI data, trying to be explained by explanatory and confounding\n      variates.\n\n    confounding_vars : array-like, shape=(n_samples, n_covars)\n      Confounding variates (covariates), fitted but not tested.\n      If None, no confounding variate is added to the model\n      (except maybe a constant column according to the value of\n      `model_intercept`)\n\n    model_intercept : bool,\n      If True, a constant column is added to the confounding variates\n      unless the tested variate is already the intercept.\n\n    n_perm : int,\n      Number of permutations to perform.\n      Permutations are costly but the more are performed, the more precision\n      one gets in the p-values estimation.\n\n    two_sided_test : boolean,\n      If True, performs an unsigned t-test. Both positive and negative\n      effects are considered; the null hypothesis is that the effect is zero.\n      If False, only positive effects are considered as relevant. The null\n      hypothesis is that the effect is zero or negative.\n\n    random_state : int or None,\n      Seed for random number generator, to have the same permutations\n      in each computing units.\n\n    n_jobs : int,\n      Number of parallel workers.\n      If 0 is provided, all CPUs are used.\n      A negative number indicates that all the CPUs except (abs(n_jobs) - 1)\n      ones will be used.\n\n    verbose: int, optional\n        verbosity level (0 means no message).\n\n    Returns\n    -------\n    pvals : array-like, shape=(n_regressors, n_descriptors)\n      Negative log10 p-values associated with the significance test of the\n      n_regressors explanatory variates against the n_descriptors target\n      variates. Family-wise corrected p-values.\n\n    score_orig_data : numpy.ndarray, shape=(n_regressors, n_descriptors)\n      t-statistic associated with the significance test of the n_regressors\n      explanatory variates against the n_descriptors target variates.\n      The ranks of the scores into the h0 distribution correspond to the\n      p-values.\n\n    h0_fmax : array-like, shape=(n_perm, )\n      Distribution of the (max) t-statistic under the null hypothesis\n      (obtained from the permutations). Array is sorted.\n\n    References\n    ----------\n    [1] Anderson, M. J. & Robinson, J. (2001).\n        Permutation tests for linear models.\n        Australian & New Zealand Journal of Statistics, 43(1), 75-88.\n    [2] Winkler, A. M. et al. (2014).\n        Permutation inference for the general linear model.\n        Neuroimage.\n    [3] Freedman, D. & Lane, D. (1983).\n        A nonstochastic interpretation of reported significance levels.\n        J. Bus. Econ. Stats., 1(4), 292-298\n\n    '
+rng = check_random_state(random_state)
+if (n_jobs == 0):
+    raise ValueError("'n_jobs == 0' is not a valid choice. Please provide a positive number of CPUs, or -1 for all CPUs, or a negative number (-i) for 'all but (i-1)' CPUs (joblib conventions).")
+elif (n_jobs < 0):
+    n_jobs = max(1, ((sklearn.externals.joblib.cpu_count() - int(n_jobs)) + 1))
+else:
+    n_jobs = min(n_jobs, sklearn.externals.joblib.cpu_count())
+if (target_vars.ndim != 2):
+    raise ValueError(("'target_vars' should be a 2D array. An array with %d dimension%s was passed" % (target_vars.ndim, ('s' if (target_vars.ndim > 1) else ''))))
+tempResult = asfortranarray(target_vars)
+	
+***************************************************	
+poliastro_poliastro-0.8.0: 0	
+***************************************************	
+skimage_skimage-0.13.0: 1	
+===================================================================	
+test_memory_order: 25	
+----------------------------	
+
+contours = find_contours(numpy.ascontiguousarray(r), 0.5)
+assert (len(contours) == 1)
+tempResult = asfortranarray(r)
+	
+***************************************************	
+sunpy_sunpy-0.8.0: 0	
+***************************************************	
+spacetelescope_synphot-0.1: 0	
+***************************************************	
+librosa_librosa-0.5.1: 0	
+***************************************************	
+mne_python-0.15.0: 4	
+===================================================================	
+_mixed_norm_solver_bcd: 161	
+----------------------------	
+
+'Solve L21 inverse problem with block coordinate descent.'
+tempResult = asfortranarray(G)
+	
+===================================================================	
+mixed_norm_solver: 239	
+----------------------------	
+
+'Solve L1/L2 mixed-norm inverse problem with active set strategy.\n\n    Parameters\n    ----------\n    M : array, shape (n_sensors, n_times)\n        The data.\n    G : array, shape (n_sensors, n_dipoles)\n        The gain matrix a.k.a. lead field.\n    alpha : float\n        The regularization parameter. It should be between 0 and 100.\n        A value of 100 will lead to an empty active set (no active source).\n    maxit : int\n        The number of iterations.\n    tol : float\n        Tolerance on dual gap for convergence checking.\n    verbose : bool, str, int, or None\n        If not None, override default verbose level (see :func:`mne.verbose`\n        and :ref:`Logging documentation <tut_logging>` for more).\n    active_set_size : int\n        Size of active set increase at each iteration.\n    debias : bool\n        Debias source estimates.\n    n_orient : int\n        The number of orientation (1 : fixed or 3 : free or loose).\n    solver : \'prox\' | \'cd\' | \'bcd\' | \'auto\'\n        The algorithm to use for the optimization.\n    return_gap : bool\n        Return final duality gap.\n\n    Returns\n    -------\n    X : array, shape (n_active, n_times)\n        The source estimates.\n    active_set : array\n        The mask of active sources.\n    E : list\n        The value of the objective function over the iterations.\n    gap : float\n        Final duality gap. Returned only if return_gap is True.\n\n    References\n    ----------\n    .. [1] A. Gramfort, M. Kowalski, M. Hamalainen,\n       "Mixed-norm estimates for the M/EEG inverse problem using accelerated\n       gradient methods", Physics in Medicine and Biology, 2012.\n       http://dx.doi.org/10.1088/0031-9155/57/7/1937\n\n    .. [2] D. Strohmeier, Y. Bekhti, J. Haueisen, A. Gramfort,\n       "The Iterative Reweighted Mixed-Norm Estimate for Spatio-Temporal\n       MEG/EEG Source Reconstruction", IEEE Transactions of Medical Imaging,\n       Volume 35 (10), pp. 2218-2228, 15 April 2013.\n    '
+n_dipoles = G.shape[1]
+n_positions = (n_dipoles // n_orient)
+(n_sensors, n_times) = M.shape
+alpha_max = norm_l2inf(numpy.dot(G.T, M), n_orient, copy=False)
+utils.logger.info(('-- ALPHA MAX : %s' % alpha_max))
+alpha = float(alpha)
+has_sklearn = True
+try:
+    from sklearn.linear_model.coordinate_descent import MultiTaskLasso
+except ImportError:
+    has_sklearn = False
+if (solver == 'auto'):
+    if (has_sklearn and (n_orient == 1)):
+        solver = 'cd'
+    else:
+        solver = 'bcd'
+if (solver == 'cd'):
+    if ((n_orient == 1) and (not has_sklearn)):
+        warn('Scikit-learn >= 0.12 cannot be found. Using block coordinate descent instead of coordinate descent.')
+        solver = 'bcd'
+    if (n_orient > 1):
+        warn('Coordinate descent is only available for fixed orientation. Using block coordinate descent instead of coordinate descent')
+        solver = 'bcd'
+if (solver == 'cd'):
+    utils.logger.info('Using coordinate descent')
+    l21_solver = _mixed_norm_solver_cd
+    lc = None
+elif (solver == 'bcd'):
+    utils.logger.info('Using block coordinate descent')
+    l21_solver = _mixed_norm_solver_bcd
+    tempResult = asfortranarray(G)
+	
+===================================================================	
+_tf_mixed_norm_solver_bcd_: 451	
+----------------------------	
+
+tempResult = asfortranarray(G)
+	
+===================================================================	
+_single_epoch_tfr: 92	
+----------------------------	
+
+'Compute single trial TFRs, either ITC, power or raw TFR.'
+tfr_e = numpy.zeros(shape, dtype=numpy.float)
+plv_e = (numpy.zeros(shape, dtype=numpy.complex) if with_plv else None)
+(n_sources, _, n_times) = shape
+for (f, w) in enumerate(Ws):
+    tfr_ = cwt(data, [w], use_fft=use_fft, decim=decim)
+    tempResult = asfortranarray(tfr_.reshape(len(data), (- 1)))
+	
+***************************************************	

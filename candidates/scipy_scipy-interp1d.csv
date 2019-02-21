@@ -1,0 +1,13 @@
+project, module, line
+sklearn_sklearn,IsotonicRegression._build_f,91
+sklearn_sklearn,LarsCV.fit,382
+sklearn_sklearn,test_lasso_path_return_models_vs_new_return_gives_same_coefficients,144
+sklearn_sklearn,test_lasso_path_return_models_vs_new_return_gives_same_coefficients,146
+sklearn_sklearn,test_lasso_cv,125
+pandas_pandas,_interpolate_scipy_wrapper,155
+nengo_nengo,_rates_isi_events,27
+sunpy_sunpy,_resample_nearest_linear,36
+sunpy_sunpy,_resample_nearest_linear,41
+librosa_librosa,harmonics_1d,45
+librosa_librosa,fmt,195
+mne_python,dpss_windows,60

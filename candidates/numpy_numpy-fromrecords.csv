@@ -1,0 +1,6 @@
+project, module, line
+astropy_astropy,test_ndarray_mixin,341
+matplotlib_matplotlib,csv2rec,1161
+matplotlib_matplotlib,rec_groupby,855
+matplotlib_matplotlib,recs_join,980
+matplotlib_matplotlib,TestMlab.test_csv2rec_roundtrip,26

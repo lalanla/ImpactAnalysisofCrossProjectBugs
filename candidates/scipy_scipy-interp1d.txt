@@ -1,0 +1,243 @@
+astropy_astropy-1.3.0: 0	
+***************************************************	
+sklearn_sklearn-0.18.0: 5	
+===================================================================	
+IsotonicRegression._build_f: 91	
+----------------------------	
+
+'Build the f_ interp1d function.'
+if (self.out_of_bounds not in ['raise', 'nan', 'clip']):
+    raise ValueError("The argument ``out_of_bounds`` must be in 'nan', 'clip', 'raise'; got {0}".format(self.out_of_bounds))
+bounds_error = (self.out_of_bounds == 'raise')
+if (len(y) == 1):
+    self.f_ = (lambda x: y.repeat(x.shape))
+else:
+    tempResult = interp1d(X, y, kind='linear', bounds_error=bounds_error)
+	
+===================================================================	
+LarsCV.fit: 382	
+----------------------------	
+
+'Fit the model using X, y as training data.\n\n        Parameters\n        ----------\n        X : array-like, shape (n_samples, n_features)\n            Training data.\n\n        y : array-like, shape (n_samples,)\n            Target values.\n\n        Returns\n        -------\n        self : object\n            returns an instance of self.\n        '
+self.fit_path = True
+(X, y) = check_X_y(X, y, y_numeric=True)
+X = as_float_array(X, copy=self.copy_X)
+y = as_float_array(y, copy=self.copy_X)
+cv = check_cv(self.cv, classifier=False)
+Gram = ('auto' if self.precompute else None)
+cv_paths = Parallel(n_jobs=self.n_jobs, verbose=self.verbose)((delayed(_lars_path_residues)(X[train], y[train], X[test], y[test], Gram=Gram, copy=False, method=self.method, verbose=max(0, (self.verbose - 1)), normalize=self.normalize, fit_intercept=self.fit_intercept, max_iter=self.max_iter, eps=self.eps, positive=self.positive) for (train, test) in cv.split(X, y)))
+all_alphas = numpy.concatenate(list(zip(*cv_paths))[0])
+all_alphas = numpy.unique(all_alphas)
+stride = int(max(1, int((len(all_alphas) / float(self.max_n_alphas)))))
+all_alphas = all_alphas[::stride]
+mse_path = numpy.empty((len(all_alphas), len(cv_paths)))
+for (index, (alphas, active, coefs, residues)) in enumerate(cv_paths):
+    alphas = alphas[::(- 1)]
+    residues = residues[::(- 1)]
+    if (alphas[0] != 0):
+        alphas = numpy.r_[(0, alphas)]
+        residues = numpy.r_[(residues[(0, numpy.newaxis)], residues)]
+    if (alphas[(- 1)] != all_alphas[(- 1)]):
+        alphas = numpy.r_[(alphas, all_alphas[(- 1)])]
+        residues = numpy.r_[(residues, residues[((- 1), numpy.newaxis)])]
+    tempResult = interp1d(alphas, residues, axis=0)
+	
+===================================================================	
+test_lasso_path_return_models_vs_new_return_gives_same_coefficients: 144	
+----------------------------	
+
+X = np.array([[1, 2, 3.1], [2.3, 5.4, 4.3]]).T
+y = numpy.array([1, 2, 3.1])
+alphas = [5.0, 1.0, 0.5]
+(alphas_lars, _, coef_path_lars) = lars_path(X, y, method='lasso')
+tempResult = interp1d(alphas_lars[::(- 1)], coef_path_lars[:, ::(- 1)])
+	
+===================================================================	
+test_lasso_path_return_models_vs_new_return_gives_same_coefficients: 146	
+----------------------------	
+
+X = np.array([[1, 2, 3.1], [2.3, 5.4, 4.3]]).T
+y = numpy.array([1, 2, 3.1])
+alphas = [5.0, 1.0, 0.5]
+(alphas_lars, _, coef_path_lars) = lars_path(X, y, method='lasso')
+coef_path_cont_lars = scipy.interpolate.interp1d(alphas_lars[::(- 1)], coef_path_lars[:, ::(- 1)])
+(alphas_lasso2, coef_path_lasso2, _) = lasso_path(X, y, alphas=alphas, return_models=False)
+tempResult = interp1d(alphas_lasso2[::(- 1)], coef_path_lasso2[:, ::(- 1)])
+	
+===================================================================	
+test_lasso_cv: 125	
+----------------------------	
+
+(X, y, X_test, y_test) = build_dataset()
+max_iter = 150
+clf = LassoCV(n_alphas=10, eps=0.001, max_iter=max_iter).fit(X, y)
+assert_almost_equal(clf.alpha_, 0.056, 2)
+clf = LassoCV(n_alphas=10, eps=0.001, max_iter=max_iter, precompute=True)
+clf.fit(X, y)
+assert_almost_equal(clf.alpha_, 0.056, 2)
+lars = LassoLarsCV(normalize=False, max_iter=30).fit(X, y)
+assert_true((numpy.abs((numpy.searchsorted(clf.alphas_[::(- 1)], lars.alpha_) - numpy.searchsorted(clf.alphas_[::(- 1)], clf.alpha_))) <= 1))
+tempResult = interp1d(lars.cv_alphas_, lars.cv_mse_path_.T)
+	
+***************************************************	
+matplotlib_matplotlib-2.0.0: 0	
+***************************************************	
+ipython_ipython-6.1.0: 0	
+***************************************************	
+pandas_pandas-0.19.2: 1	
+===================================================================	
+_interpolate_scipy_wrapper: 155	
+----------------------------	
+
+"\n    passed off to scipy.interpolate.interp1d. method is scipy's kind.\n    Returns an array interpolated at new_x.  Add any new methods to\n    the list in _clean_interp_method\n    "
+try:
+    from scipy import interpolate
+    from pandas import DatetimeIndex
+except ImportError:
+    raise ImportError('{0} interpolation requires Scipy'.format(method))
+new_x = numpy.asarray(new_x)
+alt_methods = {'barycentric': scipy.interpolate.barycentric_interpolate, 'krogh': scipy.interpolate.krogh_interpolate, 'from_derivatives': _from_derivatives, 'piecewise_polynomial': _from_derivatives}
+if getattr(x, 'is_all_dates', False):
+    (x, new_x) = (x._values.astype('i8'), new_x.astype('i8'))
+if (method == 'pchip'):
+    try:
+        alt_methods['pchip'] = scipy.interpolate.pchip_interpolate
+    except AttributeError:
+        raise ImportError('Your version of Scipy does not support PCHIP interpolation.')
+elif (method == 'akima'):
+    try:
+        from scipy.interpolate import Akima1DInterpolator
+        alt_methods['akima'] = _akima_interpolate
+    except ImportError:
+        raise ImportError('Your version of Scipy does not support Akima interpolation.')
+interp1d_methods = ['nearest', 'zero', 'slinear', 'quadratic', 'cubic', 'polynomial']
+if (method in interp1d_methods):
+    if (method == 'polynomial'):
+        method = order
+    tempResult = interp1d(x, y, kind=method, fill_value=fill_value, bounds_error=bounds_error)
+	
+***************************************************	
+dask_dask-0.7.0: 0	
+***************************************************	
+nengo_nengo-2.0.0: 1	
+===================================================================	
+_rates_isi_events: 27	
+----------------------------	
+
+import scipy.interpolate
+if (len(events) == 0):
+    return numpy.zeros_like(t)
+isis = numpy.diff(events)
+rt = numpy.zeros((len(events) + (1 if midpoint else 2)))
+rt[1:(- 1)] = ((0.5 * (events[:(- 1)] + events[1:])) if midpoint else events)
+(rt[0], rt[(- 1)]) = (t[0], t[(- 1)])
+r = numpy.zeros_like(rt)
+r[1:(len(isis) + 1)] = (1.0 / isis)
+tempResult = interp1d(rt, r, kind=interp, copy=False)
+	
+***************************************************	
+sympy_sympy-1.0.0: 0	
+***************************************************	
+daducci_amico-dev: 0	
+***************************************************	
+aplpy_aplpy-1.1.1: 0	
+***************************************************	
+markovmodel_msmtools-1.0.2: 0	
+***************************************************	
+nilearn_nilearn-0.4.0: 0	
+***************************************************	
+poliastro_poliastro-0.8.0: 0	
+***************************************************	
+skimage_skimage-0.13.0: 0	
+***************************************************	
+sunpy_sunpy-0.8.0: 2	
+===================================================================	
+_resample_nearest_linear: 36	
+----------------------------	
+
+'Resample Map using either linear or nearest interpolation.'
+dimlist = []
+for i in range(orig.ndim):
+    base = numpy.arange(dimensions[i])
+    dimlist.append(((((orig.shape[i] - m1) / (dimensions[i] - m1)) * (base + offset)) - offset))
+old_coords = [numpy.arange(i, dtype=numpy.float) for i in orig.shape]
+tempResult = interp1d(old_coords[(- 1)], orig, bounds_error=False, fill_value=min(old_coords[(- 1)]), kind=method)
+	
+===================================================================	
+_resample_nearest_linear: 41	
+----------------------------	
+
+'Resample Map using either linear or nearest interpolation.'
+dimlist = []
+for i in range(orig.ndim):
+    base = numpy.arange(dimensions[i])
+    dimlist.append(((((orig.shape[i] - m1) / (dimensions[i] - m1)) * (base + offset)) - offset))
+old_coords = [numpy.arange(i, dtype=numpy.float) for i in orig.shape]
+mint = scipy.interpolate.interp1d(old_coords[(- 1)], orig, bounds_error=False, fill_value=min(old_coords[(- 1)]), kind=method)
+new_data = mint(dimlist[(- 1)])
+trorder = ([(orig.ndim - 1)] + list(range((orig.ndim - 1))))
+for i in range((orig.ndim - 2), (- 1), (- 1)):
+    new_data = new_data.transpose(trorder)
+    tempResult = interp1d(old_coords[i], new_data, bounds_error=False, fill_value=min(old_coords[i]), kind=method)
+	
+***************************************************	
+spacetelescope_synphot-0.1: 0	
+***************************************************	
+librosa_librosa-0.5.1: 2	
+===================================================================	
+harmonics_1d: 45	
+----------------------------	
+
+"Populate a harmonic tensor from a time-frequency representation.\n\n    Parameters\n    ----------\n    harmonic_out : np.ndarray, shape=(len(h_range), X.shape)\n        The output array to store harmonics\n\n    X : np.ndarray\n        The input energy\n\n    freqs : np.ndarray, shape=(x.shape[axis])\n        The frequency values corresponding to x's elements along the\n        chosen axis.\n\n    h_range : list-like, non-negative\n        Harmonics to compute.  The first harmonic (1) corresponds to `x`\n        itself.\n        Values less than one (e.g., 1/2) correspond to sub-harmonics.\n\n    kind : str\n        Interpolation type.  See `scipy.interpolate.interp1d`.\n\n    fill_value : float\n        The value to fill when extrapolating beyond the observed\n        frequency range.\n\n    axis : int\n        The axis along which to compute harmonics\n\n    See Also\n    --------\n    harmonics\n    scipy.interpolate.interp1d\n\n\n    Examples\n    --------\n    Estimate the harmonics of a time-averaged tempogram\n\n    >>> y, sr = librosa.load(librosa.util.example_audio_file(),\n    ...                      duration=15, offset=30)\n    >>> # Compute the time-varying tempogram and average over time\n    >>> tempi = np.mean(librosa.feature.tempogram(y=y, sr=sr), axis=1)\n    >>> # We'll measure the first five harmonics\n    >>> h_range = [1, 2, 3, 4, 5]\n    >>> f_tempo = librosa.tempo_frequencies(len(tempi), sr=sr)\n    >>> # Build the harmonic tensor\n    >>> t_harmonics = librosa.interp_harmonics(tempi, f_tempo, h_range)\n    >>> print(t_harmonics.shape)\n    (5, 384)\n\n    >>> # And plot the results\n    >>> import matplotlib.pyplot as plt\n    >>> plt.figure()\n    >>> librosa.display.specshow(t_harmonics, x_axis='tempo', sr=sr)\n    >>> plt.yticks(0.5 + np.arange(len(h_range)),\n    ...            ['{:.3g}'.format(_) for _ in h_range])\n    >>> plt.ylabel('Harmonic')\n    >>> plt.xlabel('Tempo (BPM)')\n    >>> plt.tight_layout()\n\n    We can also compute frequency harmonics for spectrograms.\n    To calculate subharmonic energy, use values < 1.\n\n    >>> h_range = [1./3, 1./2, 1, 2, 3, 4]\n    >>> S = np.abs(librosa.stft(y))\n    >>> fft_freqs = librosa.fft_frequencies(sr=sr)\n    >>> S_harm = librosa.interp_harmonics(S, fft_freqs, h_range, axis=0)\n    >>> print(S_harm.shape)\n    (6, 1025, 646)\n\n    >>> plt.figure()\n    >>> for i, _sh in enumerate(S_harm, 1):\n    ...     plt.subplot(3,2,i)\n    ...     librosa.display.specshow(librosa.amplitude_to_db(_sh,\n    ...                                                      ref=S.max()),\n    ...                              sr=sr, y_axis='log')\n    ...     plt.title('h={:.3g}'.format(h_range[i-1]))\n    ...     plt.yticks([])\n    >>> plt.tight_layout()\n    "
+tempResult = interp1d(freqs, x, kind=kind, axis=axis, copy=False, bounds_error=False, fill_value=fill_value)
+	
+===================================================================	
+fmt: 195	
+----------------------------	
+
+'The fast Mellin transform (FMT) [1]_ of a uniformly sampled signal y.\n\n    When the Mellin parameter (beta) is 1/2, it is also known as the scale transform [2]_.\n    The scale transform can be useful for audio analysis because its magnitude is invariant\n    to scaling of the domain (e.g., time stretching or compression).  This is analogous\n    to the magnitude of the Fourier transform being invariant to shifts in the input domain.\n\n\n    .. [1] De Sena, Antonio, and Davide Rocchesso.\n        "A fast Mellin and scale transform."\n        EURASIP Journal on Applied Signal Processing 2007.1 (2007): 75-75.\n\n    .. [2] Cohen, L.\n        "The scale representation."\n        IEEE Transactions on Signal Processing 41, no. 12 (1993): 3275-3292.\n\n    Parameters\n    ----------\n    y : np.ndarray, real-valued\n        The input signal(s).  Can be multidimensional.\n        The target axis must contain at least 3 samples.\n\n    t_min : float > 0\n        The minimum time spacing (in samples).\n        This value should generally be less than 1 to preserve as much information as\n        possible.\n\n    n_fmt : int > 2 or None\n        The number of scale transform bins to use.\n        If None, then `n_bins = over_sample * ceil(n * log((n-1)/t_min))` is taken,\n        where `n = y.shape[axis]`\n\n    kind : str\n        The type of interpolation to use when re-sampling the input.\n        See `scipy.interpolate.interp1d` for possible values.\n\n        Note that the default is to use high-precision (cubic) interpolation.\n        This can be slow in practice; if speed is preferred over accuracy,\n        then consider using `kind=\'linear\'`.\n\n    beta : float\n        The Mellin parameter.  `beta=0.5` provides the scale transform.\n\n    over_sample : float >= 1\n        Over-sampling factor for exponential resampling.\n\n    axis : int\n        The axis along which to transform `y`\n\n    Returns\n    -------\n    x_scale : np.ndarray [dtype=complex]\n        The scale transform of `y` along the `axis` dimension.\n\n    Raises\n    ------\n    ParameterError\n        if `n_fmt < 2` or `t_min <= 0`\n        or if `y` is not finite\n        or if `y.shape[axis] < 3`.\n\n    Notes\n    -----\n    This function caches at level 30.\n\n\n    Examples\n    --------\n    >>> # Generate a signal and time-stretch it (with energy normalization)\n    >>> scale = 1.25\n    >>> freq = 3.0\n    >>> x1 = np.linspace(0, 1, num=1024, endpoint=False)\n    >>> x2 = np.linspace(0, 1, num=scale * len(x1), endpoint=False)\n    >>> y1 = np.sin(2 * np.pi * freq * x1)\n    >>> y2 = np.sin(2 * np.pi * freq * x2) / np.sqrt(scale)\n    >>> # Verify that the two signals have the same energy\n    >>> np.sum(np.abs(y1)**2), np.sum(np.abs(y2)**2)\n        (255.99999999999997, 255.99999999999969)\n    >>> scale1 = librosa.fmt(y1, n_fmt=512)\n    >>> scale2 = librosa.fmt(y2, n_fmt=512)\n    >>> # And plot the results\n    >>> import matplotlib.pyplot as plt\n    >>> plt.figure(figsize=(8, 4))\n    >>> plt.subplot(1, 2, 1)\n    >>> plt.plot(y1, label=\'Original\')\n    >>> plt.plot(y2, linestyle=\'--\', label=\'Stretched\')\n    >>> plt.xlabel(\'time (samples)\')\n    >>> plt.title(\'Input signals\')\n    >>> plt.legend(frameon=True)\n    >>> plt.axis(\'tight\')\n    >>> plt.subplot(1, 2, 2)\n    >>> plt.semilogy(np.abs(scale1), label=\'Original\')\n    >>> plt.semilogy(np.abs(scale2), linestyle=\'--\', label=\'Stretched\')\n    >>> plt.xlabel(\'scale coefficients\')\n    >>> plt.title(\'Scale transform magnitude\')\n    >>> plt.legend(frameon=True)\n    >>> plt.axis(\'tight\')\n    >>> plt.tight_layout()\n\n    >>> # Plot the scale transform of an onset strength autocorrelation\n    >>> y, sr = librosa.load(librosa.util.example_audio_file(),\n    ...                      offset=10.0, duration=30.0)\n    >>> odf = librosa.onset.onset_strength(y=y, sr=sr)\n    >>> # Auto-correlate with up to 10 seconds lag\n    >>> odf_ac = librosa.autocorrelate(odf, max_size=10 * sr // 512)\n    >>> # Normalize\n    >>> odf_ac = librosa.util.normalize(odf_ac, norm=np.inf)\n    >>> # Compute the scale transform\n    >>> odf_ac_scale = librosa.fmt(librosa.util.normalize(odf_ac), n_fmt=512)\n    >>> # Plot the results\n    >>> plt.figure()\n    >>> plt.subplot(3, 1, 1)\n    >>> plt.plot(odf, label=\'Onset strength\')\n    >>> plt.axis(\'tight\')\n    >>> plt.xlabel(\'Time (frames)\')\n    >>> plt.xticks([])\n    >>> plt.legend(frameon=True)\n    >>> plt.subplot(3, 1, 2)\n    >>> plt.plot(odf_ac, label=\'Onset autocorrelation\')\n    >>> plt.axis(\'tight\')\n    >>> plt.xlabel(\'Lag (frames)\')\n    >>> plt.xticks([])\n    >>> plt.legend(frameon=True)\n    >>> plt.subplot(3, 1, 3)\n    >>> plt.semilogy(np.abs(odf_ac_scale), label=\'Scale transform magnitude\')\n    >>> plt.axis(\'tight\')\n    >>> plt.xlabel(\'scale coefficients\')\n    >>> plt.legend(frameon=True)\n    >>> plt.tight_layout()\n    '
+n = y.shape[axis]
+if (n < 3):
+    raise ParameterError('y.shape[{:}]=={:} < 3'.format(axis, n))
+if (t_min <= 0):
+    raise ParameterError('t_min must be a positive number')
+if (n_fmt is None):
+    if (over_sample < 1):
+        raise ParameterError('over_sample must be >= 1')
+    log_base = (numpy.log((n - 1)) - numpy.log((n - 2)))
+    n_fmt = int(numpy.ceil(((over_sample * (numpy.log((n - 1)) - numpy.log(t_min))) / log_base)))
+elif (n_fmt < 3):
+    raise ParameterError('n_fmt=={:} < 3'.format(n_fmt))
+else:
+    log_base = ((numpy.log((n_fmt - 1)) - numpy.log((n_fmt - 2))) / over_sample)
+if (not numpy.all(numpy.isfinite(y))):
+    raise ParameterError('y must be finite everywhere')
+base = numpy.exp(log_base)
+x = numpy.linspace(0, 1, num=n, endpoint=False)
+tempResult = interp1d(x, y, kind=kind, axis=axis)
+	
+***************************************************	
+mne_python-0.15.0: 1	
+===================================================================	
+dpss_windows: 60	
+----------------------------	
+
+"Compute Discrete Prolate Spheroidal Sequences.\n\n    Will give of orders [0,Kmax-1] for a given frequency-spacing multiple\n    NW and sequence length N.\n\n    .. note:: Copied from NiTime.\n\n    Parameters\n    ----------\n    N : int\n        Sequence length\n    half_nbw : float, unitless\n        Standardized half bandwidth corresponding to 2 * half_bw = BW*f0\n        = BW*N/dt but with dt taken as 1\n    Kmax : int\n        Number of DPSS windows to return is Kmax (orders 0 through Kmax-1)\n    low_bias : Bool\n        Keep only tapers with eigenvalues > 0.9\n    interp_from : int (optional)\n        The dpss can be calculated using interpolation from a set of dpss\n        with the same NW and Kmax, but shorter N. This is the length of this\n        shorter set of dpss windows.\n    interp_kind : str (optional)\n        This input variable is passed to scipy.interpolate.interp1d and\n        specifies the kind of interpolation as a string ('linear', 'nearest',\n        'zero', 'slinear', 'quadratic, 'cubic') or as an integer specifying the\n        order of the spline interpolator to use.\n\n\n    Returns\n    -------\n    v, e : tuple,\n        v is an array of DPSS windows shaped (Kmax, N)\n        e are the eigenvalues\n\n    Notes\n    -----\n    Tridiagonal form of DPSS calculation from:\n\n    Slepian, D. Prolate spheroidal wave functions, Fourier analysis, and\n    uncertainty V: The discrete case. Bell System Technical Journal,\n    Volume 57 (1978), 1371430\n    "
+from scipy import interpolate
+from ..filter import next_fast_len
+Kmax = int(Kmax)
+W = (float(half_nbw) / N)
+nidx = numpy.arange(N, dtype='d')
+if (interp_from is not None):
+    if (interp_from > N):
+        e_s = ('In dpss_windows, interp_from is: %s ' % interp_from)
+        e_s += ('and N is: %s. ' % N)
+        e_s += 'Please enter interp_from smaller than N.'
+        raise ValueError(e_s)
+    dpss = []
+    (d, e) = dpss_windows(interp_from, half_nbw, Kmax, low_bias=False)
+    for this_d in d:
+        x = numpy.arange(this_d.shape[(- 1)])
+        tempResult = interp1d(x, this_d, kind=interp_kind)
+	
+***************************************************	

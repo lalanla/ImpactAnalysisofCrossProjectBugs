@@ -1,0 +1,4 @@
+project, module, line
+librosa_librosa,onset_strength_multi,89
+librosa_librosa,delta,25
+mne_python,estimate_ringing_samples,273

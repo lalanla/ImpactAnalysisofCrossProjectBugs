@@ -1,0 +1,2119 @@
+astropy_astropy-1.3.0: 3	
+===================================================================	
+test_flat_open_closed_icosmo: 529	
+----------------------------	
+
+' Test against the tabulated values generated from icosmo.org\n    with three example cosmologies (flat, open and closed).\n    '
+cosmo_flat = '# from icosmo (icosmo.org)\n# Om 0.3 w -1 h 0.7 Ol 0.7\n# z     comoving_transvers_dist   angular_diameter_dist  luminosity_dist\n       0.0000000       0.0000000       0.0000000         0.0000000\n      0.16250000       669.77536       576.15085         778.61386\n      0.32500000       1285.5964       970.26143         1703.4152\n      0.50000000       1888.6254       1259.0836         2832.9381\n      0.66250000       2395.5489       1440.9317         3982.6000\n      0.82500000       2855.5732       1564.6976         5211.4210\n       1.0000000       3303.8288       1651.9144         6607.6577\n       1.1625000       3681.1867       1702.2829         7960.5663\n       1.3250000       4025.5229       1731.4077         9359.3408\n       1.5000000       4363.8558       1745.5423         10909.640\n       1.6625000       4651.4830       1747.0359         12384.573\n       1.8250000       4916.5970       1740.3883         13889.387\n       2.0000000       5179.8621       1726.6207         15539.586\n       2.1625000       5406.0204       1709.4136         17096.540\n       2.3250000       5616.5075       1689.1752         18674.888\n       2.5000000       5827.5418       1665.0120         20396.396\n       2.6625000       6010.4886       1641.0890         22013.414\n       2.8250000       6182.1688       1616.2533         23646.796\n       3.0000000       6355.6855       1588.9214         25422.742\n       3.1625000       6507.2491       1563.3031         27086.425\n       3.3250000       6650.4520       1537.6768         28763.205\n       3.5000000       6796.1499       1510.2555         30582.674\n       3.6625000       6924.2096       1485.0852         32284.127\n       3.8250000       7045.8876       1460.2876         33996.408\n       4.0000000       7170.3664       1434.0733         35851.832\n       4.1625000       7280.3423       1410.2358         37584.767\n       4.3250000       7385.3277       1386.9160         39326.870\n       4.5000000       7493.2222       1362.4040         41212.722\n       4.6625000       7588.9589       1340.2135         42972.480\n'
+cosmo_open = '# from icosmo (icosmo.org)\n# Om 0.3 w -1 h 0.7 Ol 0.1\n# z     comoving_transvers_dist   angular_diameter_dist  luminosity_dist\n       0.0000000       0.0000000       0.0000000       0.0000000\n      0.16250000       643.08185       553.18868       747.58265\n      0.32500000       1200.9858       906.40441       1591.3062\n      0.50000000       1731.6262       1154.4175       2597.4393\n      0.66250000       2174.3252       1307.8648       3614.8157\n      0.82500000       2578.7616       1413.0201       4706.2399\n       1.0000000       2979.3460       1489.6730       5958.6920\n       1.1625000       3324.2002       1537.2024       7188.5829\n       1.3250000       3646.8432       1568.5347       8478.9104\n       1.5000000       3972.8407       1589.1363       9932.1017\n       1.6625000       4258.1131       1599.2913       11337.226\n       1.8250000       4528.5346       1603.0211       12793.110\n       2.0000000       4804.9314       1601.6438       14414.794\n       2.1625000       5049.2007       1596.5852       15968.097\n       2.3250000       5282.6693       1588.7727       17564.875\n       2.5000000       5523.0914       1578.0261       19330.820\n       2.6625000       5736.9813       1566.4113       21011.694\n       2.8250000       5942.5803       1553.6158       22730.370\n       3.0000000       6155.4289       1538.8572       24621.716\n       3.1625000       6345.6997       1524.4924       26413.975\n       3.3250000       6529.3655       1509.6799       28239.506\n       3.5000000       6720.2676       1493.3928       30241.204\n       3.6625000       6891.5474       1478.0799       32131.840\n       3.8250000       7057.4213       1462.6780       34052.058\n       4.0000000       7230.3723       1446.0745       36151.862\n       4.1625000       7385.9998       1430.7021       38130.224\n       4.3250000       7537.1112       1415.4199       40135.117\n       4.5000000       7695.0718       1399.1040       42322.895\n       4.6625000       7837.5510       1384.1150       44380.133\n'
+cosmo_closed = '# from icosmo (icosmo.org)\n# Om 2 w -1 h 0.7 Ol 0.1\n# z     comoving_transvers_dist   angular_diameter_dist  luminosity_dist\n       0.0000000       0.0000000       0.0000000       0.0000000\n      0.16250000       601.80160       517.67879       699.59436\n      0.32500000       1057.9502       798.45297       1401.7840\n      0.50000000       1438.2161       958.81076       2157.3242\n      0.66250000       1718.6778       1033.7912       2857.3019\n      0.82500000       1948.2400       1067.5288       3555.5381\n       1.0000000       2152.7954       1076.3977       4305.5908\n       1.1625000       2312.3427       1069.2914       5000.4410\n       1.3250000       2448.9755       1053.3228       5693.8681\n       1.5000000       2575.6795       1030.2718       6439.1988\n       1.6625000       2677.9671       1005.8092       7130.0873\n       1.8250000       2768.1157       979.86398       7819.9270\n       2.0000000       2853.9222       951.30739       8561.7665\n       2.1625000       2924.8116       924.84161       9249.7167\n       2.3250000       2988.5333       898.80701       9936.8732\n       2.5000000       3050.3065       871.51614       10676.073\n       2.6625000       3102.1909       847.01459       11361.774\n       2.8250000       3149.5043       823.39982       12046.854\n       3.0000000       3195.9966       798.99915       12783.986\n       3.1625000       3235.5334       777.30533       13467.908\n       3.3250000       3271.9832       756.52790       14151.327\n       3.5000000       3308.1758       735.15017       14886.791\n       3.6625000       3339.2521       716.19347       15569.263\n       3.8250000       3368.1489       698.06195       16251.319\n       4.0000000       3397.0803       679.41605       16985.401\n       4.1625000       3422.1142       662.87926       17666.664\n       4.3250000       3445.5542       647.05243       18347.576\n       4.5000000       3469.1805       630.76008       19080.493\n       4.6625000       3489.7534       616.29199       19760.729\n'
+tempResult = loadtxt(StringIO(cosmo_flat), unpack=1)
+	
+===================================================================	
+test_flat_open_closed_icosmo: 537	
+----------------------------	
+
+' Test against the tabulated values generated from icosmo.org\n    with three example cosmologies (flat, open and closed).\n    '
+cosmo_flat = '# from icosmo (icosmo.org)\n# Om 0.3 w -1 h 0.7 Ol 0.7\n# z     comoving_transvers_dist   angular_diameter_dist  luminosity_dist\n       0.0000000       0.0000000       0.0000000         0.0000000\n      0.16250000       669.77536       576.15085         778.61386\n      0.32500000       1285.5964       970.26143         1703.4152\n      0.50000000       1888.6254       1259.0836         2832.9381\n      0.66250000       2395.5489       1440.9317         3982.6000\n      0.82500000       2855.5732       1564.6976         5211.4210\n       1.0000000       3303.8288       1651.9144         6607.6577\n       1.1625000       3681.1867       1702.2829         7960.5663\n       1.3250000       4025.5229       1731.4077         9359.3408\n       1.5000000       4363.8558       1745.5423         10909.640\n       1.6625000       4651.4830       1747.0359         12384.573\n       1.8250000       4916.5970       1740.3883         13889.387\n       2.0000000       5179.8621       1726.6207         15539.586\n       2.1625000       5406.0204       1709.4136         17096.540\n       2.3250000       5616.5075       1689.1752         18674.888\n       2.5000000       5827.5418       1665.0120         20396.396\n       2.6625000       6010.4886       1641.0890         22013.414\n       2.8250000       6182.1688       1616.2533         23646.796\n       3.0000000       6355.6855       1588.9214         25422.742\n       3.1625000       6507.2491       1563.3031         27086.425\n       3.3250000       6650.4520       1537.6768         28763.205\n       3.5000000       6796.1499       1510.2555         30582.674\n       3.6625000       6924.2096       1485.0852         32284.127\n       3.8250000       7045.8876       1460.2876         33996.408\n       4.0000000       7170.3664       1434.0733         35851.832\n       4.1625000       7280.3423       1410.2358         37584.767\n       4.3250000       7385.3277       1386.9160         39326.870\n       4.5000000       7493.2222       1362.4040         41212.722\n       4.6625000       7588.9589       1340.2135         42972.480\n'
+cosmo_open = '# from icosmo (icosmo.org)\n# Om 0.3 w -1 h 0.7 Ol 0.1\n# z     comoving_transvers_dist   angular_diameter_dist  luminosity_dist\n       0.0000000       0.0000000       0.0000000       0.0000000\n      0.16250000       643.08185       553.18868       747.58265\n      0.32500000       1200.9858       906.40441       1591.3062\n      0.50000000       1731.6262       1154.4175       2597.4393\n      0.66250000       2174.3252       1307.8648       3614.8157\n      0.82500000       2578.7616       1413.0201       4706.2399\n       1.0000000       2979.3460       1489.6730       5958.6920\n       1.1625000       3324.2002       1537.2024       7188.5829\n       1.3250000       3646.8432       1568.5347       8478.9104\n       1.5000000       3972.8407       1589.1363       9932.1017\n       1.6625000       4258.1131       1599.2913       11337.226\n       1.8250000       4528.5346       1603.0211       12793.110\n       2.0000000       4804.9314       1601.6438       14414.794\n       2.1625000       5049.2007       1596.5852       15968.097\n       2.3250000       5282.6693       1588.7727       17564.875\n       2.5000000       5523.0914       1578.0261       19330.820\n       2.6625000       5736.9813       1566.4113       21011.694\n       2.8250000       5942.5803       1553.6158       22730.370\n       3.0000000       6155.4289       1538.8572       24621.716\n       3.1625000       6345.6997       1524.4924       26413.975\n       3.3250000       6529.3655       1509.6799       28239.506\n       3.5000000       6720.2676       1493.3928       30241.204\n       3.6625000       6891.5474       1478.0799       32131.840\n       3.8250000       7057.4213       1462.6780       34052.058\n       4.0000000       7230.3723       1446.0745       36151.862\n       4.1625000       7385.9998       1430.7021       38130.224\n       4.3250000       7537.1112       1415.4199       40135.117\n       4.5000000       7695.0718       1399.1040       42322.895\n       4.6625000       7837.5510       1384.1150       44380.133\n'
+cosmo_closed = '# from icosmo (icosmo.org)\n# Om 2 w -1 h 0.7 Ol 0.1\n# z     comoving_transvers_dist   angular_diameter_dist  luminosity_dist\n       0.0000000       0.0000000       0.0000000       0.0000000\n      0.16250000       601.80160       517.67879       699.59436\n      0.32500000       1057.9502       798.45297       1401.7840\n      0.50000000       1438.2161       958.81076       2157.3242\n      0.66250000       1718.6778       1033.7912       2857.3019\n      0.82500000       1948.2400       1067.5288       3555.5381\n       1.0000000       2152.7954       1076.3977       4305.5908\n       1.1625000       2312.3427       1069.2914       5000.4410\n       1.3250000       2448.9755       1053.3228       5693.8681\n       1.5000000       2575.6795       1030.2718       6439.1988\n       1.6625000       2677.9671       1005.8092       7130.0873\n       1.8250000       2768.1157       979.86398       7819.9270\n       2.0000000       2853.9222       951.30739       8561.7665\n       2.1625000       2924.8116       924.84161       9249.7167\n       2.3250000       2988.5333       898.80701       9936.8732\n       2.5000000       3050.3065       871.51614       10676.073\n       2.6625000       3102.1909       847.01459       11361.774\n       2.8250000       3149.5043       823.39982       12046.854\n       3.0000000       3195.9966       798.99915       12783.986\n       3.1625000       3235.5334       777.30533       13467.908\n       3.3250000       3271.9832       756.52790       14151.327\n       3.5000000       3308.1758       735.15017       14886.791\n       3.6625000       3339.2521       716.19347       15569.263\n       3.8250000       3368.1489       698.06195       16251.319\n       4.0000000       3397.0803       679.41605       16985.401\n       4.1625000       3422.1142       662.87926       17666.664\n       4.3250000       3445.5542       647.05243       18347.576\n       4.5000000       3469.1805       630.76008       19080.493\n       4.6625000       3489.7534       616.29199       19760.729\n'
+(redshifts, dm, da, dl) = numpy.loadtxt(StringIO(cosmo_flat), unpack=1)
+dm = (dm * units.Mpc)
+da = (da * units.Mpc)
+dl = (dl * units.Mpc)
+cosmo = core.LambdaCDM(H0=70, Om0=0.3, Ode0=0.7, Tcmb0=0.0)
+assert allclose(cosmo.comoving_transverse_distance(redshifts), dm)
+assert allclose(cosmo.angular_diameter_distance(redshifts), da)
+assert allclose(cosmo.luminosity_distance(redshifts), dl)
+tempResult = loadtxt(StringIO(cosmo_open), unpack=1)
+	
+===================================================================	
+test_flat_open_closed_icosmo: 545	
+----------------------------	
+
+' Test against the tabulated values generated from icosmo.org\n    with three example cosmologies (flat, open and closed).\n    '
+cosmo_flat = '# from icosmo (icosmo.org)\n# Om 0.3 w -1 h 0.7 Ol 0.7\n# z     comoving_transvers_dist   angular_diameter_dist  luminosity_dist\n       0.0000000       0.0000000       0.0000000         0.0000000\n      0.16250000       669.77536       576.15085         778.61386\n      0.32500000       1285.5964       970.26143         1703.4152\n      0.50000000       1888.6254       1259.0836         2832.9381\n      0.66250000       2395.5489       1440.9317         3982.6000\n      0.82500000       2855.5732       1564.6976         5211.4210\n       1.0000000       3303.8288       1651.9144         6607.6577\n       1.1625000       3681.1867       1702.2829         7960.5663\n       1.3250000       4025.5229       1731.4077         9359.3408\n       1.5000000       4363.8558       1745.5423         10909.640\n       1.6625000       4651.4830       1747.0359         12384.573\n       1.8250000       4916.5970       1740.3883         13889.387\n       2.0000000       5179.8621       1726.6207         15539.586\n       2.1625000       5406.0204       1709.4136         17096.540\n       2.3250000       5616.5075       1689.1752         18674.888\n       2.5000000       5827.5418       1665.0120         20396.396\n       2.6625000       6010.4886       1641.0890         22013.414\n       2.8250000       6182.1688       1616.2533         23646.796\n       3.0000000       6355.6855       1588.9214         25422.742\n       3.1625000       6507.2491       1563.3031         27086.425\n       3.3250000       6650.4520       1537.6768         28763.205\n       3.5000000       6796.1499       1510.2555         30582.674\n       3.6625000       6924.2096       1485.0852         32284.127\n       3.8250000       7045.8876       1460.2876         33996.408\n       4.0000000       7170.3664       1434.0733         35851.832\n       4.1625000       7280.3423       1410.2358         37584.767\n       4.3250000       7385.3277       1386.9160         39326.870\n       4.5000000       7493.2222       1362.4040         41212.722\n       4.6625000       7588.9589       1340.2135         42972.480\n'
+cosmo_open = '# from icosmo (icosmo.org)\n# Om 0.3 w -1 h 0.7 Ol 0.1\n# z     comoving_transvers_dist   angular_diameter_dist  luminosity_dist\n       0.0000000       0.0000000       0.0000000       0.0000000\n      0.16250000       643.08185       553.18868       747.58265\n      0.32500000       1200.9858       906.40441       1591.3062\n      0.50000000       1731.6262       1154.4175       2597.4393\n      0.66250000       2174.3252       1307.8648       3614.8157\n      0.82500000       2578.7616       1413.0201       4706.2399\n       1.0000000       2979.3460       1489.6730       5958.6920\n       1.1625000       3324.2002       1537.2024       7188.5829\n       1.3250000       3646.8432       1568.5347       8478.9104\n       1.5000000       3972.8407       1589.1363       9932.1017\n       1.6625000       4258.1131       1599.2913       11337.226\n       1.8250000       4528.5346       1603.0211       12793.110\n       2.0000000       4804.9314       1601.6438       14414.794\n       2.1625000       5049.2007       1596.5852       15968.097\n       2.3250000       5282.6693       1588.7727       17564.875\n       2.5000000       5523.0914       1578.0261       19330.820\n       2.6625000       5736.9813       1566.4113       21011.694\n       2.8250000       5942.5803       1553.6158       22730.370\n       3.0000000       6155.4289       1538.8572       24621.716\n       3.1625000       6345.6997       1524.4924       26413.975\n       3.3250000       6529.3655       1509.6799       28239.506\n       3.5000000       6720.2676       1493.3928       30241.204\n       3.6625000       6891.5474       1478.0799       32131.840\n       3.8250000       7057.4213       1462.6780       34052.058\n       4.0000000       7230.3723       1446.0745       36151.862\n       4.1625000       7385.9998       1430.7021       38130.224\n       4.3250000       7537.1112       1415.4199       40135.117\n       4.5000000       7695.0718       1399.1040       42322.895\n       4.6625000       7837.5510       1384.1150       44380.133\n'
+cosmo_closed = '# from icosmo (icosmo.org)\n# Om 2 w -1 h 0.7 Ol 0.1\n# z     comoving_transvers_dist   angular_diameter_dist  luminosity_dist\n       0.0000000       0.0000000       0.0000000       0.0000000\n      0.16250000       601.80160       517.67879       699.59436\n      0.32500000       1057.9502       798.45297       1401.7840\n      0.50000000       1438.2161       958.81076       2157.3242\n      0.66250000       1718.6778       1033.7912       2857.3019\n      0.82500000       1948.2400       1067.5288       3555.5381\n       1.0000000       2152.7954       1076.3977       4305.5908\n       1.1625000       2312.3427       1069.2914       5000.4410\n       1.3250000       2448.9755       1053.3228       5693.8681\n       1.5000000       2575.6795       1030.2718       6439.1988\n       1.6625000       2677.9671       1005.8092       7130.0873\n       1.8250000       2768.1157       979.86398       7819.9270\n       2.0000000       2853.9222       951.30739       8561.7665\n       2.1625000       2924.8116       924.84161       9249.7167\n       2.3250000       2988.5333       898.80701       9936.8732\n       2.5000000       3050.3065       871.51614       10676.073\n       2.6625000       3102.1909       847.01459       11361.774\n       2.8250000       3149.5043       823.39982       12046.854\n       3.0000000       3195.9966       798.99915       12783.986\n       3.1625000       3235.5334       777.30533       13467.908\n       3.3250000       3271.9832       756.52790       14151.327\n       3.5000000       3308.1758       735.15017       14886.791\n       3.6625000       3339.2521       716.19347       15569.263\n       3.8250000       3368.1489       698.06195       16251.319\n       4.0000000       3397.0803       679.41605       16985.401\n       4.1625000       3422.1142       662.87926       17666.664\n       4.3250000       3445.5542       647.05243       18347.576\n       4.5000000       3469.1805       630.76008       19080.493\n       4.6625000       3489.7534       616.29199       19760.729\n'
+(redshifts, dm, da, dl) = numpy.loadtxt(StringIO(cosmo_flat), unpack=1)
+dm = (dm * units.Mpc)
+da = (da * units.Mpc)
+dl = (dl * units.Mpc)
+cosmo = core.LambdaCDM(H0=70, Om0=0.3, Ode0=0.7, Tcmb0=0.0)
+assert allclose(cosmo.comoving_transverse_distance(redshifts), dm)
+assert allclose(cosmo.angular_diameter_distance(redshifts), da)
+assert allclose(cosmo.luminosity_distance(redshifts), dl)
+(redshifts, dm, da, dl) = numpy.loadtxt(StringIO(cosmo_open), unpack=1)
+dm = (dm * units.Mpc)
+da = (da * units.Mpc)
+dl = (dl * units.Mpc)
+cosmo = core.LambdaCDM(H0=70, Om0=0.3, Ode0=0.1, Tcmb0=0.0)
+assert allclose(cosmo.comoving_transverse_distance(redshifts), dm)
+assert allclose(cosmo.angular_diameter_distance(redshifts), da)
+assert allclose(cosmo.luminosity_distance(redshifts), dl)
+tempResult = loadtxt(StringIO(cosmo_closed), unpack=1)
+	
+***************************************************	
+scipy_scipy-0.19.0: 8	
+===================================================================	
+TestPCHIP.test_nag: 327	
+----------------------------	
+
+from scipy._lib.six import StringIO
+dataStr = '\n          7.99   0.00000E+0\n          8.09   0.27643E-4\n          8.19   0.43750E-1\n          8.70   0.16918E+0\n          9.20   0.46943E+0\n         10.00   0.94374E+0\n         12.00   0.99864E+0\n         15.00   0.99992E+0\n         20.00   0.99999E+0\n        '
+tempResult = loadtxt(StringIO(dataStr))
+	
+===================================================================	
+TestPCHIP.test_nag: 330	
+----------------------------	
+
+from scipy._lib.six import StringIO
+dataStr = '\n          7.99   0.00000E+0\n          8.09   0.27643E-4\n          8.19   0.43750E-1\n          8.70   0.16918E+0\n          9.20   0.46943E+0\n         10.00   0.94374E+0\n         12.00   0.99864E+0\n         15.00   0.99992E+0\n         20.00   0.99999E+0\n        '
+data = numpy.loadtxt(StringIO(dataStr))
+pch = pchip(data[:, 0], data[:, 1])
+resultStr = '\n           7.9900       0.0000\n           9.1910       0.4640\n          10.3920       0.9645\n          11.5930       0.9965\n          12.7940       0.9992\n          13.9950       0.9998\n          15.1960       0.9999\n          16.3970       1.0000\n          17.5980       1.0000\n          18.7990       1.0000\n          20.0000       1.0000\n        '
+tempResult = loadtxt(StringIO(resultStr))
+	
+===================================================================	
+test_label_structuring_elements: 214	
+----------------------------	
+
+tempResult = loadtxt(os.path.join(os.path.dirname(__file__), 'data', 'label_inputs.txt'))
+	
+===================================================================	
+test_label_structuring_elements: 215	
+----------------------------	
+
+data = numpy.loadtxt(os.path.join(os.path.dirname(__file__), 'data', 'label_inputs.txt'))
+tempResult = loadtxt(os.path.join(os.path.dirname(__file__), 'data', 'label_strels.txt'))
+	
+===================================================================	
+test_label_structuring_elements: 216	
+----------------------------	
+
+data = numpy.loadtxt(os.path.join(os.path.dirname(__file__), 'data', 'label_inputs.txt'))
+strels = numpy.loadtxt(os.path.join(os.path.dirname(__file__), 'data', 'label_strels.txt'))
+tempResult = loadtxt(os.path.join(os.path.dirname(__file__), 'data', 'label_results.txt'))
+	
+===================================================================	
+load_testing_files: 21	
+----------------------------	
+
+for fn in _filenames:
+    name = fn.replace('.txt', '').replace('-ml', '')
+    fqfn = os.path.join(os.path.dirname(__file__), 'data', fn)
+    fp = open(fqfn)
+    tempResult = loadtxt(fp)
+	
+===================================================================	
+main: 24	
+----------------------------	
+p = OptionParser()
+(options, args) = p.parse_args()
+if (len(args) != 1):
+    p.error('no valid directory given')
+inp = args[0]
+outp = (inp + '.npz')
+files = []
+for (dirpath, dirnames, filenames) in os.walk(inp):
+    for fn in filenames:
+        if fn.endswith('.txt'):
+            files.append((((dirpath[(len(inp) + 1):] + '/') + fn[:(- 4)]), os.path.join(dirpath, fn)))
+data = {}
+for (key, fn) in files:
+    key = key.replace('/', '-').strip('-')
+    try:
+        tempResult = loadtxt(fn)	
+===================================================================	
+TestFOneWay.test_nist: 2703	
+----------------------------	
+
+filenames = ['SiRstv.dat', 'SmLs01.dat', 'SmLs02.dat', 'SmLs03.dat', 'AtmWtAg.dat', 'SmLs04.dat', 'SmLs05.dat', 'SmLs06.dat', 'SmLs07.dat', 'SmLs08.dat', 'SmLs09.dat']
+for test_case in filenames:
+    rtol = 1e-07
+    fname = os.path.abspath(os.path.join(os.path.dirname(__file__), 'data/nist_anova', test_case))
+    with open(fname, 'r') as f:
+        content = f.read().split('\n')
+    certified = [line.split() for line in content[40:48] if line.strip()]
+    tempResult = loadtxt(fname, skiprows=60)
+	
+***************************************************	
+sklearn_sklearn-0.18.0: 8	
+===================================================================	
+load_linnerud: 157	
+----------------------------	
+
+"Load and return the linnerud dataset (multivariate regression).\n\n    Samples total: 20\n    Dimensionality: 3 for both data and targets\n    Features: integer\n    Targets: integer\n\n    Parameters\n    ----------\n    return_X_y : boolean, default=False.\n        If True, returns ``(data, target)`` instead of a Bunch object.\n        See below for more information about the `data` and `target` object.\n\n        .. versionadded:: 0.18\n\n    Returns\n    -------\n    data : Bunch\n        Dictionary-like object, the interesting attributes are: 'data' and\n        'targets', the two multivariate datasets, with 'data' corresponding to\n        the exercise and 'targets' corresponding to the physiological\n        measurements, as well as 'feature_names' and 'target_names'.\n    \n    (data, target) : tuple if ``return_X_y`` is True\n\n        .. versionadded:: 0.18\n    "
+base_dir = join(dirname(__file__), 'data/')
+tempResult = loadtxt((base_dir + 'linnerud_exercise.csv'), skiprows=1)
+	
+===================================================================	
+load_linnerud: 158	
+----------------------------	
+
+"Load and return the linnerud dataset (multivariate regression).\n\n    Samples total: 20\n    Dimensionality: 3 for both data and targets\n    Features: integer\n    Targets: integer\n\n    Parameters\n    ----------\n    return_X_y : boolean, default=False.\n        If True, returns ``(data, target)`` instead of a Bunch object.\n        See below for more information about the `data` and `target` object.\n\n        .. versionadded:: 0.18\n\n    Returns\n    -------\n    data : Bunch\n        Dictionary-like object, the interesting attributes are: 'data' and\n        'targets', the two multivariate datasets, with 'data' corresponding to\n        the exercise and 'targets' corresponding to the physiological\n        measurements, as well as 'feature_names' and 'target_names'.\n    \n    (data, target) : tuple if ``return_X_y`` is True\n\n        .. versionadded:: 0.18\n    "
+base_dir = join(dirname(__file__), 'data/')
+data_exercise = numpy.loadtxt((base_dir + 'linnerud_exercise.csv'), skiprows=1)
+tempResult = loadtxt((base_dir + 'linnerud_physiological.csv'), skiprows=1)
+	
+===================================================================	
+load_diabetes: 148	
+----------------------------	
+
+"Load and return the diabetes dataset (regression).\n\n    ==============      ==================\n    Samples total       442\n    Dimensionality      10\n    Features            real, -.2 < x < .2\n    Targets             integer 25 - 346\n    ==============      ==================\n\n    Read more in the :ref:`User Guide <datasets>`.\n\n    Parameters\n    ----------\n    return_X_y : boolean, default=False.\n        If True, returns ``(data, target)`` instead of a Bunch object.\n        See below for more information about the `data` and `target` object.\n\n        .. versionadded:: 0.18\n\n    Returns\n    -------\n    data : Bunch\n        Dictionary-like object, the interesting attributes are:\n        'data', the data to learn and 'target', the regression target for each\n        sample.\n\n    (data, target) : tuple if ``return_X_y`` is True\n\n        .. versionadded:: 0.18    \n    "
+base_dir = join(dirname(__file__), 'data')
+tempResult = loadtxt(join(base_dir, 'diabetes_data.csv.gz'))
+	
+===================================================================	
+load_diabetes: 149	
+----------------------------	
+
+"Load and return the diabetes dataset (regression).\n\n    ==============      ==================\n    Samples total       442\n    Dimensionality      10\n    Features            real, -.2 < x < .2\n    Targets             integer 25 - 346\n    ==============      ==================\n\n    Read more in the :ref:`User Guide <datasets>`.\n\n    Parameters\n    ----------\n    return_X_y : boolean, default=False.\n        If True, returns ``(data, target)`` instead of a Bunch object.\n        See below for more information about the `data` and `target` object.\n\n        .. versionadded:: 0.18\n\n    Returns\n    -------\n    data : Bunch\n        Dictionary-like object, the interesting attributes are:\n        'data', the data to learn and 'target', the regression target for each\n        sample.\n\n    (data, target) : tuple if ``return_X_y`` is True\n\n        .. versionadded:: 0.18    \n    "
+base_dir = join(dirname(__file__), 'data')
+data = numpy.loadtxt(join(base_dir, 'diabetes_data.csv.gz'))
+tempResult = loadtxt(join(base_dir, 'diabetes_target.csv.gz'))
+	
+===================================================================	
+load_digits: 130	
+----------------------------	
+
+"Load and return the digits dataset (classification).\n\n    Each datapoint is a 8x8 image of a digit.\n\n    =================   ==============\n    Classes                         10\n    Samples per class             ~180\n    Samples total                 1797\n    Dimensionality                  64\n    Features             integers 0-16\n    =================   ==============\n\n    Read more in the :ref:`User Guide <datasets>`.\n\n    Parameters\n    ----------\n    n_class : integer, between 0 and 10, optional (default=10)\n        The number of classes to return.\n\n    return_X_y : boolean, default=False.\n        If True, returns ``(data, target)`` instead of a Bunch object.\n        See below for more information about the `data` and `target` object.\n\n        .. versionadded:: 0.18\n\n    Returns\n    -------\n    data : Bunch\n        Dictionary-like object, the interesting attributes are:\n        'data', the data to learn, 'images', the images corresponding\n        to each sample, 'target', the classification labels for each\n        sample, 'target_names', the meaning of the labels, and 'DESCR',\n        the full description of the dataset.\n\n    (data, target) : tuple if ``return_X_y`` is True\n\n        .. versionadded:: 0.18\n\n    Examples\n    --------\n    To load the data and visualize the images::\n\n        >>> from sklearn.datasets import load_digits\n        >>> digits = load_digits()\n        >>> print(digits.data.shape)\n        (1797, 64)\n        >>> import matplotlib.pyplot as plt #doctest: +SKIP\n        >>> plt.gray() #doctest: +SKIP\n        >>> plt.matshow(digits.images[0]) #doctest: +SKIP\n        >>> plt.show() #doctest: +SKIP\n    "
+module_path = dirname(__file__)
+tempResult = loadtxt(join(module_path, 'data', 'digits.csv.gz'), delimiter=',')
+	
+===================================================================	
+fetch_california_housing: 29	
+----------------------------	
+
+"Loader for the California housing dataset from StatLib.\n\n    Read more in the :ref:`User Guide <datasets>`.\n\n    Parameters\n    ----------\n    data_home : optional, default: None\n        Specify another download and cache folder for the datasets. By default\n        all scikit learn data is stored in '~/scikit_learn_data' subfolders.\n\n    download_if_missing: optional, True by default\n        If False, raise a IOError if the data is not locally available\n        instead of trying to download the data from the source site.\n\n    Returns\n    -------\n    dataset : dict-like object with the following attributes:\n\n    dataset.data : ndarray, shape [20640, 8]\n        Each row corresponding to the 8 feature values in order.\n\n    dataset.target : numpy array of shape (20640,)\n        Each value corresponds to the average house value in units of 100,000.\n\n    dataset.feature_names : array of length 8\n        Array of ordered feature names used in the dataset.\n\n    dataset.DESCR : string\n        Description of the California housing dataset.\n\n    Notes\n    ------\n\n    This dataset consists of 20,640 samples and 9 features.\n    "
+data_home = get_data_home(data_home=data_home)
+if (not exists(data_home)):
+    makedirs(data_home)
+filepath = _pkl_filepath(data_home, TARGET_FILENAME)
+if (not exists(filepath)):
+    print(('downloading Cal. housing from %s to %s' % (DATA_URL, data_home)))
+    archive_fileobj = BytesIO(urlopen(DATA_URL).read())
+    fileobj = tarfile.open(mode='r:gz', fileobj=archive_fileobj).extractfile('CaliforniaHousing/cal_housing.data')
+    tempResult = loadtxt(fileobj, delimiter=',')
+	
+===================================================================	
+_load_coverage: 26	
+----------------------------	
+
+'Load a coverage file from an open file object.\n\n    This will return a numpy array of the given dtype\n    '
+header = [F.readline() for i in range(header_length)]
+make_tuple = (lambda t: (t.split()[0], float(t.split()[1])))
+header = dict([make_tuple(line) for line in header])
+tempResult = loadtxt(F, dtype=dtype)
+	
+===================================================================	
+_load_csv: 38	
+----------------------------	
+
+'Load csv file.\n\n    Parameters\n    ----------\n    F : file object\n        CSV file open in byte mode.\n\n    Returns\n    -------\n    rec : np.ndarray\n        record array representing the data\n    '
+if PY2:
+    names = F.readline().strip().split(',')
+else:
+    names = F.readline().decode('ascii').strip().split(',')
+tempResult = loadtxt(F, skiprows=0, delimiter=',', dtype='a22,f4,f4')
+	
+***************************************************	
+matplotlib_matplotlib-2.0.0: 2	
+===================================================================	
+module: 123	
+----------------------------	
+
+"\n===========================================================\nSkewT-logP diagram: using transforms and custom projections\n===========================================================\n\nThis serves as an intensive exercise of matplotlib's transforms and custom\nprojection API. This example produces a so-called SkewT-logP diagram, which is\na common plot in meteorology for displaying vertical profiles of temperature.\nAs far as matplotlib is concerned, the complexity comes from having X and Y\naxes that are not orthogonal. This is handled by including a skew component to\nthe basic Axes transforms. Additional complexity comes in handling the fact\nthat the upper and lower X-axes have different data ranges, which necessitates\na bunch of custom classes for ticks,spines, and the axis to handle this.\n\n"
+from matplotlib.axes import Axes
+import matplotlib.transforms as transforms
+import matplotlib.axis as maxis
+import matplotlib.spines as mspines
+from matplotlib.projections import register_projection
+
+class SkewXTick(matplotlib.axis.XTick):
+
+    def update_position(self, loc):
+        self._loc = loc
+        super(SkewXTick, self).update_position(loc)
+
+    def _has_default_loc(self):
+        return (self.get_loc() is None)
+
+    def _need_lower(self):
+        return (self._has_default_loc() or matplotlib.transforms.interval_contains(self.axes.lower_xlim, self.get_loc()))
+
+    def _need_upper(self):
+        return (self._has_default_loc() or matplotlib.transforms.interval_contains(self.axes.upper_xlim, self.get_loc()))
+
+    @property
+    def gridOn(self):
+        return (self._gridOn and (self._has_default_loc() or matplotlib.transforms.interval_contains(self.get_view_interval(), self.get_loc())))
+
+    @gridOn.setter
+    def gridOn(self, value):
+        self._gridOn = value
+
+    @property
+    def tick1On(self):
+        return (self._tick1On and self._need_lower())
+
+    @tick1On.setter
+    def tick1On(self, value):
+        self._tick1On = value
+
+    @property
+    def label1On(self):
+        return (self._label1On and self._need_lower())
+
+    @label1On.setter
+    def label1On(self, value):
+        self._label1On = value
+
+    @property
+    def tick2On(self):
+        return (self._tick2On and self._need_upper())
+
+    @tick2On.setter
+    def tick2On(self, value):
+        self._tick2On = value
+
+    @property
+    def label2On(self):
+        return (self._label2On and self._need_upper())
+
+    @label2On.setter
+    def label2On(self, value):
+        self._label2On = value
+
+    def get_view_interval(self):
+        return self.axes.xaxis.get_view_interval()
+
+class SkewXAxis(matplotlib.axis.XAxis):
+
+    def _get_tick(self, major):
+        return SkewXTick(self.axes, None, '', major=major)
+
+    def get_view_interval(self):
+        return (self.axes.upper_xlim[0], self.axes.lower_xlim[1])
+
+class SkewSpine(matplotlib.spines.Spine):
+
+    def _adjust_location(self):
+        pts = self._path.vertices
+        if (self.spine_type == 'top'):
+            pts[:, 0] = self.axes.upper_xlim
+        else:
+            pts[:, 0] = self.axes.lower_xlim
+
+class SkewXAxes(Axes):
+    name = 'skewx'
+
+    def _init_axis(self):
+        self.xaxis = SkewXAxis(self)
+        self.spines['top'].register_axis(self.xaxis)
+        self.spines['bottom'].register_axis(self.xaxis)
+        self.yaxis = matplotlib.axis.YAxis(self)
+        self.spines['left'].register_axis(self.yaxis)
+        self.spines['right'].register_axis(self.yaxis)
+
+    def _gen_axes_spines(self):
+        spines = {'top': SkewSpine.linear_spine(self, 'top'), 'bottom': matplotlib.spines.Spine.linear_spine(self, 'bottom'), 'left': matplotlib.spines.Spine.linear_spine(self, 'left'), 'right': matplotlib.spines.Spine.linear_spine(self, 'right')}
+        return spines
+
+    def _set_lim_and_transforms(self):
+        '\n        This is called once when the plot is created to set up all the\n        transforms for the data, text and grids.\n        '
+        rot = 30
+        matplotlib.axes.Axes._set_lim_and_transforms(self)
+        self.transDataToAxes = ((self.transScale + self.transLimits) + transforms.Affine2D().skew_deg(rot, 0))
+        self.transData = (self.transDataToAxes + self.transAxes)
+        self._xaxis_transform = ((matplotlib.transforms.blended_transform_factory((self.transScale + self.transLimits), matplotlib.transforms.IdentityTransform()) + transforms.Affine2D().skew_deg(rot, 0)) + self.transAxes)
+
+    @property
+    def lower_xlim(self):
+        return self.axes.viewLim.intervalx
+
+    @property
+    def upper_xlim(self):
+        pts = [[0.0, 1.0], [1.0, 1.0]]
+        return self.transDataToAxes.inverted().transform(pts)[:, 0]
+register_projection(SkewXAxes)
+if (__name__ == '__main__'):
+    from matplotlib.ticker import MultipleLocator, NullFormatter, ScalarFormatter
+    import matplotlib.pyplot as plt
+    from six import StringIO
+    import numpy as np
+    data_txt = '\n  978.0    345    7.8    0.8     61   4.16    325     14  282.7  294.6  283.4\n  971.0    404    7.2    0.2     61   4.01    327     17  282.7  294.2  283.4\n  946.7    610    5.2   -1.8     61   3.56    335     26  282.8  293.0  283.4\n  944.0    634    5.0   -2.0     61   3.51    336     27  282.8  292.9  283.4\n  925.0    798    3.4   -2.6     65   3.43    340     32  282.8  292.7  283.4\n  911.8    914    2.4   -2.7     69   3.46    345     37  282.9  292.9  283.5\n  906.0    966    2.0   -2.7     71   3.47    348     39  283.0  293.0  283.6\n  877.9   1219    0.4   -3.2     77   3.46      0     48  283.9  293.9  284.5\n  850.0   1478   -1.3   -3.7     84   3.44      0     47  284.8  294.8  285.4\n  841.0   1563   -1.9   -3.8     87   3.45    358     45  285.0  295.0  285.6\n  823.0   1736    1.4   -0.7     86   4.44    353     42  290.3  303.3  291.0\n  813.6   1829    4.5    1.2     80   5.17    350     40  294.5  309.8  295.4\n  809.0   1875    6.0    2.2     77   5.57    347     39  296.6  313.2  297.6\n  798.0   1988    7.4   -0.6     57   4.61    340     35  299.2  313.3  300.1\n  791.0   2061    7.6   -1.4     53   4.39    335     33  300.2  313.6  301.0\n  783.9   2134    7.0   -1.7     54   4.32    330     31  300.4  313.6  301.2\n  755.1   2438    4.8   -3.1     57   4.06    300     24  301.2  313.7  301.9\n  727.3   2743    2.5   -4.4     60   3.81    285     29  301.9  313.8  302.6\n  700.5   3048    0.2   -5.8     64   3.57    275     31  302.7  313.8  303.3\n  700.0   3054    0.2   -5.8     64   3.56    280     31  302.7  313.8  303.3\n  698.0   3077    0.0   -6.0     64   3.52    280     31  302.7  313.7  303.4\n  687.0   3204   -0.1   -7.1     59   3.28    281     31  304.0  314.3  304.6\n  648.9   3658   -3.2  -10.9     55   2.59    285     30  305.5  313.8  305.9\n  631.0   3881   -4.7  -12.7     54   2.29    289     33  306.2  313.6  306.6\n  600.7   4267   -6.4  -16.7     44   1.73    295     39  308.6  314.3  308.9\n  592.0   4381   -6.9  -17.9     41   1.59    297     41  309.3  314.6  309.6\n  577.6   4572   -8.1  -19.6     39   1.41    300     44  310.1  314.9  310.3\n  555.3   4877  -10.0  -22.3     36   1.16    295     39  311.3  315.3  311.5\n  536.0   5151  -11.7  -24.7     33   0.97    304     39  312.4  315.8  312.6\n  533.8   5182  -11.9  -25.0     33   0.95    305     39  312.5  315.8  312.7\n  500.0   5680  -15.9  -29.9     29   0.64    290     44  313.6  315.9  313.7\n  472.3   6096  -19.7  -33.4     28   0.49    285     46  314.1  315.8  314.1\n  453.0   6401  -22.4  -36.0     28   0.39    300     50  314.4  315.8  314.4\n  400.0   7310  -30.7  -43.7     27   0.20    285     44  315.0  315.8  315.0\n  399.7   7315  -30.8  -43.8     27   0.20    285     44  315.0  315.8  315.0\n  387.0   7543  -33.1  -46.1     26   0.16    281     47  314.9  315.5  314.9\n  382.7   7620  -33.8  -46.8     26   0.15    280     48  315.0  315.6  315.0\n  342.0   8398  -40.5  -53.5     23   0.08    293     52  316.1  316.4  316.1\n  320.4   8839  -43.7  -56.7     22   0.06    300     54  317.6  317.8  317.6\n  318.0   8890  -44.1  -57.1     22   0.05    301     55  317.8  318.0  317.8\n  310.0   9060  -44.7  -58.7     19   0.04    304     61  319.2  319.4  319.2\n  306.1   9144  -43.9  -57.9     20   0.05    305     63  321.5  321.7  321.5\n  305.0   9169  -43.7  -57.7     20   0.05    303     63  322.1  322.4  322.1\n  300.0   9280  -43.5  -57.5     20   0.05    295     64  323.9  324.2  323.9\n  292.0   9462  -43.7  -58.7     17   0.05    293     67  326.2  326.4  326.2\n  276.0   9838  -47.1  -62.1     16   0.03    290     74  326.6  326.7  326.6\n  264.0  10132  -47.5  -62.5     16   0.03    288     79  330.1  330.3  330.1\n  251.0  10464  -49.7  -64.7     16   0.03    285     85  331.7  331.8  331.7\n  250.0  10490  -49.7  -64.7     16   0.03    285     85  332.1  332.2  332.1\n  247.0  10569  -48.7  -63.7     16   0.03    283     88  334.7  334.8  334.7\n  244.0  10649  -48.9  -63.9     16   0.03    280     91  335.6  335.7  335.6\n  243.3  10668  -48.9  -63.9     16   0.03    280     91  335.8  335.9  335.8\n  220.0  11327  -50.3  -65.3     15   0.03    280     85  343.5  343.6  343.5\n  212.0  11569  -50.5  -65.5     15   0.03    280     83  346.8  346.9  346.8\n  210.0  11631  -49.7  -64.7     16   0.03    280     83  349.0  349.1  349.0\n  200.0  11950  -49.9  -64.9     15   0.03    280     80  353.6  353.7  353.6\n  194.0  12149  -49.9  -64.9     15   0.03    279     78  356.7  356.8  356.7\n  183.0  12529  -51.3  -66.3     15   0.03    278     75  360.4  360.5  360.4\n  164.0  13233  -55.3  -68.3     18   0.02    277     69  365.2  365.3  365.2\n  152.0  13716  -56.5  -69.5     18   0.02    275     65  371.1  371.2  371.1\n  150.0  13800  -57.1  -70.1     18   0.02    275     64  371.5  371.6  371.5\n  136.0  14414  -60.5  -72.5     19   0.02    268     54  376.0  376.1  376.0\n  132.0  14600  -60.1  -72.1     19   0.02    265     51  380.0  380.1  380.0\n  131.4  14630  -60.2  -72.2     19   0.02    265     51  380.3  380.4  380.3\n  128.0  14792  -60.9  -72.9     19   0.02    266     50  381.9  382.0  381.9\n  125.0  14939  -60.1  -72.1     19   0.02    268     49  385.9  386.0  385.9\n  119.0  15240  -62.2  -73.8     20   0.01    270     48  387.4  387.5  387.4\n  112.0  15616  -64.9  -75.9     21   0.01    265     53  389.3  389.3  389.3\n  108.0  15838  -64.1  -75.1     21   0.01    265     58  394.8  394.9  394.8\n  107.8  15850  -64.1  -75.1     21   0.01    265     58  395.0  395.1  395.0\n  105.0  16010  -64.7  -75.7     21   0.01    272     50  396.9  396.9  396.9\n  103.0  16128  -62.9  -73.9     21   0.02    277     45  402.5  402.6  402.5\n  100.0  16310  -62.5  -73.5     21   0.02    285     36  406.7  406.8  406.7\n    '
+    sound_data = StringIO(data_txt)
+    tempResult = loadtxt(sound_data, usecols=range(0, 4), unpack=True)
+	
+===================================================================	
+module: 10	
+----------------------------	
+
+from __future__ import print_function
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.cbook as cbook
+import matplotlib.dates as mdates
+from matplotlib.dates import bytespdate2num
+datafile = matplotlib.cbook.get_sample_data('msft.csv', asfileobj=False)
+print('loading', datafile)
+tempResult = loadtxt(datafile, delimiter=',', converters={0: bytespdate2num('%d-%b-%y')}, skiprows=1, usecols=(0, 2), unpack=True)
+	
+***************************************************	
+ipython_ipython-6.1.0: 0	
+***************************************************	
+pandas_pandas-0.19.2: 2	
+===================================================================	
+TestSeriesToCSV.test_to_csv: 52	
+----------------------------	
+
+import io
+with ensure_clean() as path:
+    self.ts.to_csv(path)
+    with io.open(path, newline=None) as f:
+        lines = f.readlines()
+    assert (lines[1] != '\n')
+    self.ts.to_csv(path, index=False)
+    tempResult = loadtxt(path)
+	
+===================================================================	
+TestCut.test_qcut_binning_issues: 177	
+----------------------------	
+
+path = os.path.join(pandas.util.testing.get_data_path(), 'cut_data.csv')
+tempResult = loadtxt(path)
+	
+***************************************************	
+dask_dask-0.7.0: 0	
+***************************************************	
+nengo_nengo-2.0.0: 0	
+***************************************************	
+sympy_sympy-1.0.0: 0	
+***************************************************	
+daducci_amico-dev: 1	
+===================================================================	
+Scheme.__init__: 19	
+----------------------------	
+'Initialize the acquisition scheme.\n\n        Parameters\n        ----------\n        data : string or numpy.ndarray\n            The filename of the scheme or a matrix containing the actual values\n        b0_thr : float\n            The threshold on the b-values to identify the b0 images (default: 0)\n        '
+if (type(data) is str):
+    try:
+        n = 0
+        with open(data) as fid:
+            for line in fid:
+                if re_match('[+-]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][+-]?\\d+)?', line.strip()):
+                    break
+                n += 1
+        tempResult = loadtxt(data, skiprows=n)	
+***************************************************	
+aplpy_aplpy-1.1.1: 0	
+***************************************************	
+markovmodel_msmtools-1.0.2: 70	
+===================================================================	
+TestPCCA.test_pcca_large: 63	
+----------------------------	
+
+import os
+tempResult = loadtxt((os.path.split(__file__)[0] + '/../tests/P_rev_251x251.dat'))
+	
+===================================================================	
+TestReadDiscreteTrajectory.test_read_discrete_trajectory: 21	
+----------------------------	
+
+tempResult = loadtxt(self.filename, dtype=int)
+	
+===================================================================	
+TestWriteDiscreteTrajectory.test_write_discrete_trajectory: 36	
+----------------------------	
+
+write_discrete_trajectory(self.filename, self.dtraj)
+tempResult = loadtxt(self.filename)
+	
+===================================================================	
+TestCountMatrixtMult.setUp: 92	
+----------------------------	
+
+M = 10
+self.M = M
+'Small test cases'
+dtraj_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.dtrajs_short = [dtraj_short for i in range(M)]
+self.B1_lag = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_lag = (M * numpy.array([[0, 1], [1, 1]]))
+self.B3_lag = (M * numpy.array([[2, 0], [0, 0]]))
+self.B1_sliding = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_sliding = (M * numpy.array([[1, 2], [1, 1]]))
+self.B3_sliding = (M * numpy.array([[2, 1], [0, 1]]))
+'Larger test cases'
+tempResult = loadtxt((testpath + 'dtraj.dat'))
+	
+===================================================================	
+TestCountMatrixtMult.setUp: 94	
+----------------------------	
+
+M = 10
+self.M = M
+'Small test cases'
+dtraj_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.dtrajs_short = [dtraj_short for i in range(M)]
+self.B1_lag = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_lag = (M * numpy.array([[0, 1], [1, 1]]))
+self.B3_lag = (M * numpy.array([[2, 0], [0, 0]]))
+self.B1_sliding = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_sliding = (M * numpy.array([[1, 2], [1, 1]]))
+self.B3_sliding = (M * numpy.array([[2, 1], [0, 1]]))
+'Larger test cases'
+dtraj_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.dtrajs_long = [dtraj_long for i in range(M)]
+tempResult = loadtxt((testpath + 'C_1_lag.dat'))
+	
+===================================================================	
+TestCountMatrixtMult.setUp: 95	
+----------------------------	
+
+M = 10
+self.M = M
+'Small test cases'
+dtraj_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.dtrajs_short = [dtraj_short for i in range(M)]
+self.B1_lag = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_lag = (M * numpy.array([[0, 1], [1, 1]]))
+self.B3_lag = (M * numpy.array([[2, 0], [0, 0]]))
+self.B1_sliding = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_sliding = (M * numpy.array([[1, 2], [1, 1]]))
+self.B3_sliding = (M * numpy.array([[2, 1], [0, 1]]))
+'Larger test cases'
+dtraj_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.dtrajs_long = [dtraj_long for i in range(M)]
+self.C1_lag = (M * numpy.loadtxt((testpath + 'C_1_lag.dat')))
+tempResult = loadtxt((testpath + 'C_7_lag.dat'))
+	
+===================================================================	
+TestCountMatrixtMult.setUp: 96	
+----------------------------	
+
+M = 10
+self.M = M
+'Small test cases'
+dtraj_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.dtrajs_short = [dtraj_short for i in range(M)]
+self.B1_lag = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_lag = (M * numpy.array([[0, 1], [1, 1]]))
+self.B3_lag = (M * numpy.array([[2, 0], [0, 0]]))
+self.B1_sliding = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_sliding = (M * numpy.array([[1, 2], [1, 1]]))
+self.B3_sliding = (M * numpy.array([[2, 1], [0, 1]]))
+'Larger test cases'
+dtraj_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.dtrajs_long = [dtraj_long for i in range(M)]
+self.C1_lag = (M * numpy.loadtxt((testpath + 'C_1_lag.dat')))
+self.C7_lag = (M * numpy.loadtxt((testpath + 'C_7_lag.dat')))
+tempResult = loadtxt((testpath + 'C_13_lag.dat'))
+	
+===================================================================	
+TestCountMatrixtMult.setUp: 97	
+----------------------------	
+
+M = 10
+self.M = M
+'Small test cases'
+dtraj_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.dtrajs_short = [dtraj_short for i in range(M)]
+self.B1_lag = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_lag = (M * numpy.array([[0, 1], [1, 1]]))
+self.B3_lag = (M * numpy.array([[2, 0], [0, 0]]))
+self.B1_sliding = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_sliding = (M * numpy.array([[1, 2], [1, 1]]))
+self.B3_sliding = (M * numpy.array([[2, 1], [0, 1]]))
+'Larger test cases'
+dtraj_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.dtrajs_long = [dtraj_long for i in range(M)]
+self.C1_lag = (M * numpy.loadtxt((testpath + 'C_1_lag.dat')))
+self.C7_lag = (M * numpy.loadtxt((testpath + 'C_7_lag.dat')))
+self.C13_lag = (M * numpy.loadtxt((testpath + 'C_13_lag.dat')))
+tempResult = loadtxt((testpath + 'C_1_sliding.dat'))
+	
+===================================================================	
+TestCountMatrixtMult.setUp: 98	
+----------------------------	
+
+M = 10
+self.M = M
+'Small test cases'
+dtraj_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.dtrajs_short = [dtraj_short for i in range(M)]
+self.B1_lag = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_lag = (M * numpy.array([[0, 1], [1, 1]]))
+self.B3_lag = (M * numpy.array([[2, 0], [0, 0]]))
+self.B1_sliding = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_sliding = (M * numpy.array([[1, 2], [1, 1]]))
+self.B3_sliding = (M * numpy.array([[2, 1], [0, 1]]))
+'Larger test cases'
+dtraj_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.dtrajs_long = [dtraj_long for i in range(M)]
+self.C1_lag = (M * numpy.loadtxt((testpath + 'C_1_lag.dat')))
+self.C7_lag = (M * numpy.loadtxt((testpath + 'C_7_lag.dat')))
+self.C13_lag = (M * numpy.loadtxt((testpath + 'C_13_lag.dat')))
+self.C1_sliding = (M * numpy.loadtxt((testpath + 'C_1_sliding.dat')))
+tempResult = loadtxt((testpath + 'C_7_sliding.dat'))
+	
+===================================================================	
+TestCountMatrixtMult.setUp: 99	
+----------------------------	
+
+M = 10
+self.M = M
+'Small test cases'
+dtraj_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.dtrajs_short = [dtraj_short for i in range(M)]
+self.B1_lag = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_lag = (M * numpy.array([[0, 1], [1, 1]]))
+self.B3_lag = (M * numpy.array([[2, 0], [0, 0]]))
+self.B1_sliding = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_sliding = (M * numpy.array([[1, 2], [1, 1]]))
+self.B3_sliding = (M * numpy.array([[2, 1], [0, 1]]))
+'Larger test cases'
+dtraj_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.dtrajs_long = [dtraj_long for i in range(M)]
+self.C1_lag = (M * numpy.loadtxt((testpath + 'C_1_lag.dat')))
+self.C7_lag = (M * numpy.loadtxt((testpath + 'C_7_lag.dat')))
+self.C13_lag = (M * numpy.loadtxt((testpath + 'C_13_lag.dat')))
+self.C1_sliding = (M * numpy.loadtxt((testpath + 'C_1_sliding.dat')))
+self.C7_sliding = (M * numpy.loadtxt((testpath + 'C_7_sliding.dat')))
+tempResult = loadtxt((testpath + 'C_13_sliding.dat'))
+	
+===================================================================	
+TestCountMatrix.setUp: 29	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+tempResult = loadtxt((testpath + 'dtraj.dat'))
+	
+===================================================================	
+TestCountMatrix.setUp: 30	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+self.S_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+tempResult = loadtxt((testpath + 'C_1_lag.dat'))
+	
+===================================================================	
+TestCountMatrix.setUp: 31	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+self.S_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.C1_lag = numpy.loadtxt((testpath + 'C_1_lag.dat'))
+tempResult = loadtxt((testpath + 'C_7_lag.dat'))
+	
+===================================================================	
+TestCountMatrix.setUp: 32	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+self.S_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.C1_lag = numpy.loadtxt((testpath + 'C_1_lag.dat'))
+self.C7_lag = numpy.loadtxt((testpath + 'C_7_lag.dat'))
+tempResult = loadtxt((testpath + 'C_13_lag.dat'))
+	
+===================================================================	
+TestCountMatrix.setUp: 33	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+self.S_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.C1_lag = numpy.loadtxt((testpath + 'C_1_lag.dat'))
+self.C7_lag = numpy.loadtxt((testpath + 'C_7_lag.dat'))
+self.C13_lag = numpy.loadtxt((testpath + 'C_13_lag.dat'))
+tempResult = loadtxt((testpath + 'C_1_sliding.dat'))
+	
+===================================================================	
+TestCountMatrix.setUp: 34	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+self.S_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.C1_lag = numpy.loadtxt((testpath + 'C_1_lag.dat'))
+self.C7_lag = numpy.loadtxt((testpath + 'C_7_lag.dat'))
+self.C13_lag = numpy.loadtxt((testpath + 'C_13_lag.dat'))
+self.C1_sliding = numpy.loadtxt((testpath + 'C_1_sliding.dat'))
+tempResult = loadtxt((testpath + 'C_7_sliding.dat'))
+	
+===================================================================	
+TestCountMatrix.setUp: 35	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+self.S_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.C1_lag = numpy.loadtxt((testpath + 'C_1_lag.dat'))
+self.C7_lag = numpy.loadtxt((testpath + 'C_7_lag.dat'))
+self.C13_lag = numpy.loadtxt((testpath + 'C_13_lag.dat'))
+self.C1_sliding = numpy.loadtxt((testpath + 'C_1_sliding.dat'))
+self.C7_sliding = numpy.loadtxt((testpath + 'C_7_sliding.dat'))
+tempResult = loadtxt((testpath + 'C_13_sliding.dat'))
+	
+===================================================================	
+TestCountMatrixBincountMult.setUp: 331	
+----------------------------	
+
+M = 10
+self.M = M
+'Small test cases'
+dtraj_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.dtrajs_short = [dtraj_short for i in range(M)]
+self.B1_lag = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_lag = (M * numpy.array([[0, 1], [1, 1]]))
+self.B3_lag = (M * numpy.array([[2, 0], [0, 0]]))
+self.B1_sliding = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_sliding = (M * numpy.array([[1, 2], [1, 1]]))
+self.B3_sliding = (M * numpy.array([[2, 1], [0, 1]]))
+'Larger test cases'
+tempResult = loadtxt((testpath + 'dtraj.dat'))
+	
+===================================================================	
+TestCountMatrixBincountMult.setUp: 333	
+----------------------------	
+
+M = 10
+self.M = M
+'Small test cases'
+dtraj_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.dtrajs_short = [dtraj_short for i in range(M)]
+self.B1_lag = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_lag = (M * numpy.array([[0, 1], [1, 1]]))
+self.B3_lag = (M * numpy.array([[2, 0], [0, 0]]))
+self.B1_sliding = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_sliding = (M * numpy.array([[1, 2], [1, 1]]))
+self.B3_sliding = (M * numpy.array([[2, 1], [0, 1]]))
+'Larger test cases'
+dtraj_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.dtrajs_long = [dtraj_long for i in range(M)]
+tempResult = loadtxt((testpath + 'C_1_lag.dat'))
+	
+===================================================================	
+TestCountMatrixBincountMult.setUp: 334	
+----------------------------	
+
+M = 10
+self.M = M
+'Small test cases'
+dtraj_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.dtrajs_short = [dtraj_short for i in range(M)]
+self.B1_lag = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_lag = (M * numpy.array([[0, 1], [1, 1]]))
+self.B3_lag = (M * numpy.array([[2, 0], [0, 0]]))
+self.B1_sliding = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_sliding = (M * numpy.array([[1, 2], [1, 1]]))
+self.B3_sliding = (M * numpy.array([[2, 1], [0, 1]]))
+'Larger test cases'
+dtraj_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.dtrajs_long = [dtraj_long for i in range(M)]
+self.C1_lag = (M * numpy.loadtxt((testpath + 'C_1_lag.dat')))
+tempResult = loadtxt((testpath + 'C_7_lag.dat'))
+	
+===================================================================	
+TestCountMatrixBincountMult.setUp: 335	
+----------------------------	
+
+M = 10
+self.M = M
+'Small test cases'
+dtraj_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.dtrajs_short = [dtraj_short for i in range(M)]
+self.B1_lag = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_lag = (M * numpy.array([[0, 1], [1, 1]]))
+self.B3_lag = (M * numpy.array([[2, 0], [0, 0]]))
+self.B1_sliding = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_sliding = (M * numpy.array([[1, 2], [1, 1]]))
+self.B3_sliding = (M * numpy.array([[2, 1], [0, 1]]))
+'Larger test cases'
+dtraj_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.dtrajs_long = [dtraj_long for i in range(M)]
+self.C1_lag = (M * numpy.loadtxt((testpath + 'C_1_lag.dat')))
+self.C7_lag = (M * numpy.loadtxt((testpath + 'C_7_lag.dat')))
+tempResult = loadtxt((testpath + 'C_13_lag.dat'))
+	
+===================================================================	
+TestCountMatrixBincountMult.setUp: 336	
+----------------------------	
+
+M = 10
+self.M = M
+'Small test cases'
+dtraj_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.dtrajs_short = [dtraj_short for i in range(M)]
+self.B1_lag = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_lag = (M * numpy.array([[0, 1], [1, 1]]))
+self.B3_lag = (M * numpy.array([[2, 0], [0, 0]]))
+self.B1_sliding = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_sliding = (M * numpy.array([[1, 2], [1, 1]]))
+self.B3_sliding = (M * numpy.array([[2, 1], [0, 1]]))
+'Larger test cases'
+dtraj_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.dtrajs_long = [dtraj_long for i in range(M)]
+self.C1_lag = (M * numpy.loadtxt((testpath + 'C_1_lag.dat')))
+self.C7_lag = (M * numpy.loadtxt((testpath + 'C_7_lag.dat')))
+self.C13_lag = (M * numpy.loadtxt((testpath + 'C_13_lag.dat')))
+tempResult = loadtxt((testpath + 'C_1_sliding.dat'))
+	
+===================================================================	
+TestCountMatrixBincountMult.setUp: 337	
+----------------------------	
+
+M = 10
+self.M = M
+'Small test cases'
+dtraj_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.dtrajs_short = [dtraj_short for i in range(M)]
+self.B1_lag = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_lag = (M * numpy.array([[0, 1], [1, 1]]))
+self.B3_lag = (M * numpy.array([[2, 0], [0, 0]]))
+self.B1_sliding = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_sliding = (M * numpy.array([[1, 2], [1, 1]]))
+self.B3_sliding = (M * numpy.array([[2, 1], [0, 1]]))
+'Larger test cases'
+dtraj_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.dtrajs_long = [dtraj_long for i in range(M)]
+self.C1_lag = (M * numpy.loadtxt((testpath + 'C_1_lag.dat')))
+self.C7_lag = (M * numpy.loadtxt((testpath + 'C_7_lag.dat')))
+self.C13_lag = (M * numpy.loadtxt((testpath + 'C_13_lag.dat')))
+self.C1_sliding = (M * numpy.loadtxt((testpath + 'C_1_sliding.dat')))
+tempResult = loadtxt((testpath + 'C_7_sliding.dat'))
+	
+===================================================================	
+TestCountMatrixBincountMult.setUp: 338	
+----------------------------	
+
+M = 10
+self.M = M
+'Small test cases'
+dtraj_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.dtrajs_short = [dtraj_short for i in range(M)]
+self.B1_lag = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_lag = (M * numpy.array([[0, 1], [1, 1]]))
+self.B3_lag = (M * numpy.array([[2, 0], [0, 0]]))
+self.B1_sliding = (M * numpy.array([[1, 2], [2, 1]]))
+self.B2_sliding = (M * numpy.array([[1, 2], [1, 1]]))
+self.B3_sliding = (M * numpy.array([[2, 1], [0, 1]]))
+'Larger test cases'
+dtraj_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.dtrajs_long = [dtraj_long for i in range(M)]
+self.C1_lag = (M * numpy.loadtxt((testpath + 'C_1_lag.dat')))
+self.C7_lag = (M * numpy.loadtxt((testpath + 'C_7_lag.dat')))
+self.C13_lag = (M * numpy.loadtxt((testpath + 'C_13_lag.dat')))
+self.C1_sliding = (M * numpy.loadtxt((testpath + 'C_1_sliding.dat')))
+self.C7_sliding = (M * numpy.loadtxt((testpath + 'C_7_sliding.dat')))
+tempResult = loadtxt((testpath + 'C_13_sliding.dat'))
+	
+===================================================================	
+TestCountMatrixCoo.setUp: 176	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+tempResult = loadtxt((testpath + 'dtraj.dat'))
+	
+===================================================================	
+TestCountMatrixCoo.setUp: 177	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+self.S_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+tempResult = loadtxt((testpath + 'C_1_lag.dat'))
+	
+===================================================================	
+TestCountMatrixCoo.setUp: 178	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+self.S_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.C1_lag = numpy.loadtxt((testpath + 'C_1_lag.dat'))
+tempResult = loadtxt((testpath + 'C_7_lag.dat'))
+	
+===================================================================	
+TestCountMatrixCoo.setUp: 179	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+self.S_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.C1_lag = numpy.loadtxt((testpath + 'C_1_lag.dat'))
+self.C7_lag = numpy.loadtxt((testpath + 'C_7_lag.dat'))
+tempResult = loadtxt((testpath + 'C_13_lag.dat'))
+	
+===================================================================	
+TestCountMatrixCoo.setUp: 180	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+self.S_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.C1_lag = numpy.loadtxt((testpath + 'C_1_lag.dat'))
+self.C7_lag = numpy.loadtxt((testpath + 'C_7_lag.dat'))
+self.C13_lag = numpy.loadtxt((testpath + 'C_13_lag.dat'))
+tempResult = loadtxt((testpath + 'C_1_sliding.dat'))
+	
+===================================================================	
+TestCountMatrixCoo.setUp: 181	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+self.S_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.C1_lag = numpy.loadtxt((testpath + 'C_1_lag.dat'))
+self.C7_lag = numpy.loadtxt((testpath + 'C_7_lag.dat'))
+self.C13_lag = numpy.loadtxt((testpath + 'C_13_lag.dat'))
+self.C1_sliding = numpy.loadtxt((testpath + 'C_1_sliding.dat'))
+tempResult = loadtxt((testpath + 'C_7_sliding.dat'))
+	
+===================================================================	
+TestCountMatrixCoo.setUp: 182	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+self.S_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.C1_lag = numpy.loadtxt((testpath + 'C_1_lag.dat'))
+self.C7_lag = numpy.loadtxt((testpath + 'C_7_lag.dat'))
+self.C13_lag = numpy.loadtxt((testpath + 'C_13_lag.dat'))
+self.C1_sliding = numpy.loadtxt((testpath + 'C_1_sliding.dat'))
+self.C7_sliding = numpy.loadtxt((testpath + 'C_7_sliding.dat'))
+tempResult = loadtxt((testpath + 'C_13_sliding.dat'))
+	
+===================================================================	
+TestCountMatrixBincount.setUp: 270	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+tempResult = loadtxt((testpath + 'dtraj.dat'))
+	
+===================================================================	
+TestCountMatrixBincount.setUp: 271	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+self.S_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+tempResult = loadtxt((testpath + 'C_1_lag.dat'))
+	
+===================================================================	
+TestCountMatrixBincount.setUp: 272	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+self.S_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.C1_lag = numpy.loadtxt((testpath + 'C_1_lag.dat'))
+tempResult = loadtxt((testpath + 'C_7_lag.dat'))
+	
+===================================================================	
+TestCountMatrixBincount.setUp: 273	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+self.S_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.C1_lag = numpy.loadtxt((testpath + 'C_1_lag.dat'))
+self.C7_lag = numpy.loadtxt((testpath + 'C_7_lag.dat'))
+tempResult = loadtxt((testpath + 'C_13_lag.dat'))
+	
+===================================================================	
+TestCountMatrixBincount.setUp: 274	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+self.S_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.C1_lag = numpy.loadtxt((testpath + 'C_1_lag.dat'))
+self.C7_lag = numpy.loadtxt((testpath + 'C_7_lag.dat'))
+self.C13_lag = numpy.loadtxt((testpath + 'C_13_lag.dat'))
+tempResult = loadtxt((testpath + 'C_1_sliding.dat'))
+	
+===================================================================	
+TestCountMatrixBincount.setUp: 275	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+self.S_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.C1_lag = numpy.loadtxt((testpath + 'C_1_lag.dat'))
+self.C7_lag = numpy.loadtxt((testpath + 'C_7_lag.dat'))
+self.C13_lag = numpy.loadtxt((testpath + 'C_13_lag.dat'))
+self.C1_sliding = numpy.loadtxt((testpath + 'C_1_sliding.dat'))
+tempResult = loadtxt((testpath + 'C_7_sliding.dat'))
+	
+===================================================================	
+TestCountMatrixBincount.setUp: 276	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+self.S_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.C1_lag = numpy.loadtxt((testpath + 'C_1_lag.dat'))
+self.C7_lag = numpy.loadtxt((testpath + 'C_7_lag.dat'))
+self.C13_lag = numpy.loadtxt((testpath + 'C_13_lag.dat'))
+self.C1_sliding = numpy.loadtxt((testpath + 'C_1_sliding.dat'))
+self.C7_sliding = numpy.loadtxt((testpath + 'C_7_sliding.dat'))
+tempResult = loadtxt((testpath + 'C_13_sliding.dat'))
+	
+===================================================================	
+TestCountMatrix.setUp: 49	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+tempResult = loadtxt((testpath + 'dtraj.dat'))
+	
+===================================================================	
+TestCountMatrix.setUp: 50	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+self.S_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+tempResult = loadtxt((testpath + 'C_1_lag.dat'))
+	
+===================================================================	
+TestCountMatrix.setUp: 51	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+self.S_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.C1_lag = numpy.loadtxt((testpath + 'C_1_lag.dat'))
+tempResult = loadtxt((testpath + 'C_7_lag.dat'))
+	
+===================================================================	
+TestCountMatrix.setUp: 52	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+self.S_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.C1_lag = numpy.loadtxt((testpath + 'C_1_lag.dat'))
+self.C7_lag = numpy.loadtxt((testpath + 'C_7_lag.dat'))
+tempResult = loadtxt((testpath + 'C_13_lag.dat'))
+	
+===================================================================	
+TestCountMatrix.setUp: 53	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+self.S_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.C1_lag = numpy.loadtxt((testpath + 'C_1_lag.dat'))
+self.C7_lag = numpy.loadtxt((testpath + 'C_7_lag.dat'))
+self.C13_lag = numpy.loadtxt((testpath + 'C_13_lag.dat'))
+tempResult = loadtxt((testpath + 'C_1_sliding.dat'))
+	
+===================================================================	
+TestCountMatrix.setUp: 54	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+self.S_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.C1_lag = numpy.loadtxt((testpath + 'C_1_lag.dat'))
+self.C7_lag = numpy.loadtxt((testpath + 'C_7_lag.dat'))
+self.C13_lag = numpy.loadtxt((testpath + 'C_13_lag.dat'))
+self.C1_sliding = numpy.loadtxt((testpath + 'C_1_sliding.dat'))
+tempResult = loadtxt((testpath + 'C_7_sliding.dat'))
+	
+===================================================================	
+TestCountMatrix.setUp: 55	
+----------------------------	
+
+'Small test cases'
+self.S_short = numpy.array([0, 0, 1, 0, 1, 1, 0])
+self.B1_lag = numpy.array([[1, 2], [2, 1]])
+self.B2_lag = numpy.array([[0, 1], [1, 1]])
+self.B3_lag = numpy.array([[2, 0], [0, 0]])
+self.B1_sliding = numpy.array([[1, 2], [2, 1]])
+self.B2_sliding = numpy.array([[1, 2], [1, 1]])
+self.B3_sliding = numpy.array([[2, 1], [0, 1]])
+'Larger test cases'
+self.S_long = np.loadtxt((testpath + 'dtraj.dat')).astype(int)
+self.C1_lag = numpy.loadtxt((testpath + 'C_1_lag.dat'))
+self.C7_lag = numpy.loadtxt((testpath + 'C_7_lag.dat'))
+self.C13_lag = numpy.loadtxt((testpath + 'C_13_lag.dat'))
+self.C1_sliding = numpy.loadtxt((testpath + 'C_1_sliding.dat'))
+self.C7_sliding = numpy.loadtxt((testpath + 'C_7_sliding.dat'))
+tempResult = loadtxt((testpath + 'C_13_sliding.dat'))
+	
+===================================================================	
+TestEffectiveCountMatrix.setUp: 13	
+----------------------------	
+
+testpath = (abspath(join(abspath(__file__), pardir)) + '/testfiles/')
+tempResult = loadtxt((testpath + 'dtraj.dat'), dtype=int)
+	
+===================================================================	
+Test_mle_trev.test_noninteger_counts_sparse: 51	
+----------------------------	
+
+tempResult = loadtxt((testpath + 'C_1_lag.dat'))
+	
+===================================================================	
+Test_mle_trev.test_mle_trev: 20	
+----------------------------	
+
+tempResult = loadtxt((testpath + 'C_1_lag.dat'))
+	
+===================================================================	
+Test_mle_trev.test_noninteger_counts_dense: 59	
+----------------------------	
+
+tempResult = loadtxt((testpath + 'C_1_lag.dat'))
+	
+===================================================================	
+Test_mle_trev.test_warnings: 38	
+----------------------------	
+
+tempResult = loadtxt((testpath + 'C_1_lag.dat'))
+	
+===================================================================	
+Test_mle_trev_given_pi.test_warnings: 64	
+----------------------------	
+
+tempResult = loadtxt((testpath + 'C_1_lag.dat'))
+	
+===================================================================	
+Test_mle_trev_given_pi.test_warnings: 65	
+----------------------------	
+
+C = numpy.loadtxt((testpath + 'C_1_lag.dat'))
+tempResult = loadtxt((testpath + 'pi.dat'))
+	
+===================================================================	
+Test_mle_trev_given_pi.test_mle_trev_given_pi: 25	
+----------------------------	
+
+tempResult = loadtxt((testpath + 'C_1_lag.dat'))
+	
+===================================================================	
+Test_mle_trev_given_pi.test_mle_trev_given_pi: 26	
+----------------------------	
+
+C = numpy.loadtxt((testpath + 'C_1_lag.dat'))
+tempResult = loadtxt((testpath + 'pi.dat'))
+	
+===================================================================	
+read_matrix_dense: 32	
+----------------------------	
+
+tempResult = loadtxt(filename, dtype=dtype, comments=comments)
+	
+===================================================================	
+read_matrix_sparse: 44	
+----------------------------	
+
+tempResult = loadtxt(filename, comments=comments, dtype=dtype)
+	
+===================================================================	
+TestWriteMatrixDense.test_write_matrix_dense: 102	
+----------------------------	
+
+matrix.write_matrix_dense(self.filename_int, self.A_int, fmt='%d')
+tempResult = loadtxt(self.filename_int, dtype=numpy.int)
+	
+===================================================================	
+TestWriteMatrixDense.test_write_matrix_dense: 105	
+----------------------------	
+
+matrix.write_matrix_dense(self.filename_int, self.A_int, fmt='%d')
+An = numpy.loadtxt(self.filename_int, dtype=numpy.int)
+self.assertTrue(numpy.all((An == self.A_int)))
+matrix.write_matrix_dense(self.filename_float, self.A_float)
+tempResult = loadtxt(self.filename_int)
+	
+===================================================================	
+TestWriteMatrixDense.test_write_matrix_dense: 108	
+----------------------------	
+
+matrix.write_matrix_dense(self.filename_int, self.A_int, fmt='%d')
+An = numpy.loadtxt(self.filename_int, dtype=numpy.int)
+self.assertTrue(numpy.all((An == self.A_int)))
+matrix.write_matrix_dense(self.filename_float, self.A_float)
+An = numpy.loadtxt(self.filename_int)
+self.assertTrue(numpy.all((An == self.A_float)))
+matrix.write_matrix_dense(self.filename_complex, self.A_complex)
+tempResult = loadtxt(self.filename_complex, dtype=numpy.complex)
+	
+===================================================================	
+TestLoadMatrixSparse.test_load_matrix_sparse: 267	
+----------------------------	
+
+tempResult = loadtxt(self.reference_int, dtype=numpy.int)
+	
+===================================================================	
+TestLoadMatrixSparse.test_load_matrix_sparse: 270	
+----------------------------	
+
+A = numpy.loadtxt(self.reference_int, dtype=numpy.int)
+A_n = matrix.load_matrix_sparse(self.filename_int).toarray()
+self.assertTrue(numpy.all((A == A_n)))
+tempResult = loadtxt(self.reference_float)
+	
+===================================================================	
+TestLoadMatrixSparse.test_load_matrix_sparse: 273	
+----------------------------	
+
+A = numpy.loadtxt(self.reference_int, dtype=numpy.int)
+A_n = matrix.load_matrix_sparse(self.filename_int).toarray()
+self.assertTrue(numpy.all((A == A_n)))
+A = numpy.loadtxt(self.reference_float)
+A_n = matrix.load_matrix_sparse(self.filename_float).toarray()
+self.assertTrue(numpy.all((A == A_n)))
+tempResult = loadtxt(self.reference_complex, dtype=numpy.complex)
+	
+===================================================================	
+TestReadMatrixDense.setUp: 70	
+----------------------------	
+
+self.filename_int = (testpath + 'matrix_int.dat')
+self.filename_float = (testpath + 'matrix_float.dat')
+self.filename_complex = (testpath + 'matrix_complex.dat')
+tempResult = loadtxt(self.filename_int, dtype=numpy.int)
+	
+===================================================================	
+TestReadMatrixDense.setUp: 71	
+----------------------------	
+
+self.filename_int = (testpath + 'matrix_int.dat')
+self.filename_float = (testpath + 'matrix_float.dat')
+self.filename_complex = (testpath + 'matrix_complex.dat')
+self.A_int = numpy.loadtxt(self.filename_int, dtype=numpy.int)
+tempResult = loadtxt(self.filename_float, dtype=numpy.float)
+	
+===================================================================	
+TestWriteMatrixSparse.test_write_matrix_sparse: 184	
+----------------------------	
+
+matrix.write_matrix_sparse(self.filename_int, self.A_int, fmt='%d')
+tempResult = loadtxt(self.filename_int, dtype=numpy.int)
+	
+===================================================================	
+TestWriteMatrixSparse.test_write_matrix_sparse: 191	
+----------------------------	
+
+matrix.write_matrix_sparse(self.filename_int, self.A_int, fmt='%d')
+coo_n = numpy.loadtxt(self.filename_int, dtype=numpy.int)
+'Create sparse matrix from coo data'
+A_n = self.sparse_matrix_from_coo(coo_n)
+diff = (self.A_int - A_n).tocsr()
+'Check for empty array of non-zero entries'
+self.assertTrue(numpy.all((diff.data == 0.0)))
+matrix.write_matrix_sparse(self.filename_float, self.A_float)
+tempResult = loadtxt(self.filename_float, dtype=numpy.float)
+	
+===================================================================	
+TestWriteMatrixSparse.test_write_matrix_sparse: 198	
+----------------------------	
+
+matrix.write_matrix_sparse(self.filename_int, self.A_int, fmt='%d')
+coo_n = numpy.loadtxt(self.filename_int, dtype=numpy.int)
+'Create sparse matrix from coo data'
+A_n = self.sparse_matrix_from_coo(coo_n)
+diff = (self.A_int - A_n).tocsr()
+'Check for empty array of non-zero entries'
+self.assertTrue(numpy.all((diff.data == 0.0)))
+matrix.write_matrix_sparse(self.filename_float, self.A_float)
+coo_n = numpy.loadtxt(self.filename_float, dtype=numpy.float)
+'Create sparse matrix from coo data'
+A_n = self.sparse_matrix_from_coo(coo_n)
+diff = (self.A_float - A_n).tocsr()
+'Check for empty array of non-zero entries'
+self.assertTrue(numpy.all((diff.data == 0.0)))
+matrix.write_matrix_sparse(self.filename_complex, self.A_complex)
+tempResult = loadtxt(self.filename_complex, dtype=numpy.complex)
+	
+===================================================================	
+TestReadMatrixSparse.test_read_matrix_sparse: 126	
+----------------------------	
+
+tempResult = loadtxt(self.reference_int, dtype=numpy.int)
+	
+===================================================================	
+TestReadMatrixSparse.test_read_matrix_sparse: 129	
+----------------------------	
+
+A = numpy.loadtxt(self.reference_int, dtype=numpy.int)
+A_n = matrix.read_matrix_sparse(self.filename_int, dtype=np.int).toarray()
+self.assertTrue(numpy.all((A == A_n)))
+tempResult = loadtxt(self.reference_float)
+	
+===================================================================	
+TestReadMatrixSparse.test_read_matrix_sparse: 132	
+----------------------------	
+
+A = numpy.loadtxt(self.reference_int, dtype=numpy.int)
+A_n = matrix.read_matrix_sparse(self.filename_int, dtype=np.int).toarray()
+self.assertTrue(numpy.all((A == A_n)))
+A = numpy.loadtxt(self.reference_float)
+A_n = matrix.read_matrix_sparse(self.filename_float).toarray()
+self.assertTrue(numpy.all((A == A_n)))
+tempResult = loadtxt(self.reference_complex, dtype=numpy.complex)
+	
+***************************************************	
+nilearn_nilearn-0.4.0: 2	
+===================================================================	
+fetch_abide_pcp: 322	
+----------------------------	
+
+' Fetch ABIDE dataset\n\n    Fetch the Autism Brain Imaging Data Exchange (ABIDE) dataset wrt criteria\n    that can be passed as parameter. Note that this is the preprocessed\n    version of ABIDE provided by the preprocess connectome projects (PCP).\n\n    Parameters\n    ----------\n\n    data_dir: string, optional\n        Path of the data directory. Used to force data storage in a specified\n        location. Default: None\n\n    n_subjects: int, optional\n        The number of subjects to load. If None is given,\n        all available subjects are used (this number depends on the\n        preprocessing pipeline used).\n\n    pipeline: string, optional\n        Possible pipelines are "ccs", "cpac", "dparsf" and "niak"\n\n    band_pass_filtering: boolean, optional\n        Due to controversies in the literature, band pass filtering is\n        optional. If true, signal is band filtered between 0.01Hz and 0.1Hz.\n\n    global_signal_regression: boolean optional\n        Indicates if global signal regression should be applied on the\n        signals.\n\n    derivatives: string list, optional\n        Types of downloaded files. Possible values are: alff, degree_binarize,\n        degree_weighted, dual_regression, eigenvector_binarize,\n        eigenvector_weighted, falff, func_mask, func_mean, func_preproc, lfcd,\n        reho, rois_aal, rois_cc200, rois_cc400, rois_dosenbach160, rois_ez,\n        rois_ho, rois_tt, and vmhc. Please refer to the PCP site for more\n        details.\n\n    quality_checked: boolean, optional\n        if true (default), restrict the list of the subjects to the one that\n        passed quality assessment for all raters.\n\n    kwargs: parameter list, optional\n        Any extra keyword argument will be used to filter downloaded subjects\n        according to the CSV phenotypic file. Some examples of filters are\n        indicated below.\n\n    SUB_ID: list of integers in [50001, 50607], optional\n        Ids of the subjects to be loaded.\n\n    DX_GROUP: integer in {1, 2}, optional\n        1 is autism, 2 is control\n\n    DSM_IV_TR: integer in [0, 4], optional\n        O is control, 1 is autism, 2 is Asperger, 3 is PPD-NOS,\n        4 is Asperger or PPD-NOS\n\n    AGE_AT_SCAN: float in [6.47, 64], optional\n        Age of the subject\n\n    SEX: integer in {1, 2}, optional\n        1 is male, 2 is female\n\n    HANDEDNESS_CATEGORY: string in {\'R\', \'L\', \'Mixed\', \'Ambi\'}, optional\n        R = Right, L = Left, Ambi = Ambidextrous\n\n    HANDEDNESS_SCORE: integer in [-100, 100], optional\n        Positive = Right, Negative = Left, 0 = Ambidextrous\n\n    Notes\n    -----\n    Code and description of preprocessing pipelines are provided on the\n    `PCP website <http://preprocessed-connectomes-project.github.io/>`.\n\n    References\n    ----------\n    Nielsen, Jared A., et al. "Multisite functional connectivity MRI\n    classification of autism: ABIDE results." Frontiers in human neuroscience\n    7 (2013).\n    '
+if isinstance(derivatives, _basestring):
+    derivatives = [derivatives]
+for derivative in derivatives:
+    if (derivative not in ['alff', 'degree_binarize', 'degree_weighted', 'dual_regression', 'eigenvector_binarize', 'eigenvector_weighted', 'falff', 'func_mask', 'func_mean', 'func_preproc', 'lfcd', 'reho', 'rois_aal', 'rois_cc200', 'rois_cc400', 'rois_dosenbach160', 'rois_ez', 'rois_ho', 'rois_tt', 'vmhc']):
+        raise KeyError(('%s is not a valid derivative' % derivative))
+strategy = ''
+if (not band_pass_filtering):
+    strategy += 'no'
+strategy += 'filt_'
+if (not global_signal_regression):
+    strategy += 'no'
+strategy += 'global'
+dataset_name = 'ABIDE_pcp'
+data_dir = _get_dataset_dir(dataset_name, data_dir=data_dir, verbose=verbose)
+if (url is None):
+    url = 'https://s3.amazonaws.com/fcp-indi/data/Projects/ABIDE_Initiative'
+if quality_checked:
+    kwargs['qc_rater_1'] = b'OK'
+    kwargs['qc_anat_rater_2'] = [b'OK', b'maybe']
+    kwargs['qc_func_rater_2'] = [b'OK', b'maybe']
+    kwargs['qc_anat_rater_3'] = b'OK'
+    kwargs['qc_func_rater_3'] = b'OK'
+csv = 'Phenotypic_V1_0b_preprocessed1.csv'
+path_csv = _fetch_files(data_dir, [(csv, ((url + '/') + csv), {})], verbose=verbose)[0]
+with open(path_csv, 'r') as pheno_f:
+    pheno = [('i' + pheno_f.readline())]
+    for line in pheno_f:
+        pheno.append(re.sub(',(?=[^"]*"(?:[^"]*"[^"]*")*[^"]*$)', ';', line))
+pheno = '\n'.join(pheno).encode()
+pheno = BytesIO(pheno)
+pheno = numpy.recfromcsv(pheno, comments='$', case_sensitive=True)
+pheno = pheno[(pheno['FILE_ID'] != b'no_filename')]
+user_filter = _filter_columns(pheno, kwargs)
+pheno = pheno[user_filter]
+data_dir = os.path.join(data_dir, pipeline, strategy)
+url = '/'.join([url, 'Outputs', pipeline, strategy])
+results = {}
+file_ids = [file_id.decode() for file_id in pheno['FILE_ID']]
+if (n_subjects is not None):
+    file_ids = file_ids[:n_subjects]
+    pheno = pheno[:n_subjects]
+results['description'] = _get_dataset_descr(dataset_name)
+results['phenotypic'] = pheno
+for derivative in derivatives:
+    ext = ('.1D' if derivative.startswith('rois') else '.nii.gz')
+    files = []
+    for file_id in file_ids:
+        file_ = [((((file_id + '_') + derivative) + ext), '/'.join([url, derivative, (((file_id + '_') + derivative) + ext)]), {})]
+        files.append(_fetch_files(data_dir, file_, verbose=verbose)[0])
+    if (ext == '.1D'):
+        tempResult = loadtxt(f)
+	
+===================================================================	
+_load_uniform_ball_cloud: 33	
+----------------------------	
+
+stored_points = os.path.abspath(os.path.join(__file__, '..', 'data', 'ball_cloud_{}_samples.csv'.format(n_points)))
+if os.path.isfile(stored_points):
+    tempResult = loadtxt(stored_points)
+	
+***************************************************	
+poliastro_poliastro-0.8.0: 0	
+***************************************************	
+skimage_skimage-0.13.0: 1	
+===================================================================	
+load_ciede2000_data: 25	
+----------------------------	
+
+dtype = [('pair', int), ('1', int), ('L1', float), ('a1', float), ('b1', float), ('a1_prime', float), ('C1_prime', float), ('h1_prime', float), ('hbar_prime', float), ('G', float), ('T', float), ('SL', float), ('SC', float), ('SH', float), ('RT', float), ('dE', float), ('2', int), ('L2', float), ('a2', float), ('b2', float), ('a2_prime', float), ('C2_prime', float), ('h2_prime', float)]
+path = pjoin(dirname(abspath(__file__)), 'ciede2000_test_data.txt')
+tempResult = loadtxt(path, dtype=dtype)
+	
+***************************************************	
+sunpy_sunpy-0.8.0: 0	
+***************************************************	
+spacetelescope_synphot-0.1: 0	
+***************************************************	
+librosa_librosa-0.5.1: 0	
+***************************************************	
+mne_python-0.15.0: 13	
+===================================================================	
+read_head_pos: 17	
+----------------------------	
+
+'Read MaxFilter-formatted head position parameters.\n\n    Parameters\n    ----------\n    fname : str\n        The filename to read. This can be produced by e.g.,\n        ``maxfilter -headpos <name>.pos``.\n\n    Returns\n    -------\n    pos : array, shape (N, 10)\n        The position and quaternion parameters from cHPI fitting.\n\n    See Also\n    --------\n    write_head_pos\n    head_pos_to_trans_rot_t\n\n    Notes\n    -----\n    .. versionadded:: 0.12\n    '
+_check_fname(fname, must_exist=True, overwrite='read')
+tempResult = loadtxt(fname, skiprows=1)
+	
+===================================================================	
+read_events: 115	
+----------------------------	
+
+'Read events from fif or text file.\n\n    See :ref:`tut_epoching_and_averaging` as well as :ref:`ex_read_events`\n    for more information about events.\n\n    Parameters\n    ----------\n    filename : string\n        Name of the input file.\n        If the extension is .fif, events are read assuming\n        the file is in FIF format, otherwise (e.g., .eve,\n        .lst, .txt) events are read as coming from text.\n        Note that new format event files do not contain\n        the "time" column (used to be the second column).\n    include : int | list | None\n        A event id to include or a list of them.\n        If None all events are included.\n    exclude : int | list | None\n        A event id to exclude or a list of them.\n        If None no event is excluded. If include is not None\n        the exclude parameter is ignored.\n    mask : int | None\n        The value of the digital mask to apply to the stim channel values.\n        If None (default), no masking is performed.\n    mask_type: \'and\' | \'not_and\'\n        The type of operation between the mask and the trigger.\n        Choose \'and\' for MNE-C masking behavior. The default (\'not_and\')\n        will change to \'and\' in 0.16.\n\n        .. versionadded:: 0.13\n\n    Returns\n    -------\n    events: array, shape (n_events, 3)\n        The list of events\n\n    See Also\n    --------\n    find_events, write_events\n\n    Notes\n    -----\n    This function will discard the offset line (i.e., first line with zero\n    event number) if it is present in a text file.\n\n    For more information on ``mask`` and ``mask_type``, see\n    :func:`mne.find_events`.\n    '
+check_fname(filename, 'events', ('.eve', '-eve.fif', '-eve.fif.gz', '-eve.lst', '-eve.txt'))
+ext = splitext(filename)[1].lower()
+if ((ext == '.fif') or (ext == '.gz')):
+    (fid, tree, _) = fiff_open(filename)
+    try:
+        (event_list, _) = _read_events_fif(fid, tree)
+    finally:
+        fid.close()
+else:
+    tempResult = loadtxt(filename, dtype=numpy.float64)
+	
+===================================================================	
+read_montage: 125	
+----------------------------	
+"Read a generic (built-in) montage.\n\n    Individualized (digitized) electrode positions should be read in using\n    :func:`read_dig_montage`.\n\n    In most cases, you should only need to set the `kind` parameter to load one\n    of the built-in montages (see Notes).\n\n    Parameters\n    ----------\n    kind : str\n        The name of the montage file without the file extension (e.g.\n        kind='easycap-M10' for 'easycap-M10.txt'). Files with extensions\n        '.elc', '.txt', '.csd', '.elp', '.hpts', '.sfp', '.loc' ('.locs' and\n        '.eloc') or .bvef are supported.\n    ch_names : list of str | None\n        If not all electrodes defined in the montage are present in the EEG\n        data, use this parameter to select a subset of electrode positions to\n        load. If None (default), all defined electrode positions are returned.\n\n        .. note:: ``ch_names`` are compared to channel names in the montage\n                  file after converting them both to upper case. If a match is\n                  found, the letter case in the original ``ch_names`` is used\n                  in the returned montage.\n\n    path : str | None\n        The path of the folder containing the montage file. Defaults to the\n        mne/channels/data/montages folder in your mne-python installation.\n    unit : 'm' | 'cm' | 'mm'\n        Unit of the input file. If not 'm' (default), coordinates will be\n        rescaled to 'm'.\n    transform : bool\n        If True, points will be transformed to Neuromag space. The fidicuals,\n        'nasion', 'lpa', 'rpa' must be specified in the montage file. Useful\n        for points captured using Polhemus FastSCAN. Default is False.\n\n    Returns\n    -------\n    montage : instance of Montage\n        The montage.\n\n    See Also\n    --------\n    DigMontage\n    Montage\n    read_dig_montage\n\n    Notes\n    -----\n    Built-in montages are not scaled or transformed by default.\n\n    Montages can contain fiducial points in addition to electrode channels,\n    e.g. ``biosemi64`` contains 67 locations. In the following table, the\n    number of channels and fiducials is given in parentheses in the description\n    column (e.g. 64+3 means 64 channels and 3 fiducials).\n\n    Valid ``kind`` arguments are:\n\n    ===================   =====================================================\n    Kind                  Description\n    ===================   =====================================================\n    standard_1005         Electrodes are named and positioned according to the\n                          international 10-05 system (343+3 locations)\n    standard_1020         Electrodes are named and positioned according to the\n                          international 10-20 system (94+3 locations)\n    standard_alphabetic   Electrodes are named with LETTER-NUMBER combinations\n                          (A1, B2, F4, ...) (65+3 locations)\n    standard_postfixed    Electrodes are named according to the international\n                          10-20 system using postfixes for intermediate\n                          positions (100+3 locations)\n    standard_prefixed     Electrodes are named according to the international\n                          10-20 system using prefixes for intermediate\n                          positions (74+3 locations)\n    standard_primed       Electrodes are named according to the international\n                          10-20 system using prime marks (' and '') for\n                          intermediate positions (100+3 locations)\n\n    biosemi16             BioSemi cap with 16 electrodes (16+3 locations)\n    biosemi32             BioSemi cap with 32 electrodes (32+3 locations)\n    biosemi64             BioSemi cap with 64 electrodes (64+3 locations)\n    biosemi128            BioSemi cap with 128 electrodes (128+3 locations)\n    biosemi160            BioSemi cap with 160 electrodes (160+3 locations)\n    biosemi256            BioSemi cap with 256 electrodes (256+3 locations)\n\n    easycap-M1            EasyCap with 10-05 electrode names (74 locations)\n    easycap-M10           EasyCap with numbered electrodes (61 locations)\n\n    EGI_256               Geodesic Sensor Net (256 locations)\n\n    GSN-HydroCel-32       HydroCel Geodesic Sensor Net and Cz (33+3 locations)\n    GSN-HydroCel-64_1.0   HydroCel Geodesic Sensor Net (64+3 locations)\n    GSN-HydroCel-65_1.0   HydroCel Geodesic Sensor Net and Cz (65+3 locations)\n    GSN-HydroCel-128      HydroCel Geodesic Sensor Net (128+3 locations)\n    GSN-HydroCel-129      HydroCel Geodesic Sensor Net and Cz (129+3 locations)\n    GSN-HydroCel-256      HydroCel Geodesic Sensor Net (256+3 locations)\n    GSN-HydroCel-257      HydroCel Geodesic Sensor Net and Cz (257+3 locations)\n\n    mgh60                 The (older) 60-channel cap used at\n                          MGH (60+3 locations)\n    mgh70                 The (newer) 70-channel BrainVision cap used at\n                          MGH (70+3 locations)\n    ===================   =====================================================\n\n    .. versionadded:: 0.9.0\n    "
+if (path is None):
+    path = op.join(op.dirname(__file__), 'data', 'montages')
+if (not op.isabs(kind)):
+    supported = ('.elc', '.txt', '.csd', '.sfp', '.elp', '.hpts', '.loc', '.locs', '.eloc', '.bvef')
+    montages = [op.splitext(f) for f in os.listdir(path)]
+    montages = [m for m in montages if ((m[1] in supported) and (kind == m[0]))]
+    if (len(montages) != 1):
+        raise ValueError('Could not find the montage. Please provide the full path.')
+    (kind, ext) = montages[0]
+else:
+    (kind, ext) = op.splitext(kind)
+fname = op.join(path, (kind + ext))
+fid_names = ['lpa', 'nz', 'rpa']
+if (ext == '.sfp'):
+    fid_names = ['fidt9', 'fidnz', 'fidt10']
+    with open(fname, 'r') as f:
+        lines = f.read().replace('\t', ' ').splitlines()
+    (ch_names_, pos) = ([], [])
+    for (ii, line) in enumerate(lines):
+        line = line.strip().split()
+        if (len(line) > 0):
+            if (len(line) != 4):
+                raise ValueError(('Malformed .sfp file in line ' + str(ii)))
+            (this_name, x, y, z) = line
+            ch_names_.append(this_name)
+            pos.append([float(cord) for cord in (x, y, z)])
+    pos = np.asarray(pos)
+elif (ext == '.elc'):
+    ch_names_ = []
+    pos = []
+    with open(fname) as fid:
+        for line in fid:
+            if ('UnitPosition' in line):
+                units = line.split()[1]
+                scale_factor = dict(m=1.0, mm=0.001)[units]
+                break
+        else:
+            raise RuntimeError(('Could not detect units in file %s' % fname))
+        for line in fid:
+            if ('Positions\n' in line):
+                break
+        pos = []
+        for line in fid:
+            if ('Labels\n' in line):
+                break
+            pos.append(list(map(float, line.split())))
+        for line in fid:
+            if ((not line) or (not (set(line) - set([' '])))):
+                break
+            ch_names_.append(line.strip(' ').strip('\n'))
+    pos = (np.array(pos) * scale_factor)
+elif (ext == '.txt'):
+    try:
+        data = np.genfromtxt(fname, dtype='str', skip_header=1)
+    except TypeError:
+        data = np.genfromtxt(fname, dtype='str', skiprows=1)
+    ch_names_ = data[:, 0].tolist()
+    az = np.deg2rad(data[:, 2].astype(float))
+    pol = np.deg2rad(data[:, 1].astype(float))
+    pos = _sph_to_cart(np.array([(np.ones(len(az)) * 85.0), az, pol]).T)
+elif (ext == '.csd'):
+    try:
+        data = np.genfromtxt(fname, dtype='str', skip_header=2)
+    except TypeError:
+        data = np.genfromtxt(fname, dtype='str', skiprows=2)
+    ch_names_ = data[:, 0].tolist()
+    az = np.deg2rad(data[:, 1].astype(float))
+    pol = np.deg2rad((90.0 - data[:, 2].astype(float)))
+    pos = _sph_to_cart(np.array([np.ones(len(az)), az, pol]).T)
+elif (ext == '.elp'):
+    dtype = np.dtype('S8, S8, f8, f8, f8')
+    try:
+        tempResult = loadtxt(fname, dtype=dtype, skip_header=1)	
+===================================================================	
+read_montage: 127	
+----------------------------	
+
+"Read a generic (built-in) montage.\n\n    Individualized (digitized) electrode positions should be read in using\n    :func:`read_dig_montage`.\n\n    In most cases, you should only need to set the `kind` parameter to load one\n    of the built-in montages (see Notes).\n\n    Parameters\n    ----------\n    kind : str\n        The name of the montage file without the file extension (e.g.\n        kind='easycap-M10' for 'easycap-M10.txt'). Files with extensions\n        '.elc', '.txt', '.csd', '.elp', '.hpts', '.sfp', '.loc' ('.locs' and\n        '.eloc') or .bvef are supported.\n    ch_names : list of str | None\n        If not all electrodes defined in the montage are present in the EEG\n        data, use this parameter to select a subset of electrode positions to\n        load. If None (default), all defined electrode positions are returned.\n\n        .. note:: ``ch_names`` are compared to channel names in the montage\n                  file after converting them both to upper case. If a match is\n                  found, the letter case in the original ``ch_names`` is used\n                  in the returned montage.\n\n    path : str | None\n        The path of the folder containing the montage file. Defaults to the\n        mne/channels/data/montages folder in your mne-python installation.\n    unit : 'm' | 'cm' | 'mm'\n        Unit of the input file. If not 'm' (default), coordinates will be\n        rescaled to 'm'.\n    transform : bool\n        If True, points will be transformed to Neuromag space. The fidicuals,\n        'nasion', 'lpa', 'rpa' must be specified in the montage file. Useful\n        for points captured using Polhemus FastSCAN. Default is False.\n\n    Returns\n    -------\n    montage : instance of Montage\n        The montage.\n\n    See Also\n    --------\n    DigMontage\n    Montage\n    read_dig_montage\n\n    Notes\n    -----\n    Built-in montages are not scaled or transformed by default.\n\n    Montages can contain fiducial points in addition to electrode channels,\n    e.g. ``biosemi64`` contains 67 locations. In the following table, the\n    number of channels and fiducials is given in parentheses in the description\n    column (e.g. 64+3 means 64 channels and 3 fiducials).\n\n    Valid ``kind`` arguments are:\n\n    ===================   =====================================================\n    Kind                  Description\n    ===================   =====================================================\n    standard_1005         Electrodes are named and positioned according to the\n                          international 10-05 system (343+3 locations)\n    standard_1020         Electrodes are named and positioned according to the\n                          international 10-20 system (94+3 locations)\n    standard_alphabetic   Electrodes are named with LETTER-NUMBER combinations\n                          (A1, B2, F4, ...) (65+3 locations)\n    standard_postfixed    Electrodes are named according to the international\n                          10-20 system using postfixes for intermediate\n                          positions (100+3 locations)\n    standard_prefixed     Electrodes are named according to the international\n                          10-20 system using prefixes for intermediate\n                          positions (74+3 locations)\n    standard_primed       Electrodes are named according to the international\n                          10-20 system using prime marks (' and '') for\n                          intermediate positions (100+3 locations)\n\n    biosemi16             BioSemi cap with 16 electrodes (16+3 locations)\n    biosemi32             BioSemi cap with 32 electrodes (32+3 locations)\n    biosemi64             BioSemi cap with 64 electrodes (64+3 locations)\n    biosemi128            BioSemi cap with 128 electrodes (128+3 locations)\n    biosemi160            BioSemi cap with 160 electrodes (160+3 locations)\n    biosemi256            BioSemi cap with 256 electrodes (256+3 locations)\n\n    easycap-M1            EasyCap with 10-05 electrode names (74 locations)\n    easycap-M10           EasyCap with numbered electrodes (61 locations)\n\n    EGI_256               Geodesic Sensor Net (256 locations)\n\n    GSN-HydroCel-32       HydroCel Geodesic Sensor Net and Cz (33+3 locations)\n    GSN-HydroCel-64_1.0   HydroCel Geodesic Sensor Net (64+3 locations)\n    GSN-HydroCel-65_1.0   HydroCel Geodesic Sensor Net and Cz (65+3 locations)\n    GSN-HydroCel-128      HydroCel Geodesic Sensor Net (128+3 locations)\n    GSN-HydroCel-129      HydroCel Geodesic Sensor Net and Cz (129+3 locations)\n    GSN-HydroCel-256      HydroCel Geodesic Sensor Net (256+3 locations)\n    GSN-HydroCel-257      HydroCel Geodesic Sensor Net and Cz (257+3 locations)\n\n    mgh60                 The (older) 60-channel cap used at\n                          MGH (60+3 locations)\n    mgh70                 The (newer) 70-channel BrainVision cap used at\n                          MGH (70+3 locations)\n    ===================   =====================================================\n\n    .. versionadded:: 0.9.0\n    "
+if (path is None):
+    path = os.path.join(os.path.dirname(__file__), 'data', 'montages')
+if (not os.path.isabs(kind)):
+    supported = ('.elc', '.txt', '.csd', '.sfp', '.elp', '.hpts', '.loc', '.locs', '.eloc', '.bvef')
+    montages = [os.path.splitext(f) for f in os.listdir(path)]
+    montages = [m for m in montages if ((m[1] in supported) and (kind == m[0]))]
+    if (len(montages) != 1):
+        raise ValueError('Could not find the montage. Please provide the full path.')
+    (kind, ext) = montages[0]
+else:
+    (kind, ext) = os.path.splitext(kind)
+fname = os.path.join(path, (kind + ext))
+fid_names = ['lpa', 'nz', 'rpa']
+if (ext == '.sfp'):
+    fid_names = ['fidt9', 'fidnz', 'fidt10']
+    with open(fname, 'r') as f:
+        lines = f.read().replace('\t', ' ').splitlines()
+    (ch_names_, pos) = ([], [])
+    for (ii, line) in enumerate(lines):
+        line = line.strip().split()
+        if (len(line) > 0):
+            if (len(line) != 4):
+                raise ValueError(('Malformed .sfp file in line ' + str(ii)))
+            (this_name, x, y, z) = line
+            ch_names_.append(this_name)
+            pos.append([float(cord) for cord in (x, y, z)])
+    pos = numpy.asarray(pos)
+elif (ext == '.elc'):
+    ch_names_ = []
+    pos = []
+    with open(fname) as fid:
+        for line in fid:
+            if ('UnitPosition' in line):
+                units = line.split()[1]
+                scale_factor = dict(m=1.0, mm=0.001)[units]
+                break
+        else:
+            raise RuntimeError(('Could not detect units in file %s' % fname))
+        for line in fid:
+            if ('Positions\n' in line):
+                break
+        pos = []
+        for line in fid:
+            if ('Labels\n' in line):
+                break
+            pos.append(list(map(float, line.split())))
+        for line in fid:
+            if ((not line) or (not (set(line) - set([' '])))):
+                break
+            ch_names_.append(line.strip(' ').strip('\n'))
+    pos = (numpy.array(pos) * scale_factor)
+elif (ext == '.txt'):
+    try:
+        data = numpy.genfromtxt(fname, dtype='str', skip_header=1)
+    except TypeError:
+        data = numpy.genfromtxt(fname, dtype='str', skiprows=1)
+    ch_names_ = data[:, 0].tolist()
+    az = numpy.deg2rad(data[:, 2].astype(float))
+    pol = numpy.deg2rad(data[:, 1].astype(float))
+    pos = _sph_to_cart(np.array([(np.ones(len(az)) * 85.0), az, pol]).T)
+elif (ext == '.csd'):
+    try:
+        data = numpy.genfromtxt(fname, dtype='str', skip_header=2)
+    except TypeError:
+        data = numpy.genfromtxt(fname, dtype='str', skiprows=2)
+    ch_names_ = data[:, 0].tolist()
+    az = numpy.deg2rad(data[:, 1].astype(float))
+    pol = numpy.deg2rad((90.0 - data[:, 2].astype(float)))
+    pos = _sph_to_cart(np.array([np.ones(len(az)), az, pol]).T)
+elif (ext == '.elp'):
+    dtype = numpy.dtype('S8, S8, f8, f8, f8')
+    try:
+        data = numpy.loadtxt(fname, dtype=dtype, skip_header=1)
+    except TypeError:
+        tempResult = loadtxt(fname, dtype=dtype, skiprows=1)
+	
+===================================================================	
+read_montage: 138	
+----------------------------	
+
+"Read a generic (built-in) montage.\n\n    Individualized (digitized) electrode positions should be read in using\n    :func:`read_dig_montage`.\n\n    In most cases, you should only need to set the `kind` parameter to load one\n    of the built-in montages (see Notes).\n\n    Parameters\n    ----------\n    kind : str\n        The name of the montage file without the file extension (e.g.\n        kind='easycap-M10' for 'easycap-M10.txt'). Files with extensions\n        '.elc', '.txt', '.csd', '.elp', '.hpts', '.sfp', '.loc' ('.locs' and\n        '.eloc') or .bvef are supported.\n    ch_names : list of str | None\n        If not all electrodes defined in the montage are present in the EEG\n        data, use this parameter to select a subset of electrode positions to\n        load. If None (default), all defined electrode positions are returned.\n\n        .. note:: ``ch_names`` are compared to channel names in the montage\n                  file after converting them both to upper case. If a match is\n                  found, the letter case in the original ``ch_names`` is used\n                  in the returned montage.\n\n    path : str | None\n        The path of the folder containing the montage file. Defaults to the\n        mne/channels/data/montages folder in your mne-python installation.\n    unit : 'm' | 'cm' | 'mm'\n        Unit of the input file. If not 'm' (default), coordinates will be\n        rescaled to 'm'.\n    transform : bool\n        If True, points will be transformed to Neuromag space. The fidicuals,\n        'nasion', 'lpa', 'rpa' must be specified in the montage file. Useful\n        for points captured using Polhemus FastSCAN. Default is False.\n\n    Returns\n    -------\n    montage : instance of Montage\n        The montage.\n\n    See Also\n    --------\n    DigMontage\n    Montage\n    read_dig_montage\n\n    Notes\n    -----\n    Built-in montages are not scaled or transformed by default.\n\n    Montages can contain fiducial points in addition to electrode channels,\n    e.g. ``biosemi64`` contains 67 locations. In the following table, the\n    number of channels and fiducials is given in parentheses in the description\n    column (e.g. 64+3 means 64 channels and 3 fiducials).\n\n    Valid ``kind`` arguments are:\n\n    ===================   =====================================================\n    Kind                  Description\n    ===================   =====================================================\n    standard_1005         Electrodes are named and positioned according to the\n                          international 10-05 system (343+3 locations)\n    standard_1020         Electrodes are named and positioned according to the\n                          international 10-20 system (94+3 locations)\n    standard_alphabetic   Electrodes are named with LETTER-NUMBER combinations\n                          (A1, B2, F4, ...) (65+3 locations)\n    standard_postfixed    Electrodes are named according to the international\n                          10-20 system using postfixes for intermediate\n                          positions (100+3 locations)\n    standard_prefixed     Electrodes are named according to the international\n                          10-20 system using prefixes for intermediate\n                          positions (74+3 locations)\n    standard_primed       Electrodes are named according to the international\n                          10-20 system using prime marks (' and '') for\n                          intermediate positions (100+3 locations)\n\n    biosemi16             BioSemi cap with 16 electrodes (16+3 locations)\n    biosemi32             BioSemi cap with 32 electrodes (32+3 locations)\n    biosemi64             BioSemi cap with 64 electrodes (64+3 locations)\n    biosemi128            BioSemi cap with 128 electrodes (128+3 locations)\n    biosemi160            BioSemi cap with 160 electrodes (160+3 locations)\n    biosemi256            BioSemi cap with 256 electrodes (256+3 locations)\n\n    easycap-M1            EasyCap with 10-05 electrode names (74 locations)\n    easycap-M10           EasyCap with numbered electrodes (61 locations)\n\n    EGI_256               Geodesic Sensor Net (256 locations)\n\n    GSN-HydroCel-32       HydroCel Geodesic Sensor Net and Cz (33+3 locations)\n    GSN-HydroCel-64_1.0   HydroCel Geodesic Sensor Net (64+3 locations)\n    GSN-HydroCel-65_1.0   HydroCel Geodesic Sensor Net and Cz (65+3 locations)\n    GSN-HydroCel-128      HydroCel Geodesic Sensor Net (128+3 locations)\n    GSN-HydroCel-129      HydroCel Geodesic Sensor Net and Cz (129+3 locations)\n    GSN-HydroCel-256      HydroCel Geodesic Sensor Net (256+3 locations)\n    GSN-HydroCel-257      HydroCel Geodesic Sensor Net and Cz (257+3 locations)\n\n    mgh60                 The (older) 60-channel cap used at\n                          MGH (60+3 locations)\n    mgh70                 The (newer) 70-channel BrainVision cap used at\n                          MGH (70+3 locations)\n    ===================   =====================================================\n\n    .. versionadded:: 0.9.0\n    "
+if (path is None):
+    path = os.path.join(os.path.dirname(__file__), 'data', 'montages')
+if (not os.path.isabs(kind)):
+    supported = ('.elc', '.txt', '.csd', '.sfp', '.elp', '.hpts', '.loc', '.locs', '.eloc', '.bvef')
+    montages = [os.path.splitext(f) for f in os.listdir(path)]
+    montages = [m for m in montages if ((m[1] in supported) and (kind == m[0]))]
+    if (len(montages) != 1):
+        raise ValueError('Could not find the montage. Please provide the full path.')
+    (kind, ext) = montages[0]
+else:
+    (kind, ext) = os.path.splitext(kind)
+fname = os.path.join(path, (kind + ext))
+fid_names = ['lpa', 'nz', 'rpa']
+if (ext == '.sfp'):
+    fid_names = ['fidt9', 'fidnz', 'fidt10']
+    with open(fname, 'r') as f:
+        lines = f.read().replace('\t', ' ').splitlines()
+    (ch_names_, pos) = ([], [])
+    for (ii, line) in enumerate(lines):
+        line = line.strip().split()
+        if (len(line) > 0):
+            if (len(line) != 4):
+                raise ValueError(('Malformed .sfp file in line ' + str(ii)))
+            (this_name, x, y, z) = line
+            ch_names_.append(this_name)
+            pos.append([float(cord) for cord in (x, y, z)])
+    pos = numpy.asarray(pos)
+elif (ext == '.elc'):
+    ch_names_ = []
+    pos = []
+    with open(fname) as fid:
+        for line in fid:
+            if ('UnitPosition' in line):
+                units = line.split()[1]
+                scale_factor = dict(m=1.0, mm=0.001)[units]
+                break
+        else:
+            raise RuntimeError(('Could not detect units in file %s' % fname))
+        for line in fid:
+            if ('Positions\n' in line):
+                break
+        pos = []
+        for line in fid:
+            if ('Labels\n' in line):
+                break
+            pos.append(list(map(float, line.split())))
+        for line in fid:
+            if ((not line) or (not (set(line) - set([' '])))):
+                break
+            ch_names_.append(line.strip(' ').strip('\n'))
+    pos = (numpy.array(pos) * scale_factor)
+elif (ext == '.txt'):
+    try:
+        data = numpy.genfromtxt(fname, dtype='str', skip_header=1)
+    except TypeError:
+        data = numpy.genfromtxt(fname, dtype='str', skiprows=1)
+    ch_names_ = data[:, 0].tolist()
+    az = numpy.deg2rad(data[:, 2].astype(float))
+    pol = numpy.deg2rad(data[:, 1].astype(float))
+    pos = _sph_to_cart(np.array([(np.ones(len(az)) * 85.0), az, pol]).T)
+elif (ext == '.csd'):
+    try:
+        data = numpy.genfromtxt(fname, dtype='str', skip_header=2)
+    except TypeError:
+        data = numpy.genfromtxt(fname, dtype='str', skiprows=2)
+    ch_names_ = data[:, 0].tolist()
+    az = numpy.deg2rad(data[:, 1].astype(float))
+    pol = numpy.deg2rad((90.0 - data[:, 2].astype(float)))
+    pos = _sph_to_cart(np.array([np.ones(len(az)), az, pol]).T)
+elif (ext == '.elp'):
+    dtype = numpy.dtype('S8, S8, f8, f8, f8')
+    try:
+        data = numpy.loadtxt(fname, dtype=dtype, skip_header=1)
+    except TypeError:
+        data = numpy.loadtxt(fname, dtype=dtype, skiprows=1)
+    ch_names_ = data['f1'].astype(str).tolist()
+    az = data['f2']
+    horiz = data['f3']
+    radius = numpy.abs((az / 180.0))
+    az = numpy.deg2rad(numpy.array([(h if (a >= 0.0) else (180 + h)) for (h, a) in zip(horiz, az)]))
+    pol = (radius * numpy.pi)
+    pos = _sph_to_cart(np.array([(np.ones(len(az)) * 85.0), az, pol]).T)
+elif (ext == '.hpts'):
+    fid_names = ['1', '2', '3']
+    dtype = [('type', 'S8'), ('name', 'S8'), ('x', 'f8'), ('y', 'f8'), ('z', 'f8')]
+    tempResult = loadtxt(fname, dtype=dtype)
+	
+===================================================================	
+read_montage: 142	
+----------------------------	
+
+"Read a generic (built-in) montage.\n\n    Individualized (digitized) electrode positions should be read in using\n    :func:`read_dig_montage`.\n\n    In most cases, you should only need to set the `kind` parameter to load one\n    of the built-in montages (see Notes).\n\n    Parameters\n    ----------\n    kind : str\n        The name of the montage file without the file extension (e.g.\n        kind='easycap-M10' for 'easycap-M10.txt'). Files with extensions\n        '.elc', '.txt', '.csd', '.elp', '.hpts', '.sfp', '.loc' ('.locs' and\n        '.eloc') or .bvef are supported.\n    ch_names : list of str | None\n        If not all electrodes defined in the montage are present in the EEG\n        data, use this parameter to select a subset of electrode positions to\n        load. If None (default), all defined electrode positions are returned.\n\n        .. note:: ``ch_names`` are compared to channel names in the montage\n                  file after converting them both to upper case. If a match is\n                  found, the letter case in the original ``ch_names`` is used\n                  in the returned montage.\n\n    path : str | None\n        The path of the folder containing the montage file. Defaults to the\n        mne/channels/data/montages folder in your mne-python installation.\n    unit : 'm' | 'cm' | 'mm'\n        Unit of the input file. If not 'm' (default), coordinates will be\n        rescaled to 'm'.\n    transform : bool\n        If True, points will be transformed to Neuromag space. The fidicuals,\n        'nasion', 'lpa', 'rpa' must be specified in the montage file. Useful\n        for points captured using Polhemus FastSCAN. Default is False.\n\n    Returns\n    -------\n    montage : instance of Montage\n        The montage.\n\n    See Also\n    --------\n    DigMontage\n    Montage\n    read_dig_montage\n\n    Notes\n    -----\n    Built-in montages are not scaled or transformed by default.\n\n    Montages can contain fiducial points in addition to electrode channels,\n    e.g. ``biosemi64`` contains 67 locations. In the following table, the\n    number of channels and fiducials is given in parentheses in the description\n    column (e.g. 64+3 means 64 channels and 3 fiducials).\n\n    Valid ``kind`` arguments are:\n\n    ===================   =====================================================\n    Kind                  Description\n    ===================   =====================================================\n    standard_1005         Electrodes are named and positioned according to the\n                          international 10-05 system (343+3 locations)\n    standard_1020         Electrodes are named and positioned according to the\n                          international 10-20 system (94+3 locations)\n    standard_alphabetic   Electrodes are named with LETTER-NUMBER combinations\n                          (A1, B2, F4, ...) (65+3 locations)\n    standard_postfixed    Electrodes are named according to the international\n                          10-20 system using postfixes for intermediate\n                          positions (100+3 locations)\n    standard_prefixed     Electrodes are named according to the international\n                          10-20 system using prefixes for intermediate\n                          positions (74+3 locations)\n    standard_primed       Electrodes are named according to the international\n                          10-20 system using prime marks (' and '') for\n                          intermediate positions (100+3 locations)\n\n    biosemi16             BioSemi cap with 16 electrodes (16+3 locations)\n    biosemi32             BioSemi cap with 32 electrodes (32+3 locations)\n    biosemi64             BioSemi cap with 64 electrodes (64+3 locations)\n    biosemi128            BioSemi cap with 128 electrodes (128+3 locations)\n    biosemi160            BioSemi cap with 160 electrodes (160+3 locations)\n    biosemi256            BioSemi cap with 256 electrodes (256+3 locations)\n\n    easycap-M1            EasyCap with 10-05 electrode names (74 locations)\n    easycap-M10           EasyCap with numbered electrodes (61 locations)\n\n    EGI_256               Geodesic Sensor Net (256 locations)\n\n    GSN-HydroCel-32       HydroCel Geodesic Sensor Net and Cz (33+3 locations)\n    GSN-HydroCel-64_1.0   HydroCel Geodesic Sensor Net (64+3 locations)\n    GSN-HydroCel-65_1.0   HydroCel Geodesic Sensor Net and Cz (65+3 locations)\n    GSN-HydroCel-128      HydroCel Geodesic Sensor Net (128+3 locations)\n    GSN-HydroCel-129      HydroCel Geodesic Sensor Net and Cz (129+3 locations)\n    GSN-HydroCel-256      HydroCel Geodesic Sensor Net (256+3 locations)\n    GSN-HydroCel-257      HydroCel Geodesic Sensor Net and Cz (257+3 locations)\n\n    mgh60                 The (older) 60-channel cap used at\n                          MGH (60+3 locations)\n    mgh70                 The (newer) 70-channel BrainVision cap used at\n                          MGH (70+3 locations)\n    ===================   =====================================================\n\n    .. versionadded:: 0.9.0\n    "
+if (path is None):
+    path = os.path.join(os.path.dirname(__file__), 'data', 'montages')
+if (not os.path.isabs(kind)):
+    supported = ('.elc', '.txt', '.csd', '.sfp', '.elp', '.hpts', '.loc', '.locs', '.eloc', '.bvef')
+    montages = [os.path.splitext(f) for f in os.listdir(path)]
+    montages = [m for m in montages if ((m[1] in supported) and (kind == m[0]))]
+    if (len(montages) != 1):
+        raise ValueError('Could not find the montage. Please provide the full path.')
+    (kind, ext) = montages[0]
+else:
+    (kind, ext) = os.path.splitext(kind)
+fname = os.path.join(path, (kind + ext))
+fid_names = ['lpa', 'nz', 'rpa']
+if (ext == '.sfp'):
+    fid_names = ['fidt9', 'fidnz', 'fidt10']
+    with open(fname, 'r') as f:
+        lines = f.read().replace('\t', ' ').splitlines()
+    (ch_names_, pos) = ([], [])
+    for (ii, line) in enumerate(lines):
+        line = line.strip().split()
+        if (len(line) > 0):
+            if (len(line) != 4):
+                raise ValueError(('Malformed .sfp file in line ' + str(ii)))
+            (this_name, x, y, z) = line
+            ch_names_.append(this_name)
+            pos.append([float(cord) for cord in (x, y, z)])
+    pos = numpy.asarray(pos)
+elif (ext == '.elc'):
+    ch_names_ = []
+    pos = []
+    with open(fname) as fid:
+        for line in fid:
+            if ('UnitPosition' in line):
+                units = line.split()[1]
+                scale_factor = dict(m=1.0, mm=0.001)[units]
+                break
+        else:
+            raise RuntimeError(('Could not detect units in file %s' % fname))
+        for line in fid:
+            if ('Positions\n' in line):
+                break
+        pos = []
+        for line in fid:
+            if ('Labels\n' in line):
+                break
+            pos.append(list(map(float, line.split())))
+        for line in fid:
+            if ((not line) or (not (set(line) - set([' '])))):
+                break
+            ch_names_.append(line.strip(' ').strip('\n'))
+    pos = (numpy.array(pos) * scale_factor)
+elif (ext == '.txt'):
+    try:
+        data = numpy.genfromtxt(fname, dtype='str', skip_header=1)
+    except TypeError:
+        data = numpy.genfromtxt(fname, dtype='str', skiprows=1)
+    ch_names_ = data[:, 0].tolist()
+    az = numpy.deg2rad(data[:, 2].astype(float))
+    pol = numpy.deg2rad(data[:, 1].astype(float))
+    pos = _sph_to_cart(np.array([(np.ones(len(az)) * 85.0), az, pol]).T)
+elif (ext == '.csd'):
+    try:
+        data = numpy.genfromtxt(fname, dtype='str', skip_header=2)
+    except TypeError:
+        data = numpy.genfromtxt(fname, dtype='str', skiprows=2)
+    ch_names_ = data[:, 0].tolist()
+    az = numpy.deg2rad(data[:, 1].astype(float))
+    pol = numpy.deg2rad((90.0 - data[:, 2].astype(float)))
+    pos = _sph_to_cart(np.array([np.ones(len(az)), az, pol]).T)
+elif (ext == '.elp'):
+    dtype = numpy.dtype('S8, S8, f8, f8, f8')
+    try:
+        data = numpy.loadtxt(fname, dtype=dtype, skip_header=1)
+    except TypeError:
+        data = numpy.loadtxt(fname, dtype=dtype, skiprows=1)
+    ch_names_ = data['f1'].astype(str).tolist()
+    az = data['f2']
+    horiz = data['f3']
+    radius = numpy.abs((az / 180.0))
+    az = numpy.deg2rad(numpy.array([(h if (a >= 0.0) else (180 + h)) for (h, a) in zip(horiz, az)]))
+    pol = (radius * numpy.pi)
+    pos = _sph_to_cart(np.array([(np.ones(len(az)) * 85.0), az, pol]).T)
+elif (ext == '.hpts'):
+    fid_names = ['1', '2', '3']
+    dtype = [('type', 'S8'), ('name', 'S8'), ('x', 'f8'), ('y', 'f8'), ('z', 'f8')]
+    data = numpy.loadtxt(fname, dtype=dtype)
+    ch_names_ = data['name'].astype(str).tolist()
+    pos = np.vstack((data['x'], data['y'], data['z'])).T
+elif (ext in ('.loc', '.locs', '.eloc')):
+    tempResult = loadtxt(fname, dtype='S4', usecols=[3])
+	
+===================================================================	
+read_montage: 143	
+----------------------------	
+
+"Read a generic (built-in) montage.\n\n    Individualized (digitized) electrode positions should be read in using\n    :func:`read_dig_montage`.\n\n    In most cases, you should only need to set the `kind` parameter to load one\n    of the built-in montages (see Notes).\n\n    Parameters\n    ----------\n    kind : str\n        The name of the montage file without the file extension (e.g.\n        kind='easycap-M10' for 'easycap-M10.txt'). Files with extensions\n        '.elc', '.txt', '.csd', '.elp', '.hpts', '.sfp', '.loc' ('.locs' and\n        '.eloc') or .bvef are supported.\n    ch_names : list of str | None\n        If not all electrodes defined in the montage are present in the EEG\n        data, use this parameter to select a subset of electrode positions to\n        load. If None (default), all defined electrode positions are returned.\n\n        .. note:: ``ch_names`` are compared to channel names in the montage\n                  file after converting them both to upper case. If a match is\n                  found, the letter case in the original ``ch_names`` is used\n                  in the returned montage.\n\n    path : str | None\n        The path of the folder containing the montage file. Defaults to the\n        mne/channels/data/montages folder in your mne-python installation.\n    unit : 'm' | 'cm' | 'mm'\n        Unit of the input file. If not 'm' (default), coordinates will be\n        rescaled to 'm'.\n    transform : bool\n        If True, points will be transformed to Neuromag space. The fidicuals,\n        'nasion', 'lpa', 'rpa' must be specified in the montage file. Useful\n        for points captured using Polhemus FastSCAN. Default is False.\n\n    Returns\n    -------\n    montage : instance of Montage\n        The montage.\n\n    See Also\n    --------\n    DigMontage\n    Montage\n    read_dig_montage\n\n    Notes\n    -----\n    Built-in montages are not scaled or transformed by default.\n\n    Montages can contain fiducial points in addition to electrode channels,\n    e.g. ``biosemi64`` contains 67 locations. In the following table, the\n    number of channels and fiducials is given in parentheses in the description\n    column (e.g. 64+3 means 64 channels and 3 fiducials).\n\n    Valid ``kind`` arguments are:\n\n    ===================   =====================================================\n    Kind                  Description\n    ===================   =====================================================\n    standard_1005         Electrodes are named and positioned according to the\n                          international 10-05 system (343+3 locations)\n    standard_1020         Electrodes are named and positioned according to the\n                          international 10-20 system (94+3 locations)\n    standard_alphabetic   Electrodes are named with LETTER-NUMBER combinations\n                          (A1, B2, F4, ...) (65+3 locations)\n    standard_postfixed    Electrodes are named according to the international\n                          10-20 system using postfixes for intermediate\n                          positions (100+3 locations)\n    standard_prefixed     Electrodes are named according to the international\n                          10-20 system using prefixes for intermediate\n                          positions (74+3 locations)\n    standard_primed       Electrodes are named according to the international\n                          10-20 system using prime marks (' and '') for\n                          intermediate positions (100+3 locations)\n\n    biosemi16             BioSemi cap with 16 electrodes (16+3 locations)\n    biosemi32             BioSemi cap with 32 electrodes (32+3 locations)\n    biosemi64             BioSemi cap with 64 electrodes (64+3 locations)\n    biosemi128            BioSemi cap with 128 electrodes (128+3 locations)\n    biosemi160            BioSemi cap with 160 electrodes (160+3 locations)\n    biosemi256            BioSemi cap with 256 electrodes (256+3 locations)\n\n    easycap-M1            EasyCap with 10-05 electrode names (74 locations)\n    easycap-M10           EasyCap with numbered electrodes (61 locations)\n\n    EGI_256               Geodesic Sensor Net (256 locations)\n\n    GSN-HydroCel-32       HydroCel Geodesic Sensor Net and Cz (33+3 locations)\n    GSN-HydroCel-64_1.0   HydroCel Geodesic Sensor Net (64+3 locations)\n    GSN-HydroCel-65_1.0   HydroCel Geodesic Sensor Net and Cz (65+3 locations)\n    GSN-HydroCel-128      HydroCel Geodesic Sensor Net (128+3 locations)\n    GSN-HydroCel-129      HydroCel Geodesic Sensor Net and Cz (129+3 locations)\n    GSN-HydroCel-256      HydroCel Geodesic Sensor Net (256+3 locations)\n    GSN-HydroCel-257      HydroCel Geodesic Sensor Net and Cz (257+3 locations)\n\n    mgh60                 The (older) 60-channel cap used at\n                          MGH (60+3 locations)\n    mgh70                 The (newer) 70-channel BrainVision cap used at\n                          MGH (70+3 locations)\n    ===================   =====================================================\n\n    .. versionadded:: 0.9.0\n    "
+if (path is None):
+    path = os.path.join(os.path.dirname(__file__), 'data', 'montages')
+if (not os.path.isabs(kind)):
+    supported = ('.elc', '.txt', '.csd', '.sfp', '.elp', '.hpts', '.loc', '.locs', '.eloc', '.bvef')
+    montages = [os.path.splitext(f) for f in os.listdir(path)]
+    montages = [m for m in montages if ((m[1] in supported) and (kind == m[0]))]
+    if (len(montages) != 1):
+        raise ValueError('Could not find the montage. Please provide the full path.')
+    (kind, ext) = montages[0]
+else:
+    (kind, ext) = os.path.splitext(kind)
+fname = os.path.join(path, (kind + ext))
+fid_names = ['lpa', 'nz', 'rpa']
+if (ext == '.sfp'):
+    fid_names = ['fidt9', 'fidnz', 'fidt10']
+    with open(fname, 'r') as f:
+        lines = f.read().replace('\t', ' ').splitlines()
+    (ch_names_, pos) = ([], [])
+    for (ii, line) in enumerate(lines):
+        line = line.strip().split()
+        if (len(line) > 0):
+            if (len(line) != 4):
+                raise ValueError(('Malformed .sfp file in line ' + str(ii)))
+            (this_name, x, y, z) = line
+            ch_names_.append(this_name)
+            pos.append([float(cord) for cord in (x, y, z)])
+    pos = numpy.asarray(pos)
+elif (ext == '.elc'):
+    ch_names_ = []
+    pos = []
+    with open(fname) as fid:
+        for line in fid:
+            if ('UnitPosition' in line):
+                units = line.split()[1]
+                scale_factor = dict(m=1.0, mm=0.001)[units]
+                break
+        else:
+            raise RuntimeError(('Could not detect units in file %s' % fname))
+        for line in fid:
+            if ('Positions\n' in line):
+                break
+        pos = []
+        for line in fid:
+            if ('Labels\n' in line):
+                break
+            pos.append(list(map(float, line.split())))
+        for line in fid:
+            if ((not line) or (not (set(line) - set([' '])))):
+                break
+            ch_names_.append(line.strip(' ').strip('\n'))
+    pos = (numpy.array(pos) * scale_factor)
+elif (ext == '.txt'):
+    try:
+        data = numpy.genfromtxt(fname, dtype='str', skip_header=1)
+    except TypeError:
+        data = numpy.genfromtxt(fname, dtype='str', skiprows=1)
+    ch_names_ = data[:, 0].tolist()
+    az = numpy.deg2rad(data[:, 2].astype(float))
+    pol = numpy.deg2rad(data[:, 1].astype(float))
+    pos = _sph_to_cart(np.array([(np.ones(len(az)) * 85.0), az, pol]).T)
+elif (ext == '.csd'):
+    try:
+        data = numpy.genfromtxt(fname, dtype='str', skip_header=2)
+    except TypeError:
+        data = numpy.genfromtxt(fname, dtype='str', skiprows=2)
+    ch_names_ = data[:, 0].tolist()
+    az = numpy.deg2rad(data[:, 1].astype(float))
+    pol = numpy.deg2rad((90.0 - data[:, 2].astype(float)))
+    pos = _sph_to_cart(np.array([np.ones(len(az)), az, pol]).T)
+elif (ext == '.elp'):
+    dtype = numpy.dtype('S8, S8, f8, f8, f8')
+    try:
+        data = numpy.loadtxt(fname, dtype=dtype, skip_header=1)
+    except TypeError:
+        data = numpy.loadtxt(fname, dtype=dtype, skiprows=1)
+    ch_names_ = data['f1'].astype(str).tolist()
+    az = data['f2']
+    horiz = data['f3']
+    radius = numpy.abs((az / 180.0))
+    az = numpy.deg2rad(numpy.array([(h if (a >= 0.0) else (180 + h)) for (h, a) in zip(horiz, az)]))
+    pol = (radius * numpy.pi)
+    pos = _sph_to_cart(np.array([(np.ones(len(az)) * 85.0), az, pol]).T)
+elif (ext == '.hpts'):
+    fid_names = ['1', '2', '3']
+    dtype = [('type', 'S8'), ('name', 'S8'), ('x', 'f8'), ('y', 'f8'), ('z', 'f8')]
+    data = numpy.loadtxt(fname, dtype=dtype)
+    ch_names_ = data['name'].astype(str).tolist()
+    pos = np.vstack((data['x'], data['y'], data['z'])).T
+elif (ext in ('.loc', '.locs', '.eloc')):
+    ch_names_ = np.loadtxt(fname, dtype='S4', usecols=[3]).astype(str).tolist()
+    tempResult = loadtxt(fname, dtype=float, usecols=[1, 2])
+	
+===================================================================	
+test_montage: 92	
+----------------------------	
+'Test making montages.'
+tempdir = _TempDir()
+inputs = dict(sfp='FidNz 0       9.071585155     -2.359754454\nFidT9 -6.711765       0.040402876     -3.251600355\nvery_very_very_long_name -5.831241498 -4.494821698  4.955347697\nCz 0       0       8.899186843', csd='// MatLab   Sphere coordinates [degrees]         Cartesian coordinates\n// Label       Theta       Phi    Radius         X         Y         Z       off sphere surface\nE1      37.700     -14.000       1.000    0.7677    0.5934   -0.2419  -0.00000000000000011\nE3      51.700      11.000       1.000    0.6084    0.7704    0.1908   0.00000000000000000\nE31      90.000     -11.000       1.000    0.0000    0.9816   -0.1908   0.00000000000000000\nE61     158.000     -17.200       1.000   -0.8857    0.3579   -0.2957  -0.00000000000000022', mm_elc='# ASA electrode file\nReferenceLabel  avg\nUnitPosition    mm\nNumberPositions=    68\nPositions\n-86.0761 -19.9897 -47.9860\n85.7939 -20.0093 -48.0310\n0.0083 86.8110 -39.9830\n-86.0761 -24.9897 -67.9860\nLabels\nLPA\nRPA\nNz\nDummy\n', m_elc='# ASA electrode file\nReferenceLabel  avg\nUnitPosition    m\nNumberPositions=    68\nPositions\n-.0860761 -.0199897 -.0479860\n.0857939 -.0200093 -.0480310\n.0000083 .00868110 -.0399830\n.08 -.02 -.04\nLabels\nLPA\nRPA\nNz\nDummy\n', txt='Site  Theta  Phi\nFp1  -92    -72\nFp2   92     72\nvery_very_very_long_name       -92     72\nO2        92    -90\n', elp='346\nEEG\t      F3\t -62.027\t -50.053\t      85\nEEG\t      Fz\t  45.608\t      90\t      85\nEEG\t      F4\t   62.01\t  50.103\t      85\nEEG\t      FCz\t   68.01\t  58.103\t      85\n', hpts='eeg Fp1 -95.0 -3. -3.\neeg AF7 -1 -1 -3\neeg A3 -2 -2 2\neeg A 0 0 0', bvef='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<!-- Generated by EasyCap Configurator 19.05.2014 -->\n<Electrodes defaults="false">\n  <Electrode>\n    <Name>Fp1</Name>\n    <Theta>-90</Theta>\n    <Phi>-72</Phi>\n    <Radius>1</Radius>\n    <Number>1</Number>\n  </Electrode>\n  <Electrode>\n    <Name>Fz</Name>\n    <Theta>45</Theta>\n    <Phi>90</Phi>\n    <Radius>1</Radius>\n    <Number>2</Number>\n  </Electrode>\n  <Electrode>\n    <Name>F3</Name>\n    <Theta>-60</Theta>\n    <Phi>-51</Phi>\n    <Radius>1</Radius>\n    <Number>3</Number>\n  </Electrode>\n  <Electrode>\n    <Name>F7</Name>\n    <Theta>-90</Theta>\n    <Phi>-36</Phi>\n    <Radius>1</Radius>\n    <Number>4</Number>\n  </Electrode>\n</Electrodes>')
+poss = dict(sfp=[[0.0, 9.07159, (- 2.35975)], [(- 6.71176), 0.0404, (- 3.2516)], [(- 5.83124), (- 4.49482), 4.95535], [0.0, 0.0, 8.89919]], mm_elc=[[(- 0.08608), (- 0.01999), (- 0.04799)], [0.08579, (- 0.02001), (- 0.04803)], [1e-05, 0.08681, (- 0.03998)], [(- 0.08608), (- 0.02499), (- 0.06799)]], m_elc=[[(- 0.08608), (- 0.01999), (- 0.04799)], [0.08579, (- 0.02001), (- 0.04803)], [1e-05, 0.00868, (- 0.03998)], [0.08, (- 0.02), (- 0.04)]], txt=[[(- 26.25044), 80.79056, (- 2.96646)], [26.25044, 80.79056, (- 2.96646)], [(- 26.25044), (- 80.79056), (- 2.96646)], [0.0, (- 84.94822), (- 2.96646)]], elp=[[(- 48.20043), 57.55106, 39.86971], [0.0, 60.73848, 59.4629], [48.1426, 57.58403, 39.89198], [41.64599, 66.91489, 31.8278]], hpts=[[(- 95), (- 3), (- 3)], [(- 1), (- 1.0), (- 3.0)], [(- 2), (- 2), 2.0], [0, 0, 0]], bvef=[[(- 26.266444), 80.839803, 5.204748e-15], [3.680313e-15, 60.104076, 60.104076], [(- 46.325632), 57.207392, 42.5], [(- 68.766444), 49.961746, 5.204748e-15]])
+for (key, text) in inputs.items():
+    kind = key.split('_')[(- 1)]
+    fname = op.join(tempdir, ('test.' + kind))
+    with open(fname, 'w') as fid:
+        fid.write(text)
+    montage = read_montage(fname)
+    if (kind in ('sfp', 'txt')):
+        assert_true(('very_very_very_long_name' in montage.ch_names))
+    assert_equal(len(montage.ch_names), 4)
+    assert_equal(len(montage.ch_names), len(montage.pos))
+    assert_equal(montage.pos.shape, (4, 3))
+    assert_equal(montage.kind, 'test')
+    if (kind == 'csd'):
+        dtype = [('label', 'S4'), ('theta', 'f8'), ('phi', 'f8'), ('radius', 'f8'), ('x', 'f8'), ('y', 'f8'), ('z', 'f8'), ('off_sph', 'f8')]
+        try:
+            tempResult = loadtxt(fname, skip_header=2, dtype=dtype)	
+===================================================================	
+test_montage: 94	
+----------------------------	
+
+'Test making montages.'
+tempdir = _TempDir()
+inputs = dict(sfp='FidNz 0       9.071585155     -2.359754454\nFidT9 -6.711765       0.040402876     -3.251600355\nvery_very_very_long_name -5.831241498 -4.494821698  4.955347697\nCz 0       0       8.899186843', csd='// MatLab   Sphere coordinates [degrees]         Cartesian coordinates\n// Label       Theta       Phi    Radius         X         Y         Z       off sphere surface\nE1      37.700     -14.000       1.000    0.7677    0.5934   -0.2419  -0.00000000000000011\nE3      51.700      11.000       1.000    0.6084    0.7704    0.1908   0.00000000000000000\nE31      90.000     -11.000       1.000    0.0000    0.9816   -0.1908   0.00000000000000000\nE61     158.000     -17.200       1.000   -0.8857    0.3579   -0.2957  -0.00000000000000022', mm_elc='# ASA electrode file\nReferenceLabel  avg\nUnitPosition    mm\nNumberPositions=    68\nPositions\n-86.0761 -19.9897 -47.9860\n85.7939 -20.0093 -48.0310\n0.0083 86.8110 -39.9830\n-86.0761 -24.9897 -67.9860\nLabels\nLPA\nRPA\nNz\nDummy\n', m_elc='# ASA electrode file\nReferenceLabel  avg\nUnitPosition    m\nNumberPositions=    68\nPositions\n-.0860761 -.0199897 -.0479860\n.0857939 -.0200093 -.0480310\n.0000083 .00868110 -.0399830\n.08 -.02 -.04\nLabels\nLPA\nRPA\nNz\nDummy\n', txt='Site  Theta  Phi\nFp1  -92    -72\nFp2   92     72\nvery_very_very_long_name       -92     72\nO2        92    -90\n', elp='346\nEEG\t      F3\t -62.027\t -50.053\t      85\nEEG\t      Fz\t  45.608\t      90\t      85\nEEG\t      F4\t   62.01\t  50.103\t      85\nEEG\t      FCz\t   68.01\t  58.103\t      85\n', hpts='eeg Fp1 -95.0 -3. -3.\neeg AF7 -1 -1 -3\neeg A3 -2 -2 2\neeg A 0 0 0', bvef='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<!-- Generated by EasyCap Configurator 19.05.2014 -->\n<Electrodes defaults="false">\n  <Electrode>\n    <Name>Fp1</Name>\n    <Theta>-90</Theta>\n    <Phi>-72</Phi>\n    <Radius>1</Radius>\n    <Number>1</Number>\n  </Electrode>\n  <Electrode>\n    <Name>Fz</Name>\n    <Theta>45</Theta>\n    <Phi>90</Phi>\n    <Radius>1</Radius>\n    <Number>2</Number>\n  </Electrode>\n  <Electrode>\n    <Name>F3</Name>\n    <Theta>-60</Theta>\n    <Phi>-51</Phi>\n    <Radius>1</Radius>\n    <Number>3</Number>\n  </Electrode>\n  <Electrode>\n    <Name>F7</Name>\n    <Theta>-90</Theta>\n    <Phi>-36</Phi>\n    <Radius>1</Radius>\n    <Number>4</Number>\n  </Electrode>\n</Electrodes>')
+poss = dict(sfp=[[0.0, 9.07159, (- 2.35975)], [(- 6.71176), 0.0404, (- 3.2516)], [(- 5.83124), (- 4.49482), 4.95535], [0.0, 0.0, 8.89919]], mm_elc=[[(- 0.08608), (- 0.01999), (- 0.04799)], [0.08579, (- 0.02001), (- 0.04803)], [1e-05, 0.08681, (- 0.03998)], [(- 0.08608), (- 0.02499), (- 0.06799)]], m_elc=[[(- 0.08608), (- 0.01999), (- 0.04799)], [0.08579, (- 0.02001), (- 0.04803)], [1e-05, 0.00868, (- 0.03998)], [0.08, (- 0.02), (- 0.04)]], txt=[[(- 26.25044), 80.79056, (- 2.96646)], [26.25044, 80.79056, (- 2.96646)], [(- 26.25044), (- 80.79056), (- 2.96646)], [0.0, (- 84.94822), (- 2.96646)]], elp=[[(- 48.20043), 57.55106, 39.86971], [0.0, 60.73848, 59.4629], [48.1426, 57.58403, 39.89198], [41.64599, 66.91489, 31.8278]], hpts=[[(- 95), (- 3), (- 3)], [(- 1), (- 1.0), (- 3.0)], [(- 2), (- 2), 2.0], [0, 0, 0]], bvef=[[(- 26.266444), 80.839803, 5.204748e-15], [3.680313e-15, 60.104076, 60.104076], [(- 46.325632), 57.207392, 42.5], [(- 68.766444), 49.961746, 5.204748e-15]])
+for (key, text) in inputs.items():
+    kind = key.split('_')[(- 1)]
+    fname = os.path.join(tempdir, ('test.' + kind))
+    with open(fname, 'w') as fid:
+        fid.write(text)
+    montage = read_montage(fname)
+    if (kind in ('sfp', 'txt')):
+        assert_true(('very_very_very_long_name' in montage.ch_names))
+    assert_equal(len(montage.ch_names), 4)
+    assert_equal(len(montage.ch_names), len(montage.pos))
+    assert_equal(montage.pos.shape, (4, 3))
+    assert_equal(montage.kind, 'test')
+    if (kind == 'csd'):
+        dtype = [('label', 'S4'), ('theta', 'f8'), ('phi', 'f8'), ('radius', 'f8'), ('x', 'f8'), ('y', 'f8'), ('z', 'f8'), ('off_sph', 'f8')]
+        try:
+            table = numpy.loadtxt(fname, skip_header=2, dtype=dtype)
+        except TypeError:
+            tempResult = loadtxt(fname, skiprows=2, dtype=dtype)
+	
+===================================================================	
+_read_dig_points: 210	
+----------------------------	
+
+"Read digitizer data from a text file.\n\n    If fname ends in .hsp or .esp, the function assumes digitizer files in [m],\n    otherwise it assumes space-delimited text files in [mm].\n\n    Parameters\n    ----------\n    fname : str\n        The filepath of space delimited file with points, or a .mat file\n        (Polhemus FastTrak format).\n    comments : str\n        The character used to indicate the start of a comment;\n        Default: '%'.\n    unit : 'auto' | 'm' | 'cm' | 'mm'\n        Unit of the digitizer files (hsp and elp). If not 'm', coordinates will\n        be rescaled to 'm'. Default is 'auto', which assumes 'm' for *.hsp and\n        *.elp files and 'mm' for *.txt files, corresponding to the known\n        Polhemus export formats.\n\n    Returns\n    -------\n    dig_points : np.ndarray, shape (n_points, 3)\n        Array of dig points in [m].\n    "
+if (unit not in ('auto', 'm', 'mm', 'cm')):
+    raise ValueError('unit must be one of "auto", "m", "mm", or "cm"')
+(_, ext) = os.path.splitext(fname)
+if ((ext == '.elp') or (ext == '.hsp')):
+    with open(fname) as fid:
+        file_str = fid.read()
+    value_pattern = '\\-?\\d+\\.?\\d*e?\\-?\\d*'
+    coord_pattern = '({0})\\s+({0})\\s+({0})\\s*$'.format(value_pattern)
+    if (ext == '.hsp'):
+        coord_pattern = ('^' + coord_pattern)
+    points_str = [m.groups() for m in re.finditer(coord_pattern, file_str, re.MULTILINE)]
+    dig_points = numpy.array(points_str, dtype=float)
+elif (ext == '.mat'):
+    from scipy.io import loadmat
+    dig_points = loadmat(fname)['Points'].T
+else:
+    tempResult = loadtxt(fname, comments=comments, ndmin=2)
+	
+===================================================================	
+test_edf_stim_channel: 164	
+----------------------------	
+
+'Test stim channel for edf file.'
+raw = read_raw_edf(edf_stim_channel_path, preload=True, stim_channel=(- 1))
+tempResult = loadtxt(edf_txt_stim_channel_path)
+	
+===================================================================	
+test_io_egi: 49	
+----------------------------	
+
+'Test importing EGI simple binary files.'
+with open(egi_txt_fname) as fid:
+    tempResult = loadtxt(fid)
+	
+===================================================================	
+test_snr: 31	
+----------------------------	
+
+'Test SNR calculation'
+tempdir = _TempDir()
+inv = read_inverse_operator(fname_inv)
+evoked = read_evokeds(fname_evoked, baseline=(None, 0))[0]
+snr = estimate_snr(evoked, inv)[0]
+orig_dir = os.getcwd()
+os.chdir(tempdir)
+try:
+    cmd = ['mne_compute_mne', '--inv', fname_inv, '--meas', fname_evoked, '--snronly', '--bmin', '-200', '--bmax', '0']
+    run_subprocess(cmd)
+except Exception:
+    pass
+finally:
+    os.chdir(orig_dir)
+tempResult = loadtxt(os.path.join(tempdir, 'SNR'))
+	
+***************************************************	

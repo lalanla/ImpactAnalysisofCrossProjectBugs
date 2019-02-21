@@ -1,0 +1,49 @@
+astropy_astropy-1.3.0: 0	
+***************************************************	
+sklearn_sklearn-0.18.0: 0	
+***************************************************	
+matplotlib_matplotlib-2.0.0: 0	
+***************************************************	
+ipython_ipython-6.1.0: 0	
+***************************************************	
+pandas_pandas-0.19.2: 0	
+***************************************************	
+dask_dask-0.7.0: 0	
+***************************************************	
+nengo_nengo-2.0.0: 0	
+***************************************************	
+sympy_sympy-1.0.0: 0	
+***************************************************	
+daducci_amico-dev: 0	
+***************************************************	
+aplpy_aplpy-1.1.1: 0	
+***************************************************	
+markovmodel_msmtools-1.0.2: 0	
+***************************************************	
+nilearn_nilearn-0.4.0: 0	
+***************************************************	
+poliastro_poliastro-0.8.0: 0	
+***************************************************	
+skimage_skimage-0.13.0: 0	
+***************************************************	
+sunpy_sunpy-0.8.0: 0	
+***************************************************	
+spacetelescope_synphot-0.1: 0	
+***************************************************	
+librosa_librosa-0.5.1: 1	
+===================================================================	
+resample: 73	
+----------------------------	
+
+"Resample a time series from orig_sr to target_sr\n\n    Parameters\n    ----------\n    y : np.ndarray [shape=(n,) or shape=(2, n)]\n        audio time series.  Can be mono or stereo.\n\n    orig_sr : number > 0 [scalar]\n        original sampling rate of `y`\n\n    target_sr : number > 0 [scalar]\n        target sampling rate\n\n    res_type : str\n        resample type (see note)\n\n        .. note::\n            By default, this uses `resampy`'s high-quality mode ('kaiser_best').\n\n            To use a faster method, set `res_type='kaiser_fast'`.\n\n            To use `scipy.signal.resample`, set `res_type='scipy'`.\n\n    fix : bool\n        adjust the length of the resampled signal to be of size exactly\n        `ceil(target_sr * len(y) / orig_sr)`\n\n    scale : bool\n        Scale the resampled signal so that `y` and `y_hat` have approximately\n        equal total energy.\n\n    kwargs : additional keyword arguments\n        If `fix==True`, additional keyword arguments to pass to\n        `librosa.util.fix_length`.\n\n    Returns\n    -------\n    y_hat : np.ndarray [shape=(n * target_sr / orig_sr,)]\n        `y` resampled from `orig_sr` to `target_sr`\n\n\n    See Also\n    --------\n    librosa.util.fix_length\n    scipy.signal.resample\n    resampy.resample\n\n    Notes\n    -----\n    This function caches at level 20.\n\n    Examples\n    --------\n    Downsample from 22 KHz to 8 KHz\n\n    >>> y, sr = librosa.load(librosa.util.example_audio_file(), sr=22050)\n    >>> y_8k = librosa.resample(y, sr, 8000)\n    >>> y.shape, y_8k.shape\n    ((1355168,), (491671,))\n\n    "
+util.valid_audio(y, mono=False)
+if (orig_sr == target_sr):
+    return y
+ratio = (float(target_sr) / orig_sr)
+n_samples = int(numpy.ceil((y.shape[(- 1)] * ratio)))
+if (res_type == 'scipy'):
+    tempResult = resample(y, n_samples, axis=(- 1))
+	
+***************************************************	
+mne_python-0.15.0: 0	
+***************************************************	

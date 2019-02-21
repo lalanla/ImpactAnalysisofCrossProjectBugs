@@ -1,0 +1,293 @@
+astropy_astropy-1.3.0: 1	
+===================================================================	
+test_ndarray_mixin: 341	
+----------------------------	
+
+'\n    Test directly adding a plain structured array into a table instead of the\n    view as an NdarrayMixin.  Once added as an NdarrayMixin then all the previous\n    tests apply.\n    '
+a = numpy.array([(1, 'a'), (2, 'b'), (3, 'c'), (4, 'd')], dtype=('<i4,' + ('|S1' if extern.six.PY2 else '|U1')))
+b = numpy.array([(10, 'aa'), (20, 'bb'), (30, 'cc'), (40, 'dd')], dtype=[('x', 'i4'), ('y', ('S2' if extern.six.PY2 else 'U2'))])
+tempResult = fromrecords([(100, 'raa'), (200, 'rbb'), (300, 'rcc'), (400, 'rdd')], names=['rx', 'ry'])
+	
+***************************************************	
+scipy_scipy-0.19.0: 0	
+***************************************************	
+sklearn_sklearn-0.18.0: 0	
+***************************************************	
+matplotlib_matplotlib-2.0.0: 4	
+===================================================================	
+csv2rec: 1161	
+----------------------------	
+
+"\n    Load data from comma/space/tab delimited file in *fname* into a\n    numpy record array and return the record array.\n\n    If *names* is *None*, a header row is required to automatically\n    assign the recarray names.  The headers will be lower cased,\n    spaces will be converted to underscores, and illegal attribute\n    name characters removed.  If *names* is not *None*, it is a\n    sequence of names to use for the column names.  In this case, it\n    is assumed there is no header row.\n\n\n    - *fname*: can be a filename or a file handle.  Support for gzipped\n      files is automatic, if the filename ends in '.gz'\n\n    - *comments*: the character used to indicate the start of a comment\n      in the file, or *None* to switch off the removal of comments\n\n    - *skiprows*: is the number of rows from the top to skip\n\n    - *checkrows*: is the number of rows to check to validate the column\n      data type.  When set to zero all rows are validated.\n\n    - *converterd*: if not *None*, is a dictionary mapping column number or\n      munged column name to a converter function.\n\n    - *names*: if not None, is a list of header names.  In this case, no\n      header will be read from the file\n\n    - *missingd* is a dictionary mapping munged column names to field values\n      which signify that the field does not contain actual data and should\n      be masked, e.g., '0000-00-00' or 'unused'\n\n    - *missing*: a string whose value signals a missing field regardless of\n      the column it appears in\n\n    - *use_mrecords*: if True, return an mrecords.fromrecords record array if\n      any of the data are missing\n\n    - *dayfirst*: default is False so that MM-DD-YY has precedence over\n      DD-MM-YY.  See\n      http://labix.org/python-dateutil#head-b95ce2094d189a89f80f5ae52a05b4ab7b41af47\n      for further information.\n\n    - *yearfirst*: default is False so that MM-DD-YY has precedence over\n      YY-MM-DD. See\n      http://labix.org/python-dateutil#head-b95ce2094d189a89f80f5ae52a05b4ab7b41af47\n      for further information.\n\n      If no rows are found, *None* is returned -- see\n      :file:`examples/loadrec.py`\n    "
+if (converterd is None):
+    converterd = dict()
+if (missingd is None):
+    missingd = {}
+import dateutil.parser
+import datetime
+fh = matplotlib.cbook.to_filehandle(fname)
+delimiter = str(delimiter)
+
+class FH():
+    '\n        For space-delimited files, we want different behavior than\n        comma or tab.  Generally, we want multiple spaces to be\n        treated as a single separator, whereas with comma and tab we\n        want multiple commas to return multiple (empty) fields.  The\n        join/strip trick below effects this.\n        '
+
+    def __init__(self, fh):
+        self.fh = fh
+
+    def close(self):
+        self.fh.close()
+
+    def seek(self, arg):
+        self.fh.seek(arg)
+
+    def fix(self, s):
+        return ' '.join(s.split())
+
+    def __next__(self):
+        return self.fix(next(self.fh))
+
+    def __iter__(self):
+        for line in self.fh:
+            (yield self.fix(line))
+if (delimiter == ' '):
+    fh = FH(fh)
+reader = csv.reader(fh, delimiter=delimiter)
+
+def process_skiprows(reader):
+    if skiprows:
+        for (i, row) in enumerate(reader):
+            if (i >= (skiprows - 1)):
+                break
+    return (fh, reader)
+process_skiprows(reader)
+
+def ismissing(name, val):
+    'Should the value val in column name be masked?'
+    if ((val == missing) or (val == missingd.get(name)) or (val == '')):
+        return True
+    else:
+        return False
+
+def with_default_value(func, default):
+
+    def newfunc(name, val):
+        if ismissing(name, val):
+            return default
+        else:
+            return func(val)
+    return newfunc
+
+def mybool(x):
+    if (x == 'True'):
+        return True
+    elif (x == 'False'):
+        return False
+    else:
+        raise ValueError('invalid bool')
+dateparser = dateutil.parser.parse
+
+def mydateparser(x):
+    d = dateparser(x, dayfirst=dayfirst, yearfirst=yearfirst)
+    return d
+mydateparser = with_default_value(mydateparser, datetime.datetime(1, 1, 1))
+myfloat = with_default_value(float, numpy.nan)
+myint = with_default_value(int, (- 1))
+mystr = with_default_value(str, '')
+mybool = with_default_value(mybool, None)
+
+def mydate(x):
+    d = dateparser(x, dayfirst=dayfirst, yearfirst=yearfirst)
+    if ((d.hour > 0) or (d.minute > 0) or (d.second > 0)):
+        raise ValueError('not a date')
+    return d.date()
+mydate = with_default_value(mydate, datetime.date(1, 1, 1))
+
+def get_func(name, item, func):
+    funcmap = {mybool: myint, myint: myfloat, myfloat: mydate, mydate: mydateparser, mydateparser: mystr}
+    try:
+        func(name, item)
+    except:
+        if (func == mystr):
+            raise ValueError('Could not find a working conversion function')
+        else:
+            return get_func(name, item, funcmap[func])
+    else:
+        return func
+itemd = {'return': 'return_', 'file': 'file_', 'print': 'print_'}
+
+def get_converters(reader, comments):
+    converters = None
+    i = 0
+    for row in reader:
+        if (len(row) and (comments is not None) and row[0].startswith(comments)):
+            continue
+        if (i == 0):
+            converters = ([mybool] * len(row))
+        if (checkrows and (i > checkrows)):
+            break
+        i += 1
+        for (j, (name, item)) in enumerate(zip(names, row)):
+            func = converterd.get(j)
+            if (func is None):
+                func = converterd.get(name)
+            if (func is None):
+                func = converters[j]
+                if len(item.strip()):
+                    func = get_func(name, item, func)
+            else:
+                func = with_default_value(func, None)
+            converters[j] = func
+    return converters
+needheader = (names is None)
+if needheader:
+    for row in reader:
+        if (len(row) and (comments is not None) and row[0].startswith(comments)):
+            continue
+        headers = row
+        break
+    delete = set("~!@#$%^&*()-=+~\\|]}[{';: /?.>,<")
+    delete.add('"')
+    names = []
+    seen = dict()
+    for (i, item) in enumerate(headers):
+        item = item.strip().lower().replace(' ', '_')
+        item = ''.join([c for c in item if (c not in delete)])
+        if (not len(item)):
+            item = ('column%d' % i)
+        item = itemd.get(item, item)
+        cnt = seen.get(item, 0)
+        if (cnt > 0):
+            names.append((item + ('_%d' % cnt)))
+        else:
+            names.append(item)
+        seen[item] = (cnt + 1)
+elif matplotlib.cbook.is_string_like(names):
+    names = [n.strip() for n in names.split(',')]
+converters = get_converters(reader, comments)
+if (converters is None):
+    raise ValueError('Could not find any valid data in CSV file')
+fh.seek(0)
+reader = csv.reader(fh, delimiter=delimiter)
+process_skiprows(reader)
+if needheader:
+    while 1:
+        row = next(reader)
+        if (len(row) and (comments is not None) and row[0].startswith(comments)):
+            continue
+        break
+rows = []
+rowmasks = []
+for (i, row) in enumerate(reader):
+    if (not len(row)):
+        continue
+    if ((comments is not None) and row[0].startswith(comments)):
+        continue
+    row.extend(([''] * (len(converters) - len(row))))
+    rows.append([func(name, val) for (func, name, val) in zip(converters, names, row)])
+    rowmasks.append([ismissing(name, val) for (name, val) in zip(names, row)])
+fh.close()
+if (not len(rows)):
+    return None
+if (use_mrecords and numpy.any(rowmasks)):
+    try:
+        from numpy.ma import mrecords
+    except ImportError:
+        raise RuntimeError('numpy 1.05 or later is required for masked array support')
+    else:
+        r = numpy.ma.mrecords.fromrecords(rows, names=names, mask=rowmasks)
+else:
+    tempResult = fromrecords(rows, names=names)
+	
+===================================================================	
+rec_groupby: 855	
+----------------------------	
+
+"\n    *r* is a numpy record array\n\n    *groupby* is a sequence of record array attribute names that\n    together form the grouping key.  e.g., ('date', 'productcode')\n\n    *stats* is a sequence of (*attr*, *func*, *outname*) tuples which\n    will call ``x = func(attr)`` and assign *x* to the record array\n    output with attribute *outname*.  For example::\n\n      stats = ( ('sales', len, 'numsales'), ('sales', np.mean, 'avgsale') )\n\n    Return record array has *dtype* names for each attribute name in\n    the *groupby* argument, with the associated group values, and\n    for each outname name in the *stats* argument, with the associated\n    stat summary output.\n    "
+rowd = dict()
+for (i, row) in enumerate(r):
+    key = tuple([row[attr] for attr in groupby])
+    rowd.setdefault(key, []).append(i)
+keys = list(six.iterkeys(rowd))
+keys.sort()
+rows = []
+for key in keys:
+    row = list(key)
+    ind = rowd[key]
+    thisr = r[ind]
+    row.extend([func(thisr[attr]) for (attr, func, outname) in stats])
+    rows.append(row)
+(attrs, funcs, outnames) = list(zip(*stats))
+names = list(groupby)
+names.extend(outnames)
+tempResult = fromrecords(rows, names=names)
+	
+===================================================================	
+recs_join: 980	
+----------------------------	
+
+'\n    Join a sequence of record arrays on single column key.\n\n    This function only joins a single column of the multiple record arrays\n\n    *key*\n      is the column name that acts as a key\n\n    *name*\n      is the name of the column that we want to join\n\n    *recs*\n      is a list of record arrays to join\n\n    *jointype*\n      is a string \'inner\' or \'outer\'\n\n    *missing*\n      is what any missing field is replaced by\n\n    *postfixes*\n      if not None, a len recs sequence of postfixes\n\n    returns a record array with columns [rowkey, name0, name1, ... namen-1].\n    or if postfixes [PF0, PF1, ..., PFN-1] are supplied,\n    [rowkey, namePF0, namePF1, ... namePFN-1].\n\n    Example::\n\n      r = recs_join("date", "close", recs=[r0, r1], missing=0.)\n\n    '
+results = []
+aligned_iters = matplotlib.cbook.align_iterators(operator.attrgetter(key), *[iter(r) for r in recs])
+
+def extract(r):
+    if (r is None):
+        return missing
+    else:
+        return r[name]
+if (jointype == 'outer'):
+    for (rowkey, row) in aligned_iters:
+        results.append(([rowkey] + list(map(extract, row))))
+elif (jointype == 'inner'):
+    for (rowkey, row) in aligned_iters:
+        if (None not in row):
+            results.append(([rowkey] + list(map(extract, row))))
+if (postfixes is None):
+    postfixes = [('%d' % i) for i in range(len(recs))]
+names = ','.join(([key] + [('%s%s' % (name, postfix)) for postfix in postfixes]))
+tempResult = fromrecords(results, names=names)
+	
+===================================================================	
+TestMlab.test_csv2rec_roundtrip: 26	
+----------------------------	
+
+delta = datetime.timedelta(days=1)
+date0 = datetime.date(2007, 12, 16)
+date1 = (date0 + delta)
+date2 = (date1 + delta)
+delta = datetime.timedelta(days=1)
+datetime0 = datetime.datetime(2007, 12, 16, 22, 29, 34, 924122)
+datetime1 = (datetime0 + delta)
+datetime2 = (datetime1 + delta)
+tempResult = fromrecords([(123, date0, datetime0, 1197346475.013734, 'a,bc'), (456, date1, datetime1, 123.456, "d'ef"), (789, date2, datetime2, 1e-09, 'ghi')], names='intdata,datedata,datetimedata,floatdata,stringdata')
+	
+***************************************************	
+ipython_ipython-6.1.0: 0	
+***************************************************	
+pandas_pandas-0.19.2: 0	
+***************************************************	
+dask_dask-0.7.0: 0	
+***************************************************	
+nengo_nengo-2.0.0: 0	
+***************************************************	
+sympy_sympy-1.0.0: 0	
+***************************************************	
+daducci_amico-dev: 0	
+***************************************************	
+aplpy_aplpy-1.1.1: 0	
+***************************************************	
+markovmodel_msmtools-1.0.2: 0	
+***************************************************	
+nilearn_nilearn-0.4.0: 0	
+***************************************************	
+poliastro_poliastro-0.8.0: 0	
+***************************************************	
+skimage_skimage-0.13.0: 0	
+***************************************************	
+sunpy_sunpy-0.8.0: 0	
+***************************************************	
+spacetelescope_synphot-0.1: 0	
+***************************************************	
+librosa_librosa-0.5.1: 0	
+***************************************************	
+mne_python-0.15.0: 0	
+***************************************************	

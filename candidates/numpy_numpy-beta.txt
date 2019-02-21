@@ -1,0 +1,51 @@
+astropy_astropy-1.3.0: 0	
+***************************************************	
+scipy_scipy-0.19.0: 0	
+***************************************************	
+sklearn_sklearn-0.18.0: 0	
+***************************************************	
+matplotlib_matplotlib-2.0.0: 0	
+***************************************************	
+ipython_ipython-6.1.0: 0	
+***************************************************	
+pandas_pandas-0.19.2: 0	
+***************************************************	
+dask_dask-0.7.0: 0	
+***************************************************	
+nengo_nengo-2.0.0: 0	
+***************************************************	
+sympy_sympy-1.0.0: 0	
+***************************************************	
+daducci_amico-dev: 0	
+***************************************************	
+aplpy_aplpy-1.1.1: 0	
+***************************************************	
+markovmodel_msmtools-1.0.2: 1	
+===================================================================	
+TransitionMatrixSamplerRev._update: 158	
+----------------------------	
+
+'\n        Gibbs sampler for reversible transiton matrix\n        Output: sample_mem, sample_mem[i]=eval_fun(i-th sample of transition matrix)\n\n        Parameters:\n        -----------\n        T_init : ndarray(n,n)\n            An initial transition matrix to seed the sampling. When omitted, the initial transition matrix will\n            be constructed from C + C.T, row-normalized. Attention: it is not checked whether T_init is reversible,\n            the user needs to ensure this.\n        n_step : int\n            the number of sampling steps made before returning a new transition matrix. In each sampling step, all\n            transition matrix elements are updated.\n\n        '
+for iter in range(n_step):
+    for i in range(self._n):
+        for j in range((i + 1)):
+            if ((self._C[(i, j)] + self._C[(j, i)]) > 0):
+                if (i == j):
+                    if (self._is_positive(self._C[(i, i)]) and self._is_positive((self._sumC[i] - self._C[(i, i)]))):
+                        tempResult = beta(self._C[(i, i)], (self._sumC[i] - self._C[(i, i)]))
+	
+***************************************************	
+nilearn_nilearn-0.4.0: 0	
+***************************************************	
+poliastro_poliastro-0.8.0: 0	
+***************************************************	
+skimage_skimage-0.13.0: 0	
+***************************************************	
+sunpy_sunpy-0.8.0: 0	
+***************************************************	
+spacetelescope_synphot-0.1: 0	
+***************************************************	
+librosa_librosa-0.5.1: 0	
+***************************************************	
+mne_python-0.15.0: 0	
+***************************************************	

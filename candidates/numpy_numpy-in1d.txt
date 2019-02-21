@@ -1,0 +1,1512 @@
+astropy_astropy-1.3.0: 0	
+***************************************************	
+scipy_scipy-0.19.0: 3	
+===================================================================	
+_onenormest_core: 216	
+----------------------------	
+
+'\n    Compute a lower bound of the 1-norm of a sparse matrix.\n\n    Parameters\n    ----------\n    A : ndarray or other linear operator\n        A linear operator that can produce matrix products.\n    AT : ndarray or other linear operator\n        The transpose of A.\n    t : int, optional\n        A positive parameter controlling the tradeoff between\n        accuracy versus time and memory usage.\n    itmax : int, optional\n        Use at most this many iterations.\n\n    Returns\n    -------\n    est : float\n        An underestimate of the 1-norm of the sparse matrix.\n    v : ndarray, optional\n        The vector such that ||Av||_1 == est*||v||_1.\n        It can be thought of as an input to the linear operator\n        that gives an output with particularly large norm.\n    w : ndarray, optional\n        The vector Av which has relatively large 1-norm.\n        It can be thought of as an output of the linear operator\n        that is relatively large in norm compared to the input.\n    nmults : int, optional\n        The number of matrix products that were computed.\n    nresamples : int, optional\n        The number of times a parallel column was observed,\n        necessitating a re-randomization of the column.\n\n    Notes\n    -----\n    This is algorithm 2.4.\n\n    '
+A_linear_operator = aslinearoperator(A)
+AT_linear_operator = aslinearoperator(AT)
+if (itmax < 2):
+    raise ValueError('at least two iterations are required')
+if (t < 1):
+    raise ValueError('at least one column is required')
+n = A.shape[0]
+if (t >= n):
+    raise ValueError('t should be smaller than the order of A')
+nmults = 0
+nresamples = 0
+X = numpy.ones((n, t), dtype=float)
+if (t > 1):
+    for i in range(1, t):
+        resample_column(i, X)
+    for i in range(t):
+        while column_needs_resampling(i, X):
+            resample_column(i, X)
+            nresamples += 1
+X /= float(n)
+ind_hist = numpy.zeros(0, dtype=numpy.intp)
+est_old = 0
+S = numpy.zeros((n, t), dtype=float)
+k = 1
+ind = None
+while True:
+    Y = numpy.asarray(A_linear_operator.matmat(X))
+    nmults += 1
+    mags = _sum_abs_axis0(Y)
+    est = numpy.max(mags)
+    best_j = numpy.argmax(mags)
+    if ((est > est_old) or (k == 2)):
+        if (k >= 2):
+            ind_best = ind[best_j]
+        w = Y[:, best_j]
+    if ((k >= 2) and (est <= est_old)):
+        est = est_old
+        break
+    est_old = est
+    S_old = S
+    if (k > itmax):
+        break
+    S = sign_round_up(Y)
+    del Y
+    if every_col_of_X_is_parallel_to_a_col_of_Y(S, S_old):
+        break
+    if (t > 1):
+        for i in range(t):
+            while column_needs_resampling(i, S, S_old):
+                resample_column(i, S)
+                nresamples += 1
+    del S_old
+    Z = numpy.asarray(AT_linear_operator.matmat(S))
+    nmults += 1
+    h = _max_abs_axis1(Z)
+    del Z
+    if ((k >= 2) and (max(h) == h[ind_best])):
+        break
+    ind = np.argsort(h)[::(- 1)][:(t + len(ind_hist))].copy()
+    del h
+    if (t > 1):
+        tempResult = in1d(ind[:t], ind_hist)
+	
+===================================================================	
+_onenormest_core: 218	
+----------------------------	
+
+'\n    Compute a lower bound of the 1-norm of a sparse matrix.\n\n    Parameters\n    ----------\n    A : ndarray or other linear operator\n        A linear operator that can produce matrix products.\n    AT : ndarray or other linear operator\n        The transpose of A.\n    t : int, optional\n        A positive parameter controlling the tradeoff between\n        accuracy versus time and memory usage.\n    itmax : int, optional\n        Use at most this many iterations.\n\n    Returns\n    -------\n    est : float\n        An underestimate of the 1-norm of the sparse matrix.\n    v : ndarray, optional\n        The vector such that ||Av||_1 == est*||v||_1.\n        It can be thought of as an input to the linear operator\n        that gives an output with particularly large norm.\n    w : ndarray, optional\n        The vector Av which has relatively large 1-norm.\n        It can be thought of as an output of the linear operator\n        that is relatively large in norm compared to the input.\n    nmults : int, optional\n        The number of matrix products that were computed.\n    nresamples : int, optional\n        The number of times a parallel column was observed,\n        necessitating a re-randomization of the column.\n\n    Notes\n    -----\n    This is algorithm 2.4.\n\n    '
+A_linear_operator = aslinearoperator(A)
+AT_linear_operator = aslinearoperator(AT)
+if (itmax < 2):
+    raise ValueError('at least two iterations are required')
+if (t < 1):
+    raise ValueError('at least one column is required')
+n = A.shape[0]
+if (t >= n):
+    raise ValueError('t should be smaller than the order of A')
+nmults = 0
+nresamples = 0
+X = numpy.ones((n, t), dtype=float)
+if (t > 1):
+    for i in range(1, t):
+        resample_column(i, X)
+    for i in range(t):
+        while column_needs_resampling(i, X):
+            resample_column(i, X)
+            nresamples += 1
+X /= float(n)
+ind_hist = numpy.zeros(0, dtype=numpy.intp)
+est_old = 0
+S = numpy.zeros((n, t), dtype=float)
+k = 1
+ind = None
+while True:
+    Y = numpy.asarray(A_linear_operator.matmat(X))
+    nmults += 1
+    mags = _sum_abs_axis0(Y)
+    est = numpy.max(mags)
+    best_j = numpy.argmax(mags)
+    if ((est > est_old) or (k == 2)):
+        if (k >= 2):
+            ind_best = ind[best_j]
+        w = Y[:, best_j]
+    if ((k >= 2) and (est <= est_old)):
+        est = est_old
+        break
+    est_old = est
+    S_old = S
+    if (k > itmax):
+        break
+    S = sign_round_up(Y)
+    del Y
+    if every_col_of_X_is_parallel_to_a_col_of_Y(S, S_old):
+        break
+    if (t > 1):
+        for i in range(t):
+            while column_needs_resampling(i, S, S_old):
+                resample_column(i, S)
+                nresamples += 1
+    del S_old
+    Z = numpy.asarray(AT_linear_operator.matmat(S))
+    nmults += 1
+    h = _max_abs_axis1(Z)
+    del Z
+    if ((k >= 2) and (max(h) == h[ind_best])):
+        break
+    ind = np.argsort(h)[::(- 1)][:(t + len(ind_hist))].copy()
+    del h
+    if (t > 1):
+        if np.in1d(ind[:t], ind_hist).all():
+            break
+        tempResult = in1d(ind, ind_hist)
+	
+===================================================================	
+_onenormest_core: 222	
+----------------------------	
+
+'\n    Compute a lower bound of the 1-norm of a sparse matrix.\n\n    Parameters\n    ----------\n    A : ndarray or other linear operator\n        A linear operator that can produce matrix products.\n    AT : ndarray or other linear operator\n        The transpose of A.\n    t : int, optional\n        A positive parameter controlling the tradeoff between\n        accuracy versus time and memory usage.\n    itmax : int, optional\n        Use at most this many iterations.\n\n    Returns\n    -------\n    est : float\n        An underestimate of the 1-norm of the sparse matrix.\n    v : ndarray, optional\n        The vector such that ||Av||_1 == est*||v||_1.\n        It can be thought of as an input to the linear operator\n        that gives an output with particularly large norm.\n    w : ndarray, optional\n        The vector Av which has relatively large 1-norm.\n        It can be thought of as an output of the linear operator\n        that is relatively large in norm compared to the input.\n    nmults : int, optional\n        The number of matrix products that were computed.\n    nresamples : int, optional\n        The number of times a parallel column was observed,\n        necessitating a re-randomization of the column.\n\n    Notes\n    -----\n    This is algorithm 2.4.\n\n    '
+A_linear_operator = aslinearoperator(A)
+AT_linear_operator = aslinearoperator(AT)
+if (itmax < 2):
+    raise ValueError('at least two iterations are required')
+if (t < 1):
+    raise ValueError('at least one column is required')
+n = A.shape[0]
+if (t >= n):
+    raise ValueError('t should be smaller than the order of A')
+nmults = 0
+nresamples = 0
+X = numpy.ones((n, t), dtype=float)
+if (t > 1):
+    for i in range(1, t):
+        resample_column(i, X)
+    for i in range(t):
+        while column_needs_resampling(i, X):
+            resample_column(i, X)
+            nresamples += 1
+X /= float(n)
+ind_hist = numpy.zeros(0, dtype=numpy.intp)
+est_old = 0
+S = numpy.zeros((n, t), dtype=float)
+k = 1
+ind = None
+while True:
+    Y = numpy.asarray(A_linear_operator.matmat(X))
+    nmults += 1
+    mags = _sum_abs_axis0(Y)
+    est = numpy.max(mags)
+    best_j = numpy.argmax(mags)
+    if ((est > est_old) or (k == 2)):
+        if (k >= 2):
+            ind_best = ind[best_j]
+        w = Y[:, best_j]
+    if ((k >= 2) and (est <= est_old)):
+        est = est_old
+        break
+    est_old = est
+    S_old = S
+    if (k > itmax):
+        break
+    S = sign_round_up(Y)
+    del Y
+    if every_col_of_X_is_parallel_to_a_col_of_Y(S, S_old):
+        break
+    if (t > 1):
+        for i in range(t):
+            while column_needs_resampling(i, S, S_old):
+                resample_column(i, S)
+                nresamples += 1
+    del S_old
+    Z = numpy.asarray(AT_linear_operator.matmat(S))
+    nmults += 1
+    h = _max_abs_axis1(Z)
+    del Z
+    if ((k >= 2) and (max(h) == h[ind_best])):
+        break
+    ind = np.argsort(h)[::(- 1)][:(t + len(ind_hist))].copy()
+    del h
+    if (t > 1):
+        if np.in1d(ind[:t], ind_hist).all():
+            break
+        seen = numpy.in1d(ind, ind_hist)
+        ind = numpy.concatenate((ind[(~ seen)], ind[seen]))
+    for j in range(t):
+        X[:, j] = elementary_vector(n, ind[j])
+    tempResult = in1d(ind[:t], ind_hist)
+	
+***************************************************	
+sklearn_sklearn-0.18.0: 12	
+===================================================================	
+LabelShuffleSplit._iter_indices: 416	
+----------------------------	
+
+for (label_train, label_test) in super(LabelShuffleSplit, self)._iter_indices():
+    tempResult = in1d(self.label_indices, label_train)
+	
+===================================================================	
+LabelShuffleSplit._iter_indices: 417	
+----------------------------	
+
+for (label_train, label_test) in super(LabelShuffleSplit, self)._iter_indices():
+    train = numpy.flatnonzero(numpy.in1d(self.label_indices, label_train))
+    tempResult = in1d(self.label_indices, label_test)
+	
+===================================================================	
+fetch_20newsgroups: 128	
+----------------------------	
+
+"Load the filenames and data from the 20 newsgroups dataset.\n\n    Read more in the :ref:`User Guide <20newsgroups>`.\n\n    Parameters\n    ----------\n    subset: 'train' or 'test', 'all', optional\n        Select the dataset to load: 'train' for the training set, 'test'\n        for the test set, 'all' for both, with shuffled ordering.\n\n    data_home: optional, default: None\n        Specify a download and cache folder for the datasets. If None,\n        all scikit-learn data is stored in '~/scikit_learn_data' subfolders.\n\n    categories: None or collection of string or unicode\n        If None (default), load all the categories.\n        If not None, list of category names to load (other categories\n        ignored).\n\n    shuffle: bool, optional\n        Whether or not to shuffle the data: might be important for models that\n        make the assumption that the samples are independent and identically\n        distributed (i.i.d.), such as stochastic gradient descent.\n\n    random_state: numpy random number generator or seed integer\n        Used to shuffle the dataset.\n\n    download_if_missing: optional, True by default\n        If False, raise an IOError if the data is not locally available\n        instead of trying to download the data from the source site.\n\n    remove: tuple\n        May contain any subset of ('headers', 'footers', 'quotes'). Each of\n        these are kinds of text that will be detected and removed from the\n        newsgroup posts, preventing classifiers from overfitting on\n        metadata.\n\n        'headers' removes newsgroup headers, 'footers' removes blocks at the\n        ends of posts that look like signatures, and 'quotes' removes lines\n        that appear to be quoting another post.\n\n        'headers' follows an exact standard; the other filters are not always\n        correct.\n    "
+data_home = get_data_home(data_home=data_home)
+cache_path = _pkl_filepath(data_home, CACHE_NAME)
+twenty_home = os.path.join(data_home, '20news_home')
+cache = None
+if os.path.exists(cache_path):
+    try:
+        with open(cache_path, 'rb') as f:
+            compressed_content = f.read()
+        uncompressed_content = codecs.decode(compressed_content, 'zlib_codec')
+        cache = pickle.loads(uncompressed_content)
+    except Exception as e:
+        print((80 * '_'))
+        print('Cache loading failed')
+        print((80 * '_'))
+        print(e)
+if (cache is None):
+    if download_if_missing:
+        logger.info('Downloading 20news dataset. This may take a few minutes.')
+        cache = download_20newsgroups(target_dir=twenty_home, cache_path=cache_path)
+    else:
+        raise IOError('20Newsgroups dataset not found')
+if (subset in ('train', 'test')):
+    data = cache[subset]
+elif (subset == 'all'):
+    data_lst = list()
+    target = list()
+    filenames = list()
+    for subset in ('train', 'test'):
+        data = cache[subset]
+        data_lst.extend(data.data)
+        target.extend(data.target)
+        filenames.extend(data.filenames)
+    data.data = data_lst
+    data.target = numpy.array(target)
+    data.filenames = numpy.array(filenames)
+else:
+    raise ValueError(("subset can only be 'train', 'test' or 'all', got '%s'" % subset))
+data.description = 'the 20 newsgroups by date dataset'
+if ('headers' in remove):
+    data.data = [strip_newsgroup_header(text) for text in data.data]
+if ('footers' in remove):
+    data.data = [strip_newsgroup_footer(text) for text in data.data]
+if ('quotes' in remove):
+    data.data = [strip_newsgroup_quoting(text) for text in data.data]
+if (categories is not None):
+    labels = [(data.target_names.index(cat), cat) for cat in categories]
+    labels.sort()
+    (labels, categories) = zip(*labels)
+    tempResult = in1d(data.target, labels)
+	
+===================================================================	
+_mask_edges_weights: 31	
+----------------------------	
+
+'Apply a mask to edges (weighted or not)'
+inds = numpy.arange(mask.size)
+inds = inds[mask.ravel()]
+tempResult = in1d(edges[0], inds)
+	
+===================================================================	
+_mask_edges_weights: 31	
+----------------------------	
+
+'Apply a mask to edges (weighted or not)'
+inds = numpy.arange(mask.size)
+inds = inds[mask.ravel()]
+tempResult = in1d(edges[1], inds)
+	
+===================================================================	
+GroupShuffleSplit._iter_indices: 312	
+----------------------------	
+
+if (groups is None):
+    raise ValueError('The groups parameter should not be None')
+(classes, group_indices) = numpy.unique(groups, return_inverse=True)
+for (group_train, group_test) in super(GroupShuffleSplit, self)._iter_indices(X=classes):
+    tempResult = in1d(group_indices, group_train)
+	
+===================================================================	
+GroupShuffleSplit._iter_indices: 313	
+----------------------------	
+
+if (groups is None):
+    raise ValueError('The groups parameter should not be None')
+(classes, group_indices) = numpy.unique(groups, return_inverse=True)
+for (group_train, group_test) in super(GroupShuffleSplit, self)._iter_indices(X=classes):
+    train = numpy.flatnonzero(numpy.in1d(group_indices, group_train))
+    tempResult = in1d(group_indices, group_test)
+	
+===================================================================	
+test_group_shuffle_split: 446	
+----------------------------	
+
+groups = [numpy.array([1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3]), numpy.array([0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3]), numpy.array([0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2]), numpy.array([1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4])]
+for l in groups:
+    X = y = numpy.ones(len(l))
+    n_splits = 6
+    test_size = (1.0 / 3)
+    slo = GroupShuffleSplit(n_splits, test_size=test_size, random_state=0)
+    repr(slo)
+    assert_equal(slo.get_n_splits(X, y, groups=l), n_splits)
+    l_unique = numpy.unique(l)
+    for (train, test) in slo.split(X, y, groups=l):
+        l_train_unique = numpy.unique(l[train])
+        l_test_unique = numpy.unique(l[test])
+        tempResult = in1d(l[train], l_test_unique)
+	
+===================================================================	
+test_group_shuffle_split: 447	
+----------------------------	
+
+groups = [numpy.array([1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3]), numpy.array([0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3]), numpy.array([0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2]), numpy.array([1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4])]
+for l in groups:
+    X = y = numpy.ones(len(l))
+    n_splits = 6
+    test_size = (1.0 / 3)
+    slo = GroupShuffleSplit(n_splits, test_size=test_size, random_state=0)
+    repr(slo)
+    assert_equal(slo.get_n_splits(X, y, groups=l), n_splits)
+    l_unique = numpy.unique(l)
+    for (train, test) in slo.split(X, y, groups=l):
+        l_train_unique = numpy.unique(l[train])
+        l_test_unique = numpy.unique(l[test])
+        assert_false(numpy.any(numpy.in1d(l[train], l_test_unique)))
+        tempResult = in1d(l[test], l_train_unique)
+	
+===================================================================	
+test_label_shuffle_split: 386	
+----------------------------	
+
+ys = [numpy.array([1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3]), numpy.array([0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3]), numpy.array([0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2]), numpy.array([1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4])]
+for y in ys:
+    n_iter = 6
+    test_size = (1.0 / 3)
+    slo = sklearn.cross_validation.LabelShuffleSplit(y, n_iter, test_size=test_size, random_state=0)
+    repr(slo)
+    assert_equal(len(slo), n_iter)
+    y_unique = numpy.unique(y)
+    for (train, test) in slo:
+        y_train_unique = numpy.unique(y[train])
+        y_test_unique = numpy.unique(y[test])
+        tempResult = in1d(y[train], y_test_unique)
+	
+===================================================================	
+test_label_shuffle_split: 387	
+----------------------------	
+
+ys = [numpy.array([1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3]), numpy.array([0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3]), numpy.array([0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2]), numpy.array([1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4])]
+for y in ys:
+    n_iter = 6
+    test_size = (1.0 / 3)
+    slo = sklearn.cross_validation.LabelShuffleSplit(y, n_iter, test_size=test_size, random_state=0)
+    repr(slo)
+    assert_equal(len(slo), n_iter)
+    y_unique = numpy.unique(y)
+    for (train, test) in slo:
+        y_train_unique = numpy.unique(y[train])
+        y_test_unique = numpy.unique(y[test])
+        assert_false(numpy.any(numpy.in1d(y[train], y_test_unique)))
+        tempResult = in1d(y[test], y_train_unique)
+	
+===================================================================	
+compute_class_weight: 18	
+----------------------------	
+
+'Estimate class weights for unbalanced datasets.\n\n    Parameters\n    ----------\n    class_weight : dict, \'balanced\' or None\n        If \'balanced\', class weights will be given by\n        ``n_samples / (n_classes * np.bincount(y))``.\n        If a dictionary is given, keys are classes and values\n        are corresponding class weights.\n        If None is given, the class weights will be uniform.\n\n    classes : ndarray\n        Array of the classes occurring in the data, as given by\n        ``np.unique(y_org)`` with ``y_org`` the original class labels.\n\n    y : array-like, shape (n_samples,)\n        Array of original class labels per sample;\n\n    Returns\n    -------\n    class_weight_vect : ndarray, shape (n_classes,)\n        Array with class_weight_vect[i] the weight for i-th class\n\n    References\n    ----------\n    The "balanced" heuristic is inspired by\n    Logistic Regression in Rare Events Data, King, Zen, 2001.\n    '
+from ..preprocessing import LabelEncoder
+if (set(y) - set(classes)):
+    raise ValueError('classes should include all valid labels that can be in y')
+if ((class_weight is None) or (len(class_weight) == 0)):
+    weight = numpy.ones(classes.shape[0], dtype=numpy.float64, order='C')
+elif (class_weight in ['auto', 'balanced']):
+    le = LabelEncoder()
+    y_ind = le.fit_transform(y)
+    tempResult = in1d(classes, le.classes_)
+	
+***************************************************	
+matplotlib_matplotlib-2.0.0: 1	
+===================================================================	
+test_trirefine: 588	
+----------------------------	
+
+n = 3
+subdiv = 2
+x = numpy.linspace((- 1.0), 1.0, (n + 1))
+(x, y) = numpy.meshgrid(x, x)
+x = x.ravel()
+y = y.ravel()
+mask = numpy.zeros((2 * (n ** 2)), dtype=numpy.bool)
+mask[(n ** 2):] = True
+triang = matplotlib.tri.Triangulation(x, y, triangles=meshgrid_triangles((n + 1)), mask=mask)
+refiner = matplotlib.tri.UniformTriRefiner(triang)
+refi_triang = refiner.refine_triangulation(subdiv=subdiv)
+x_refi = refi_triang.x
+y_refi = refi_triang.y
+n_refi = (n * (subdiv ** 2))
+x_verif = numpy.linspace((- 1.0), 1.0, (n_refi + 1))
+(x_verif, y_verif) = numpy.meshgrid(x_verif, x_verif)
+x_verif = x_verif.ravel()
+y_verif = y_verif.ravel()
+tempResult = in1d(numpy.around((x_verif * (2.5 + y_verif)), 8), numpy.around((x_refi * (2.5 + y_refi)), 8))
+	
+***************************************************	
+ipython_ipython-6.1.0: 0	
+***************************************************	
+pandas_pandas-0.19.2: 5	
+===================================================================	
+isin: 58	
+----------------------------	
+
+'\n    Compute the isin boolean array\n\n    Parameters\n    ----------\n    comps: array-like\n    values: array-like\n\n    Returns\n    -------\n    boolean array same length as comps\n    '
+if (not is_list_like(comps)):
+    raise TypeError('only list-like objects are allowed to be passed to isin(), you passed a [{0}]'.format(type(comps).__name__))
+comps = numpy.asarray(comps)
+if (not is_list_like(values)):
+    raise TypeError('only list-like objects are allowed to be passed to isin(), you passed a [{0}]'.format(type(values).__name__))
+if (not isinstance(values, numpy.ndarray)):
+    values = list(values)
+if ((_np_version_under1p8 and pandas.compat.PY3) or (len(comps) > 1000000)):
+    tempResult = in1d(x, numpy.asarray(list(y)))
+	
+===================================================================	
+GroupBy.nth: 674	
+----------------------------	
+
+"\n        Take the nth row from each group if n is an int, or a subset of rows\n        if n is a list of ints.\n\n        If dropna, will take the nth non-null row, dropna is either\n        Truthy (if a Series) or 'all', 'any' (if a DataFrame);\n        this is equivalent to calling dropna(how=dropna) before the\n        groupby.\n\n        Parameters\n        ----------\n        n : int or list of ints\n            a single nth value for the row or a list of nth values\n        dropna : None or str, optional\n            apply the specified dropna operation before counting which row is\n            the nth row. Needs to be None, 'any' or 'all'\n\n        Examples\n        --------\n\n        >>> df = pd.DataFrame({'A': [1, 1, 2, 1, 2],\n        ...                    'B': [np.nan, 2, 3, 4, 5]}, columns=['A', 'B'])\n        >>> g = df.groupby('A')\n        >>> g.nth(0)\n             B\n        A\n        1  NaN\n        2  3.0\n        >>> g.nth(1)\n             B\n        A\n        1  2.0\n        2  5.0\n        >>> g.nth(-1)\n             B\n        A\n        1  4.0\n        2  5.0\n        >>> g.nth([0, 1])\n             B\n        A\n        1  NaN\n        1  2.0\n        2  3.0\n        2  5.0\n\n        Specifying ``dropna`` allows count ignoring NaN\n\n        >>> g.nth(0, dropna='any')\n             B\n        A\n        1  2.0\n        2  3.0\n\n        NaNs denote group exhausted when using dropna\n\n        >>> g.nth(3, dropna='any')\n            B\n        A\n        1 NaN\n        2 NaN\n\n        Specifying ``as_index=False`` in ``groupby`` keeps the original index.\n\n        >>> df.groupby('A', as_index=False).nth(1)\n           A    B\n        1  1  2.0\n        4  2  5.0\n        "
+if isinstance(n, int):
+    nth_values = [n]
+elif isinstance(n, (set, list, tuple)):
+    nth_values = list(set(n))
+    if (dropna is not None):
+        raise ValueError('dropna option with a list of nth values is not supported')
+else:
+    raise TypeError('n needs to be an int or a list/set/tuple of ints')
+nth_values = numpy.array(nth_values, dtype=numpy.intp)
+self._set_group_selection()
+if (not dropna):
+    tempResult = in1d(self._cumcount_array(), nth_values)
+	
+===================================================================	
+GroupBy.nth: 674	
+----------------------------	
+
+"\n        Take the nth row from each group if n is an int, or a subset of rows\n        if n is a list of ints.\n\n        If dropna, will take the nth non-null row, dropna is either\n        Truthy (if a Series) or 'all', 'any' (if a DataFrame);\n        this is equivalent to calling dropna(how=dropna) before the\n        groupby.\n\n        Parameters\n        ----------\n        n : int or list of ints\n            a single nth value for the row or a list of nth values\n        dropna : None or str, optional\n            apply the specified dropna operation before counting which row is\n            the nth row. Needs to be None, 'any' or 'all'\n\n        Examples\n        --------\n\n        >>> df = pd.DataFrame({'A': [1, 1, 2, 1, 2],\n        ...                    'B': [np.nan, 2, 3, 4, 5]}, columns=['A', 'B'])\n        >>> g = df.groupby('A')\n        >>> g.nth(0)\n             B\n        A\n        1  NaN\n        2  3.0\n        >>> g.nth(1)\n             B\n        A\n        1  2.0\n        2  5.0\n        >>> g.nth(-1)\n             B\n        A\n        1  4.0\n        2  5.0\n        >>> g.nth([0, 1])\n             B\n        A\n        1  NaN\n        1  2.0\n        2  3.0\n        2  5.0\n\n        Specifying ``dropna`` allows count ignoring NaN\n\n        >>> g.nth(0, dropna='any')\n             B\n        A\n        1  2.0\n        2  3.0\n\n        NaNs denote group exhausted when using dropna\n\n        >>> g.nth(3, dropna='any')\n            B\n        A\n        1 NaN\n        2 NaN\n\n        Specifying ``as_index=False`` in ``groupby`` keeps the original index.\n\n        >>> df.groupby('A', as_index=False).nth(1)\n           A    B\n        1  1  2.0\n        4  2  5.0\n        "
+if isinstance(n, int):
+    nth_values = [n]
+elif isinstance(n, (set, list, tuple)):
+    nth_values = list(set(n))
+    if (dropna is not None):
+        raise ValueError('dropna option with a list of nth values is not supported')
+else:
+    raise TypeError('n needs to be an int or a list/set/tuple of ints')
+nth_values = numpy.array(nth_values, dtype=numpy.intp)
+self._set_group_selection()
+if (not dropna):
+    tempResult = in1d((self._cumcount_array(ascending=False) + 1), (- nth_values))
+	
+===================================================================	
+MultiIndex.convert_indexer: 1038	
+----------------------------	
+
+r = numpy.arange(start, stop, step)
+if ((indexer is not None) and (len(indexer) != len(labels))):
+    from pandas import Series
+    mapper = Series(indexer)
+    indexer = labels.take(_ensure_platform_int(indexer))
+    result = Series(Index(indexer).isin(r).nonzero()[0])
+    m = result.map(mapper)._values
+else:
+    m = numpy.zeros(len(labels), dtype=bool)
+    tempResult = in1d(labels, r, assume_unique=Index(labels).is_unique)
+	
+===================================================================	
+Holiday.dates: 124	
+----------------------------	
+
+'\n        Calculate holidays observed between start date and end date\n\n        Parameters\n        ----------\n        start_date : starting date, datetime-like, optional\n        end_date : ending date, datetime-like, optional\n        return_name : bool, optional, default=False\n            If True, return a series that has dates and holiday names.\n            False will only return dates.\n        '
+start_date = Timestamp(start_date)
+end_date = Timestamp(end_date)
+filter_start_date = start_date
+filter_end_date = end_date
+if (self.year is not None):
+    dt = Timestamp(datetime(self.year, self.month, self.day))
+    if return_name:
+        return Series(self.name, index=[dt])
+    else:
+        return [dt]
+dates = self._reference_dates(start_date, end_date)
+holiday_dates = self._apply_rule(dates)
+if (self.days_of_week is not None):
+    tempResult = in1d(holiday_dates.dayofweek, self.days_of_week)
+	
+***************************************************	
+dask_dask-0.7.0: 0	
+***************************************************	
+nengo_nengo-2.0.0: 0	
+***************************************************	
+sympy_sympy-1.0.0: 0	
+***************************************************	
+daducci_amico-dev: 0	
+***************************************************	
+aplpy_aplpy-1.1.1: 0	
+***************************************************	
+markovmodel_msmtools-1.0.2: 0	
+***************************************************	
+nilearn_nilearn-0.4.0: 2	
+===================================================================	
+fetch_cobre: 431	
+----------------------------	
+
+"Fetch COBRE datasets preprocessed using NIAK 0.17 under CentOS\n    version 6.3 with Octave version 4.0.2 and the Minc toolkit version 0.3.18.\n\n    Downloads and returns COBRE preprocessed resting state fMRI datasets,\n    covariates and phenotypic information such as demographic, clinical\n    variables, measure of frame displacement FD (an average FD for all the time\n    frames left after censoring).\n\n    Each subject `fmri_XXXXXXX.nii.gz` is a 3D+t nifti volume (150 volumes).\n    WARNING: no confounds were actually regressed from the data, so it can be\n    done interactively by the user who will be able to explore different\n    analytical paths easily.\n\n    For each subject, there is `fmri_XXXXXXX.tsv` files which contains the\n    covariates such as motion parameters, mean CSF signal that should to be\n    regressed out of the functional data.\n\n    `keys_confounds.json`: a json file, that describes each variable mentioned\n    in the files `fmri_XXXXXXX.tsv.gz`. It also contains a list of time frames\n    that have been removed from the time series by censoring for high motion.\n\n    `phenotypic_data.tsv` contains the data of clinical variables that\n    explained in `keys_phenotypic_data.json`\n\n    .. versionadded:: 0.3\n\n    Parameters\n    ----------\n    n_subjects: int, optional\n        The number of subjects to load from maximum of 146 subjects.\n        By default, 10 subjects will be loaded. If n_subjects=None,\n        all subjects will be loaded.\n\n    data_dir: str, optional\n        Path to the data directory. Used to force data storage in a\n        specified location. Default: None\n\n    url: str, optional\n        Override download url. Used for test only (or if you setup a\n        mirror of the data). Default: None\n\n    verbose: int, optional\n       Verbosity level (0 means no message).\n\n    Returns\n    -------\n    data: Bunch\n        Dictionary-like object, the attributes are:\n\n        - 'func': string list\n            Paths to Nifti images.\n        - 'confounds': string list\n            Paths to .tsv files of each subject, confounds.\n        - 'phenotypic': numpy.recarray\n            Contains data of clinical variables, sex, age, FD.\n        - 'description': data description of the release and references.\n        - 'desc_con': str\n            description of the confounds variables\n        - 'desc_phenotypic': str\n            description of the phenotypic variables.\n\n    Notes\n    -----\n    See `more information about datasets structure\n    <https://figshare.com/articles/COBRE_preprocessed_with_NIAK_0_17_-_lightweight_release/4197885>`_\n    "
+if (url is None):
+    url = 'https://api.figshare.com/v2/articles/4197885'
+dataset_name = 'cobre'
+data_dir = _get_dataset_dir(dataset_name, data_dir=data_dir, verbose=verbose)
+fdescr = _get_dataset_descr(dataset_name)
+files = _fetch_files(data_dir, [('4197885', url, {})], verbose=verbose)[0]
+files = json.load(open(files, 'r'))
+files = files['files']
+files_ = {}
+for f in files:
+    files_[f['name']] = f
+files = files_
+csv_name_gz = 'phenotypic_data.tsv.gz'
+csv_name = os.path.splitext(csv_name_gz)[0]
+csv_file_phen = _fetch_files(data_dir, [(csv_name, files[csv_name_gz]['download_url'], {'md5': files[csv_name_gz].get('md5', None), 'move': csv_name_gz, 'uncompress': True})], verbose=verbose)[0]
+names = ['ID', 'Current Age', 'Gender', 'Handedness', 'Subject Type', 'Diagnosis', 'Frames OK', 'FD', 'FD Scrubbed']
+csv_array_phen = numpy.recfromcsv(csv_file_phen, names=names, skip_header=True, delimiter='\t')
+max_subjects = len(csv_array_phen)
+if (n_subjects is None):
+    n_subjects = max_subjects
+if (n_subjects > max_subjects):
+    warnings.warn(('Warning: there are only %d subjects' % max_subjects))
+    n_subjects = max_subjects
+sz_count = list(csv_array_phen['subject_type']).count(b'Patient')
+ct_count = list(csv_array_phen['subject_type']).count(b'Control')
+n_sz = np.round(((float(n_subjects) / max_subjects) * sz_count)).astype(int)
+n_ct = np.round(((float(n_subjects) / max_subjects) * ct_count)).astype(int)
+sz_ids = csv_array_phen[(csv_array_phen['subject_type'] == b'Patient')]['id'][:n_sz]
+ct_ids = csv_array_phen[(csv_array_phen['subject_type'] == b'Control')]['id'][:n_ct]
+ids = numpy.hstack([sz_ids, ct_ids])
+tempResult = in1d(csv_array_phen['id'], ids)
+	
+===================================================================	
+_remove_small_regions: 42	
+----------------------------	
+
+'Remove small regions in volume from input_data of specified min_size.\n\n    min_size should be specified in mm^3 (region size in volume).\n\n    Parameters\n    ----------\n    input_data : numpy.ndarray\n        Values inside the regions defined by labels contained in input_data\n        are summed together to get the size and compare with given min_size.\n        For example, see scipy.ndimage.label\n\n    index : numpy.ndarray\n        A sequence of label numbers of the regions to be measured corresponding\n        to input_data. For example, sequence can be generated using\n        np.arange(n_labels + 1)\n\n    affine : numpy.ndarray\n        Affine of input_data is used to convert size in voxels to size in\n        volume of region in mm^3.\n\n    min_size : float in mm^3\n        Size of regions in input_data which falls below the specified min_size\n        of volume in mm^3 will be discarded.\n\n    Returns\n    -------\n    out : numpy.ndarray\n        Data returned will have regions removed specified by min_size\n        Otherwise, if criterion is not met then same input data will be\n        returned.\n    '
+(_, region_indices) = numpy.unique(input_data, return_inverse=True)
+region_sizes = numpy.bincount(region_indices)
+size_in_vox = (min_size / numpy.abs(numpy.linalg.det(affine[:3, :3])))
+labels_kept = (region_sizes > size_in_vox)
+if (not numpy.all(labels_kept)):
+    tempResult = in1d(input_data, numpy.where(numpy.logical_not(labels_kept))[0])
+	
+***************************************************	
+poliastro_poliastro-0.8.0: 0	
+***************************************************	
+skimage_skimage-0.13.0: 2	
+===================================================================	
+skeletonize: 15	
+----------------------------	
+
+'Return the skeleton of a binary image.\n\n    Thinning is used to reduce each connected component in a binary image\n    to a single-pixel wide skeleton.\n\n    Parameters\n    ----------\n    image : numpy.ndarray\n        A binary image containing the objects to be skeletonized. \'1\'\n        represents foreground, and \'0\' represents background. It\n        also accepts arrays of boolean values where True is foreground.\n\n    Returns\n    -------\n    skeleton : ndarray\n        A matrix containing the thinned image.\n\n    See also\n    --------\n    medial_axis\n\n    Notes\n    -----\n    The algorithm [Zha84]_ works by making successive passes of the image,\n    removing pixels on object borders. This continues until no\n    more pixels can be removed.  The image is correlated with a\n    mask that assigns each pixel a number in the range [0...255]\n    corresponding to each possible pattern of its 8 neighbouring\n    pixels. A look up table is then used to assign the pixels a\n    value of 0, 1, 2 or 3, which are selectively removed during\n    the iterations.\n\n    Note that this algorithm will give different results than a\n    medial axis transform, which is also often referred to as\n    "skeletonization".\n\n    References\n    ----------\n    .. [Zha84] A fast parallel algorithm for thinning digital patterns,\n           T. Y. Zhang and C. Y. Suen, Communications of the ACM,\n           March 1984, Volume 27, Number 3.\n\n\n    Examples\n    --------\n    >>> X, Y = np.ogrid[0:9, 0:9]\n    >>> ellipse = (1./3 * (X - 4)**2 + (Y - 4)**2 < 3**2).astype(np.uint8)\n    >>> ellipse\n    array([[0, 0, 0, 1, 1, 1, 0, 0, 0],\n           [0, 0, 1, 1, 1, 1, 1, 0, 0],\n           [0, 0, 1, 1, 1, 1, 1, 0, 0],\n           [0, 0, 1, 1, 1, 1, 1, 0, 0],\n           [0, 0, 1, 1, 1, 1, 1, 0, 0],\n           [0, 0, 1, 1, 1, 1, 1, 0, 0],\n           [0, 0, 1, 1, 1, 1, 1, 0, 0],\n           [0, 0, 1, 1, 1, 1, 1, 0, 0],\n           [0, 0, 0, 1, 1, 1, 0, 0, 0]], dtype=uint8)\n    >>> skel = skeletonize(ellipse)\n    >>> skel.astype(np.uint8)\n    array([[0, 0, 0, 0, 0, 0, 0, 0, 0],\n           [0, 0, 0, 0, 0, 0, 0, 0, 0],\n           [0, 0, 0, 0, 0, 0, 0, 0, 0],\n           [0, 0, 0, 0, 1, 0, 0, 0, 0],\n           [0, 0, 0, 0, 1, 0, 0, 0, 0],\n           [0, 0, 0, 0, 1, 0, 0, 0, 0],\n           [0, 0, 0, 0, 1, 0, 0, 0, 0],\n           [0, 0, 0, 0, 0, 0, 0, 0, 0],\n           [0, 0, 0, 0, 0, 0, 0, 0, 0]], dtype=uint8)\n\n    '
+image = image.astype(numpy.uint8)
+if (image.ndim != 2):
+    raise ValueError('Skeletonize requires a 2D array')
+tempResult = in1d(image.flat, (0, 1))
+	
+===================================================================	
+clear_border: 25	
+----------------------------	
+
+'Clear objects connected to the label image border.\n\n    Parameters\n    ----------\n    labels : (M[, N[, ..., P]]) array of int or bool\n        Imaging data labels.\n    buffer_size : int, optional\n        The width of the border examined.  By default, only objects\n        that touch the outside of the image are removed.\n    bgval : float or int, optional\n        Cleared objects are set to this value.\n    in_place : bool, optional\n        Whether or not to manipulate the labels array in-place.\n\n    Returns\n    -------\n    out : (M[, N[, ..., P]]) array\n        Imaging data labels with cleared borders\n\n    Examples\n    --------\n    >>> import numpy as np\n    >>> from skimage.segmentation import clear_border\n    >>> labels = np.array([[0, 0, 0, 0, 0, 0, 0, 1, 0],\n    ...                    [0, 0, 0, 0, 1, 0, 0, 0, 0],\n    ...                    [1, 0, 0, 1, 0, 1, 0, 0, 0],\n    ...                    [0, 0, 1, 1, 1, 1, 1, 0, 0],\n    ...                    [0, 1, 1, 1, 1, 1, 1, 1, 0],\n    ...                    [0, 0, 0, 0, 0, 0, 0, 0, 0]])\n    >>> clear_border(labels)\n    array([[0, 0, 0, 0, 0, 0, 0, 0, 0],\n           [0, 0, 0, 0, 1, 0, 0, 0, 0],\n           [0, 0, 0, 1, 0, 1, 0, 0, 0],\n           [0, 0, 1, 1, 1, 1, 1, 0, 0],\n           [0, 1, 1, 1, 1, 1, 1, 1, 0],\n           [0, 0, 0, 0, 0, 0, 0, 0, 0]])\n\n    '
+image = labels
+if any(((buffer_size >= s) for s in image.shape)):
+    raise ValueError('buffer size may not be greater than image size')
+borders = numpy.zeros_like(image, dtype=numpy.bool_)
+ext = (buffer_size + 1)
+slstart = slice(ext)
+slend = slice((- ext), None)
+slices = [slice(s) for s in image.shape]
+for d in range(image.ndim):
+    slicedim = list(slices)
+    slicedim[d] = slstart
+    borders[slicedim] = True
+    slicedim[d] = slend
+    borders[slicedim] = True
+labels = label(image, background=0)
+number = (numpy.max(labels) + 1)
+borders_indices = numpy.unique(labels[borders])
+indices = numpy.arange((number + 1))
+tempResult = in1d(indices, borders_indices)
+	
+***************************************************	
+sunpy_sunpy-0.8.0: 0	
+***************************************************	
+spacetelescope_synphot-0.1: 0	
+***************************************************	
+librosa_librosa-0.5.1: 1	
+===================================================================	
+match_events: 179	
+----------------------------	
+
+'Match one set of events to another.\n\n    This is useful for tasks such as matching beats to the nearest\n    detected onsets, or frame-aligned events to the nearest zero-crossing.\n\n    .. note:: A target event may be matched to multiple source events.\n\n    Examples\n    --------\n    >>> # Sources are multiples of 7\n    >>> s_from = np.arange(0, 100, 7)\n    >>> s_from\n    array([ 0,  7, 14, 21, 28, 35, 42, 49, 56, 63, 70, 77, 84, 91,\n           98])\n    >>> # Targets are multiples of 10\n    >>> s_to = np.arange(0, 100, 10)\n    >>> s_to\n    array([ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90])\n    >>> # Find the matching\n    >>> idx = librosa.util.match_events(s_from, s_to)\n    >>> idx\n    array([0, 1, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 8, 9, 9])\n    >>> # Print each source value to its matching target\n    >>> zip(s_from, s_to[idx])\n    [(0, 0), (7, 10), (14, 10), (21, 20), (28, 30), (35, 30),\n     (42, 40), (49, 50), (56, 60), (63, 60), (70, 70), (77, 80),\n     (84, 80), (91, 90), (98, 90)]\n\n    Parameters\n    ----------\n    events_from : ndarray [shape=(n,)]\n      Array of events (eg, times, sample or frame indices) to match from.\n\n    events_to : ndarray [shape=(m,)]\n      Array of events (eg, times, sample or frame indices) to\n      match against.\n\n    left : bool\n    right : bool\n        If `False`, then matched events cannot be to the left (or right)\n        of source events.\n\n    Returns\n    -------\n    event_mapping : np.ndarray [shape=(n,)]\n        For each event in `events_from`, the corresponding event\n        index in `events_to`.\n\n        `event_mapping[i] == arg min |events_from[i] - events_to[:]|`\n\n    See Also\n    --------\n    match_intervals\n\n    Raises\n    ------\n    ParameterError\n        If either array of input events is not the correct shape\n    '
+if ((len(events_from) == 0) or (len(events_to) == 0)):
+    raise ParameterError('Attempting to match empty event list')
+tempResult = in1d(events_from, events_to)
+	
+***************************************************	
+mne_python-0.15.0: 35	
+===================================================================	
+compute_raw_covariance: 171	
+----------------------------	
+
+"Estimate noise covariance matrix from a continuous segment of raw data.\n\n    It is typically useful to estimate a noise covariance from empty room\n    data or time intervals before starting the stimulation.\n\n    .. note:: This function will:\n\n                  1. Partition the data into evenly spaced, equal-length\n                     epochs.\n                  2. Load them into memory.\n                  3. Subtract the mean across all time points and epochs\n                     for each channel.\n                  4. Process the :class:`Epochs` by\n                     :func:`compute_covariance`.\n\n              This will produce a slightly different result compared to\n              using :func:`make_fixed_length_events`, :class:`Epochs`, and\n              :func:`compute_covariance` directly, since that would (with\n              the recommended baseline correction) subtract the mean across\n              time *for each epoch* (instead of across epochs) for each\n              channel.\n\n    Parameters\n    ----------\n    raw : instance of Raw\n        Raw data\n    tmin : float\n        Beginning of time interval in seconds. Defaults to 0.\n    tmax : float | None (default None)\n        End of time interval in seconds. If None (default), use the end of the\n        recording.\n    tstep : float (default 0.2)\n        Length of data chunks for artefact rejection in seconds.\n        Can also be None to use a single epoch of (tmax - tmin)\n        duration. This can use a lot of memory for large ``Raw``\n        instances.\n    reject : dict | None (default None)\n        Rejection parameters based on peak-to-peak amplitude.\n        Valid keys are 'grad' | 'mag' | 'eeg' | 'eog' | 'ecg'.\n        If reject is None then no rejection is done. Example::\n\n            reject = dict(grad=4000e-13, # T / m (gradiometers)\n                          mag=4e-12, # T (magnetometers)\n                          eeg=40e-6, # V (EEG channels)\n                          eog=250e-6 # V (EOG channels)\n                          )\n\n    flat : dict | None (default None)\n        Rejection parameters based on flatness of signal.\n        Valid keys are 'grad' | 'mag' | 'eeg' | 'eog' | 'ecg', and values\n        are floats that set the minimum acceptable peak-to-peak amplitude.\n        If flat is None then no rejection is done.\n    picks : array-like of int | None (default None)\n        Indices of channels to include (if None, data channels are used).\n    method : str | list | None (default 'empirical')\n        The method used for covariance estimation.\n        See :func:`mne.compute_covariance`.\n\n        .. versionadded:: 0.12\n\n    method_params : dict | None (default None)\n        Additional parameters to the estimation procedure.\n        See :func:`mne.compute_covariance`.\n\n        .. versionadded:: 0.12\n\n    cv : int | sklearn model_selection object (default 3)\n        The cross validation method. Defaults to 3, which will\n        internally trigger a default 3-fold shuffle split.\n\n        .. versionadded:: 0.12\n\n    scalings : dict | None (default None)\n        Defaults to ``dict(mag=1e15, grad=1e13, eeg=1e6)``.\n        These defaults will scale magnetometers and gradiometers\n        at the same unit.\n\n        .. versionadded:: 0.12\n\n    n_jobs : int (default 1)\n        Number of jobs to run in parallel.\n\n        .. versionadded:: 0.12\n\n    return_estimators : bool (default False)\n        Whether to return all estimators or the best. Only considered if\n        method equals 'auto' or is a list of str. Defaults to False\n\n        .. versionadded:: 0.12\n\n    reject_by_annotation : bool\n        Whether to reject based on annotations. If True (default), epochs\n        overlapping with segments whose description begins with ``'bad'`` are\n        rejected. If False, no rejection based on annotations is performed.\n\n        .. versionadded:: 0.14.0\n\n    verbose : bool | str | int | None (default None)\n        If not None, override default verbose level (see :func:`mne.verbose`\n        and :ref:`Logging documentation <tut_logging>` for more).\n\n    Returns\n    -------\n    cov : instance of Covariance | list\n        The computed covariance. If method equals 'auto' or is a list of str\n        and return_estimators equals True, a list of covariance estimators is\n        returned (sorted by log-likelihood, from high to low, i.e. from best\n        to worst).\n\n    See Also\n    --------\n    compute_covariance : Estimate noise covariance matrix from epochs\n    "
+tmin = (0.0 if (tmin is None) else float(tmin))
+tmax = (raw.times[(- 1)] if (tmax is None) else float(tmax))
+tstep = ((tmax - tmin) if (tstep is None) else float(tstep))
+tstep_m1 = (tstep - (1.0 / raw.info['sfreq']))
+events = make_fixed_length_events(raw, 1, tmin, tmax, tstep)
+utils.logger.info(('Using up to %s segment%s' % (len(events), _pl(events))))
+if (picks is None):
+    picks = numpy.arange(raw.info['nchan'])
+    tempResult = in1d(picks, _pick_data_channels(raw.info, with_ref_meg=False))
+	
+===================================================================	
+EpochsArray.__init__: 884	
+----------------------------	
+
+dtype = (numpy.complex128 if numpy.any(numpy.iscomplex(data)) else numpy.float64)
+data = numpy.asanyarray(data, dtype=dtype)
+if (data.ndim != 3):
+    raise ValueError('Data must be a 3D array of shape (n_epochs, n_channels, n_samples)')
+if (len(info['ch_names']) != data.shape[1]):
+    raise ValueError('Info and data must have same number of channels.')
+if (events is None):
+    n_epochs = len(data)
+    events = numpy.c_[(numpy.arange(n_epochs), numpy.zeros(n_epochs, int), numpy.ones(n_epochs, int))]
+if (data.shape[0] != len(events)):
+    raise ValueError('The number of epochs and the number of eventsmust match')
+info = info.copy()
+tmax = (((data.shape[2] - 1) / info['sfreq']) + tmin)
+if (event_id is None):
+    event_id = dict(((str(e), int(e)) for e in numpy.unique(events[:, 2])))
+super(EpochsArray, self).__init__(info, data, events, event_id, tmin, tmax, baseline, reject=reject, flat=flat, reject_tmin=reject_tmin, reject_tmax=reject_tmax, decim=1, proj=proj, on_missing=on_missing)
+tempResult = in1d(self.events[:, 2], list(self.event_id.values()))
+	
+===================================================================	
+BaseEpochs.__init__: 125	
+----------------------------	
+
+self.verbose = verbose
+if (on_missing not in ['error', 'warning', 'ignore']):
+    raise ValueError(('on_missing must be one of: error, warning, ignore. Got: %s' % on_missing))
+if (event_id is None):
+    event_id = list(numpy.unique(events[:, 2]))
+if isinstance(event_id, dict):
+    for key in event_id.keys():
+        if (not isinstance(key, string_types)):
+            raise TypeError(('Event names must be of type str, got %s (%s)' % (key, type(key))))
+    event_id = dict(((key, _ensure_int(val, ('event_id[%s]' % key))) for (key, val) in event_id.items()))
+elif isinstance(event_id, list):
+    event_id = [_ensure_int(v, ('event_id[%s]' % vi)) for (vi, v) in enumerate(event_id)]
+    event_id = dict(zip((str(i) for i in event_id), event_id))
+else:
+    event_id = _ensure_int(event_id, 'event_id')
+    event_id = {str(event_id): event_id}
+self.event_id = event_id
+del event_id
+if (events is not None):
+    if (events.dtype.kind not in ['i', 'u']):
+        raise ValueError('events must be an array of type int')
+    if ((events.ndim != 2) or (events.shape[1] != 3)):
+        raise ValueError('events must be 2D with 3 columns')
+    for (key, val) in self.event_id.items():
+        if (val not in events[:, 2]):
+            msg = ('No matching events found for %s (event id %i)' % (key, val))
+            if (on_missing == 'error'):
+                raise ValueError(msg)
+            elif (on_missing == 'warning'):
+                warn(msg)
+            else:
+                pass
+    values = list(self.event_id.values())
+    tempResult = in1d(events[:, 2], values)
+	
+===================================================================	
+_read_evoked: 367	
+----------------------------	
+
+'Read evoked data from a FIF file.'
+if (fname is None):
+    raise ValueError('No evoked filename specified')
+(f, tree, _) = fiff_open(fname)
+with f as fid:
+    (info, meas) = read_meas_info(fid, tree, clean_bads=True)
+    processed = dir_tree_find(meas, io.constants.FIFF.FIFFB_PROCESSED_DATA)
+    if (len(processed) == 0):
+        raise ValueError('Could not find processed data')
+    evoked_node = dir_tree_find(meas, io.constants.FIFF.FIFFB_EVOKED)
+    if (len(evoked_node) == 0):
+        raise ValueError('Could not find evoked data')
+    if isinstance(condition, string_types):
+        if (kind not in _aspect_dict.keys()):
+            raise ValueError('kind must be "average" or "standard_error"')
+        (comments, aspect_kinds, t) = _get_entries(fid, evoked_node, allow_maxshield)
+        tempResult = in1d(comments, [condition])
+	
+===================================================================	
+_read_evoked: 367	
+----------------------------	
+
+'Read evoked data from a FIF file.'
+if (fname is None):
+    raise ValueError('No evoked filename specified')
+(f, tree, _) = fiff_open(fname)
+with f as fid:
+    (info, meas) = read_meas_info(fid, tree, clean_bads=True)
+    processed = dir_tree_find(meas, io.constants.FIFF.FIFFB_PROCESSED_DATA)
+    if (len(processed) == 0):
+        raise ValueError('Could not find processed data')
+    evoked_node = dir_tree_find(meas, io.constants.FIFF.FIFFB_EVOKED)
+    if (len(evoked_node) == 0):
+        raise ValueError('Could not find evoked data')
+    if isinstance(condition, string_types):
+        if (kind not in _aspect_dict.keys()):
+            raise ValueError('kind must be "average" or "standard_error"')
+        (comments, aspect_kinds, t) = _get_entries(fid, evoked_node, allow_maxshield)
+        tempResult = in1d(aspect_kinds, [_aspect_dict[kind]])
+	
+===================================================================	
+_filt_check_picks: 855	
+----------------------------	
+
+from .io.pick import _pick_data_or_ica
+data_picks = _pick_data_or_ica(info)
+update_info = False
+if (picks is None):
+    picks = data_picks
+    update_info = True
+    if (len(picks) == 0):
+        raise RuntimeError('Could not find any valid channels for your Raw object. Please contact the MNE-Python developers.')
+elif ((h_freq is not None) or (l_freq is not None)):
+    tempResult = in1d(data_picks, picks)
+	
+===================================================================	
+Label.fill: 223	
+----------------------------	
+
+'Fill the surface between sources for a source space label.\n\n        Parameters\n        ----------\n        src : SourceSpaces\n            Source space in which the label was defined. If a source space is\n            provided, the label is expanded to fill in surface vertices that\n            lie between the vertices included in the source space. For the\n            added vertices, ``pos`` is filled in with positions from the\n            source space, and ``values`` is filled in from the closest source\n            space vertex.\n        name : None | str\n            Name for the new Label (default is self.name).\n\n        Returns\n        -------\n        label : Label\n            The label covering the same vertices in source space but also\n            including intermediate surface vertices.\n        '
+if (len(self.vertices) == 0):
+    return self.copy()
+if (self.hemi == 'lh'):
+    hemi_src = src[0]
+elif (self.hemi == 'rh'):
+    hemi_src = src[1]
+tempResult = in1d(self.vertices, hemi_src['vertno'])
+	
+===================================================================	
+Label.fill: 231	
+----------------------------	
+
+'Fill the surface between sources for a source space label.\n\n        Parameters\n        ----------\n        src : SourceSpaces\n            Source space in which the label was defined. If a source space is\n            provided, the label is expanded to fill in surface vertices that\n            lie between the vertices included in the source space. For the\n            added vertices, ``pos`` is filled in with positions from the\n            source space, and ``values`` is filled in from the closest source\n            space vertex.\n        name : None | str\n            Name for the new Label (default is self.name).\n\n        Returns\n        -------\n        label : Label\n            The label covering the same vertices in source space but also\n            including intermediate surface vertices.\n        '
+if (len(self.vertices) == 0):
+    return self.copy()
+if (self.hemi == 'lh'):
+    hemi_src = src[0]
+elif (self.hemi == 'rh'):
+    hemi_src = src[1]
+if (not numpy.all(numpy.in1d(self.vertices, hemi_src['vertno']))):
+    msg = "Source space does not contain all of the label's vertices"
+    raise ValueError(msg)
+nearest = hemi_src['nearest']
+if (nearest is None):
+    warn('Computing patch info for source space, this can take a while. In order to avoid this in the future, run mne.add_source_space_distances() on the source space and save it.')
+    add_source_space_distances(src)
+    nearest = hemi_src['nearest']
+tempResult = in1d(nearest, self.vertices, False)
+	
+===================================================================	
+_split_label_contig: 489	
+----------------------------	
+
+'Split label into contiguous regions (i.e., connected components).\n\n    Parameters\n    ----------\n    label_to_split : Label | str\n        Label which is to be split (Label object or path to a label file).\n    subject : None | str\n        Subject which this label belongs to (needed to locate surface file;\n        should only be specified if it is not specified in the label).\n    subjects_dir : None | str\n        Path to SUBJECTS_DIR if it is not set in the environment.\n\n    Returns\n    -------\n    labels : list of Label\n        The contiguous labels, in order of decending size.\n    '
+(label_to_split, subject, subjects_dir) = _prep_label_split(label_to_split, subject, subjects_dir)
+surf_fname = '.'.join((label_to_split.hemi, 'sphere'))
+surf_path = os.path.join(subjects_dir, subject, 'surf', surf_fname)
+(surface_points, surface_tris) = read_surface(surf_path)
+verts_arr = label_to_split.vertices
+edges_all = mesh_edges(surface_tris)
+select_edges = edges_all[verts_arr][:, verts_arr].tocoo()
+comp_labels = _get_components(verts_arr, select_edges)
+label_divs = []
+for comp in comp_labels:
+    label_divs.append(verts_arr[comp])
+n_parts = len(label_divs)
+if label_to_split.name.endswith(('lh', 'rh')):
+    basename = label_to_split.name[:(- 3)]
+    name_ext = label_to_split.name[(- 3):]
+else:
+    basename = label_to_split.name
+    name_ext = ''
+name_pattern = ('%s_div%%i%s' % (basename, name_ext))
+names = tuple(((name_pattern % i) for i in range(1, (n_parts + 1))))
+if (label_to_split.color is None):
+    colors = ((None,) * n_parts)
+else:
+    colors = _split_colors(label_to_split.color, n_parts)
+label_divs.sort(key=(lambda x: len(x)), reverse=True)
+labels = []
+for (div, name, color) in zip(label_divs, names, colors):
+    verts = numpy.array(sorted(list(div)), int)
+    tempResult = in1d(verts_arr, verts, assume_unique=True)
+	
+===================================================================	
+Label.get_vertices_used: 292	
+----------------------------	
+
+"Get the source space's vertices inside the label.\n\n        Parameters\n        ----------\n        vertices : ndarray of int, shape (n_vertices,) | None\n            The set of vertices to compare the label to. If None, equals to\n            ``np.arange(10242)``. Defaults to None.\n\n        Returns\n        -------\n        label_verts : ndarray of in, shape (n_label_vertices,)\n            The vertices of the label corresponding used by the data.\n        "
+if (vertices is None):
+    vertices = numpy.arange(10242)
+tempResult = in1d(vertices, self.vertices)
+	
+===================================================================	
+Label.__sub__: 201	
+----------------------------	
+
+'Subtract BiHemiLabels.'
+if isinstance(other, BiHemiLabel):
+    if (self.hemi == 'lh'):
+        return (self - other.lh)
+    else:
+        return (self - other.rh)
+elif isinstance(other, Label):
+    if (self.subject != other.subject):
+        raise ValueError(('Label subject parameters must match, got "%s" and "%s". Consider setting the subject parameter on initialization, or setting label.subject manually before combining labels.' % (self.subject, other.subject)))
+else:
+    raise TypeError(('Need: Label or BiHemiLabel. Got: %r' % other))
+if (self.hemi == other.hemi):
+    tempResult = in1d(self.vertices, other.vertices, True, invert=True)
+	
+===================================================================	
+Label.get_tris: 298	
+----------------------------	
+
+"Get the source space's triangles inside the label.\n\n        Parameters\n        ----------\n        tris : ndarray of int, shape (n_tris, 3)\n            The set of triangles corresponding to the vertices in a\n            source space.\n        vertices : ndarray of int, shape (n_vertices,) | None\n            The set of vertices to compare the label to. If None, equals to\n            ``np.arange(10242)``. Defaults to None.\n\n        Returns\n        -------\n        label_tris : ndarray of int, shape (n_tris, 3)\n            The subset of tris used by the label\n        "
+vertices_ = self.get_vertices_used(vertices)
+tempResult = in1d(tris, vertices_)
+	
+===================================================================	
+_spatio_temporal_src_connectivity_ico: 1130	
+----------------------------	
+
+if (src[0]['use_tris'] is None):
+    raise RuntimeError('The source space does not appear to be an ico surface. Connectivity cannot be extracted from non-ico source spaces.')
+used_verts = [numpy.unique(s['use_tris']) for s in src]
+lh_tris = numpy.searchsorted(used_verts[0], src[0]['use_tris'])
+rh_tris = numpy.searchsorted(used_verts[1], src[1]['use_tris'])
+tris = numpy.concatenate((lh_tris, ((rh_tris + numpy.max(lh_tris)) + 1)))
+connectivity = spatio_temporal_tris_connectivity(tris, n_times)
+tempResult = in1d(u, s['vertno'])
+	
+===================================================================	
+_BaseSurfaceSourceEstimate._hemilabel_stc: 632	
+----------------------------	
+
+if (label.hemi == 'lh'):
+    stc_vertices = self.vertices[0]
+else:
+    stc_vertices = self.vertices[1]
+tempResult = in1d(stc_vertices, label.vertices)
+	
+===================================================================	
+_make_volume_source_space: 1043	
+----------------------------	
+
+'Make a source space which covers the volume bounded by surf.'
+if ('rr' in surf):
+    mins = numpy.min(surf['rr'], axis=0)
+    maxs = numpy.max(surf['rr'], axis=0)
+    cm = numpy.mean(surf['rr'], axis=0)
+    maxdist = np.linalg.norm((surf['rr'] - cm), axis=1).max()
+else:
+    mins = (surf['r0'] - surf['R'])
+    maxs = (surf['r0'] + surf['R'])
+    cm = surf['r0'].copy()
+    maxdist = surf['R']
+utils.logger.info(('Surface CM = (%6.1f %6.1f %6.1f) mm' % ((1000 * cm[0]), (1000 * cm[1]), (1000 * cm[2]))))
+utils.logger.info(('Surface fits inside a sphere with radius %6.1f mm' % (1000 * maxdist)))
+utils.logger.info('Surface extent:')
+for (c, mi, ma) in zip('xyz', mins, maxs):
+    utils.logger.info(('    %s = %6.1f ... %6.1f mm' % (c, (1000 * mi), (1000 * ma))))
+maxn = numpy.array([((numpy.floor((numpy.abs(m) / grid)) + 1) if (m > 0) else ((- numpy.floor((numpy.abs(m) / grid))) - 1)) for m in maxs], int)
+minn = numpy.array([((numpy.floor((numpy.abs(m) / grid)) + 1) if (m > 0) else ((- numpy.floor((numpy.abs(m) / grid))) - 1)) for m in mins], int)
+utils.logger.info('Grid extent:')
+for (c, mi, ma) in zip('xyz', minn, maxn):
+    utils.logger.info(('    %s = %6.1f ... %6.1f mm' % (c, ((1000 * mi) * grid), ((1000 * ma) * grid))))
+ns = ((maxn - minn) + 1)
+npts = numpy.prod(ns)
+nrow = ns[0]
+ncol = ns[1]
+nplane = (nrow * ncol)
+rr = numpy.meshgrid(numpy.arange(minn[2], (maxn[2] + 1)), numpy.arange(minn[1], (maxn[1] + 1)), numpy.arange(minn[0], (maxn[0] + 1)), indexing='ij')
+(x, y, z) = (rr[2].ravel(), rr[1].ravel(), rr[0].ravel())
+rr = np.array([(x * grid), (y * grid), (z * grid)]).T
+sp = dict(np=npts, nn=numpy.zeros((npts, 3)), rr=rr, inuse=numpy.ones(npts, int), type='vol', nuse=npts, coord_frame=io.constants.FIFF.FIFFV_COORD_MRI, id=(- 1), shape=ns)
+sp['nn'][:, 2] = 1.0
+assert (sp['rr'].shape[0] == npts)
+utils.logger.info('%d sources before omitting any.', sp['nuse'])
+dists = numpy.linalg.norm((sp['rr'] - cm), axis=1)
+bads = numpy.where(numpy.logical_or((dists < exclude), (dists > maxdist)))[0]
+sp['inuse'][bads] = False
+sp['nuse'] -= len(bads)
+utils.logger.info('%d sources after omitting infeasible sources.', sp['nuse'])
+if ('rr' in surf):
+    _filter_source_spaces(surf, mindist, None, [sp], n_jobs)
+else:
+    vertno = numpy.where(sp['inuse'])[0]
+    bads = (numpy.linalg.norm((sp['rr'][vertno] - surf['r0']), axis=(- 1)) >= (surf['R'] - (mindist / 1000.0)))
+    sp['nuse'] -= bads.sum()
+    sp['inuse'][vertno[bads]] = False
+    sp['vertno'] = numpy.where(sp['inuse'])[0]
+    del vertno
+del surf
+utils.logger.info(('%d sources remaining after excluding the sources outside the surface and less than %6.1f mm inside.' % (sp['nuse'], mindist)))
+if (not do_neighbors):
+    if (volume_label is not None):
+        raise RuntimeError('volume_label cannot be None unless do_neighbors is True')
+    return sp
+k = numpy.arange(npts)
+neigh = numpy.empty((26, npts), int)
+neigh.fill((- 1))
+idxs = [(z > minn[2]), (x < maxn[0]), (y < maxn[1]), (x > minn[0]), (y > minn[1]), (z < maxn[2])]
+offsets = [(- nplane), 1, nrow, (- 1), (- nrow), nplane]
+for (n, idx, offset) in zip(neigh[:6], idxs, offsets):
+    n[idx] = (k[idx] + offset)
+idx1 = (z > minn[2])
+idx2 = numpy.logical_and(idx1, (x < maxn[0]))
+neigh[(6, idx2)] = ((k[idx2] + 1) - nplane)
+idx3 = numpy.logical_and(idx2, (y < maxn[1]))
+neigh[(7, idx3)] = (((k[idx3] + 1) + nrow) - nplane)
+idx2 = numpy.logical_and(idx1, (y < maxn[1]))
+neigh[(8, idx2)] = ((k[idx2] + nrow) - nplane)
+idx2 = numpy.logical_and(idx1, (x > minn[0]))
+idx3 = numpy.logical_and(idx2, (y < maxn[1]))
+neigh[(9, idx3)] = (((k[idx3] - 1) + nrow) - nplane)
+neigh[(10, idx2)] = ((k[idx2] - 1) - nplane)
+idx3 = numpy.logical_and(idx2, (y > minn[1]))
+neigh[(11, idx3)] = (((k[idx3] - 1) - nrow) - nplane)
+idx2 = numpy.logical_and(idx1, (y > minn[1]))
+neigh[(12, idx2)] = ((k[idx2] - nrow) - nplane)
+idx3 = numpy.logical_and(idx2, (x < maxn[0]))
+neigh[(13, idx3)] = (((k[idx3] + 1) - nrow) - nplane)
+idx1 = numpy.logical_and((x < maxn[0]), (y < maxn[1]))
+neigh[(14, idx1)] = ((k[idx1] + 1) + nrow)
+idx1 = (x > minn[0])
+idx2 = numpy.logical_and(idx1, (y < maxn[1]))
+neigh[(15, idx2)] = ((k[idx2] - 1) + nrow)
+idx2 = numpy.logical_and(idx1, (y > minn[1]))
+neigh[(16, idx2)] = ((k[idx2] - 1) - nrow)
+idx1 = numpy.logical_and((y > minn[1]), (x < maxn[0]))
+neigh[(17, idx1)] = (((k[idx1] + 1) - nrow) - nplane)
+idx1 = (z < maxn[2])
+idx2 = numpy.logical_and(idx1, (x < maxn[0]))
+neigh[(18, idx2)] = ((k[idx2] + 1) + nplane)
+idx3 = numpy.logical_and(idx2, (y < maxn[1]))
+neigh[(19, idx3)] = (((k[idx3] + 1) + nrow) + nplane)
+idx2 = numpy.logical_and(idx1, (y < maxn[1]))
+neigh[(20, idx2)] = ((k[idx2] + nrow) + nplane)
+idx2 = numpy.logical_and(idx1, (x > minn[0]))
+idx3 = numpy.logical_and(idx2, (y < maxn[1]))
+neigh[(21, idx3)] = (((k[idx3] - 1) + nrow) + nplane)
+neigh[(22, idx2)] = ((k[idx2] - 1) + nplane)
+idx3 = numpy.logical_and(idx2, (y > minn[1]))
+neigh[(23, idx3)] = (((k[idx3] - 1) - nrow) + nplane)
+idx2 = numpy.logical_and(idx1, (y > minn[1]))
+neigh[(24, idx2)] = ((k[idx2] - nrow) + nplane)
+idx3 = numpy.logical_and(idx2, (x < maxn[0]))
+neigh[(25, idx3)] = (((k[idx3] + 1) - nrow) + nplane)
+if (volume_label is not None):
+    try:
+        import nibabel as nib
+    except ImportError:
+        raise ImportError('nibabel is required to read segmentation file.')
+    utils.logger.info(('Selecting voxels from %s' % volume_label))
+    mgz = nibabel.load(mri)
+    mgz_data = mgz.get_data()
+    lut = _get_lut()
+    vol_id = _get_lut_id(lut, volume_label, True)
+    vox_bool = (mgz_data == vol_id)
+    vox_xyz = np.array(np.where(vox_bool)).T
+    trans = _get_mgz_header(mri)['vox2ras_tkr']
+    trans[:3] /= 1000.0
+    rr_voi = apply_trans(trans, vox_xyz)
+    dists = _compute_nearest(rr_voi, sp['rr'], return_dists=True)[1]
+    maxdist = numpy.linalg.norm((trans[:3, :3].sum(0) / 2.0))
+    bads = numpy.where((dists > maxdist))[0]
+    sp['inuse'][bads] = False
+    sp['vertno'] = numpy.where((sp['inuse'] > 0))[0]
+    sp['nuse'] = len(sp['vertno'])
+    sp['seg_name'] = volume_label
+    sp['mri_file'] = mri
+    utils.logger.info('%d sources remaining after excluding sources too far from VOI voxels', sp['nuse'])
+utils.logger.info('Adjusting the neighborhood info...')
+log_inuse = (sp['inuse'] > 0)
+neigh[:, numpy.logical_not(log_inuse)] = (- 1)
+vertno = numpy.where(log_inuse)[0]
+sp['vertno'] = vertno
+old_shape = neigh.shape
+neigh = neigh.ravel()
+checks = numpy.where((neigh >= 0))[0]
+tempResult = in1d(checks, vertno)
+	
+===================================================================	
+_get_morph_src_reordering: 1463	
+----------------------------	
+
+'Get the reordering indices for a morphed source space.\n\n    Parameters\n    ----------\n    vertices : list\n        The vertices for the left and right hemispheres.\n    src_from : instance of SourceSpaces\n        The original source space.\n    subject_from : str\n        The source subject.\n    subject_to : str\n        The destination subject.\n    subjects_dir : string, or None\n        Path to SUBJECTS_DIR if it is not set in the environment.\n    verbose : bool, str, int, or None\n        If not None, override default verbose level (see :func:`mne.verbose`\n        and :ref:`Logging documentation <tut_logging>` for more).\n\n    Returns\n    -------\n    data_idx : ndarray, shape (n_vertices,)\n        The array used to reshape the data.\n    from_vertices : list\n        The right and left hemisphere vertex numbers for the "from" subject.\n    '
+subjects_dir = get_subjects_dir(subjects_dir, raise_error=True)
+from_vertices = list()
+data_idxs = list()
+offset = 0
+for (ii, hemi) in enumerate(('lh', 'rh')):
+    best = _get_vertex_map_nn(src_from[ii], subject_from, subject_to, hemi, subjects_dir)
+    full_mapping = best[src_from[ii]['vertno']]
+    tempResult = in1d(full_mapping, vertices[ii])
+	
+===================================================================	
+_get_morph_src_reordering: 1466	
+----------------------------	
+
+'Get the reordering indices for a morphed source space.\n\n    Parameters\n    ----------\n    vertices : list\n        The vertices for the left and right hemispheres.\n    src_from : instance of SourceSpaces\n        The original source space.\n    subject_from : str\n        The source subject.\n    subject_to : str\n        The destination subject.\n    subjects_dir : string, or None\n        Path to SUBJECTS_DIR if it is not set in the environment.\n    verbose : bool, str, int, or None\n        If not None, override default verbose level (see :func:`mne.verbose`\n        and :ref:`Logging documentation <tut_logging>` for more).\n\n    Returns\n    -------\n    data_idx : ndarray, shape (n_vertices,)\n        The array used to reshape the data.\n    from_vertices : list\n        The right and left hemisphere vertex numbers for the "from" subject.\n    '
+subjects_dir = get_subjects_dir(subjects_dir, raise_error=True)
+from_vertices = list()
+data_idxs = list()
+offset = 0
+for (ii, hemi) in enumerate(('lh', 'rh')):
+    best = _get_vertex_map_nn(src_from[ii], subject_from, subject_to, hemi, subjects_dir)
+    full_mapping = best[src_from[ii]['vertno']]
+    used_vertices = numpy.in1d(full_mapping, vertices[ii])
+    from_vertices.append(src_from[ii]['vertno'][used_vertices])
+    remaining_mapping = full_mapping[used_vertices]
+    tempResult = in1d(vertices[ii], full_mapping)
+	
+===================================================================	
+make_forward_dipole: 339	
+----------------------------	
+
+'Convert dipole object to source estimate and calculate forward operator.\n\n    The instance of Dipole is converted to a discrete source space,\n    which is then combined with a BEM or a sphere model and\n    the sensor information in info to form a forward operator.\n\n    The source estimate object (with the forward operator) can be projected to\n    sensor-space using :func:`mne.simulation.simulate_evoked`.\n\n    .. note:: If the (unique) time points of the dipole object are unevenly\n              spaced, the first output will be a list of single-timepoint\n              source estimates.\n\n    Parameters\n    ----------\n    dipole : instance of Dipole\n        Dipole object containing position, orientation and amplitude of\n        one or more dipoles. Multiple simultaneous dipoles may be defined by\n        assigning them identical times.\n    bem : str | dict\n        The BEM filename (str) or a loaded sphere model (dict).\n    info : instance of Info\n        The measurement information dictionary. It is sensor-information etc.,\n        e.g., from a real data file.\n    trans : str | None\n        The head<->MRI transform filename. Must be provided unless BEM\n        is a sphere model.\n    n_jobs : int\n        Number of jobs to run in parallel (used in making forward solution).\n    verbose : bool, str, int, or None\n        If not None, override default verbose level (see :func:`mne.verbose`\n        and :ref:`Logging documentation <tut_logging>` for more).\n\n    Returns\n    -------\n    fwd : instance of Forward\n        The forward solution corresponding to the source estimate(s).\n    stc : instance of VolSourceEstimate | list of VolSourceEstimate\n        The dipoles converted to a discrete set of points and associated\n        time courses. If the time points of the dipole are unevenly spaced,\n        a list of single-timepoint source estimates are returned.\n\n    See Also\n    --------\n    mne.simulation.simulate_evoked\n\n    Notes\n    -----\n    .. versionadded:: 0.12.0\n    '
+times = dipole.times.copy()
+pos = dipole.pos.copy()
+amplitude = dipole.amplitude.copy()
+ori = dipole.ori.copy()
+sources = dict(rr=pos, nn=ori)
+sp = _make_discrete_source_space(sources, coord_frame='head')
+src = SourceSpaces([sp])
+fwd = make_forward_solution(info, trans, src, bem, n_jobs=n_jobs, verbose=verbose)
+convert_forward_solution(fwd, surf_ori=False, force_fixed=True, copy=False, use_cps=False, verbose=None)
+if (fwd['src'][0]['nuse'] != len(pos)):
+    inuse = fwd['src'][0]['inuse'].astype(numpy.bool)
+    head = 'The following dipoles are outside the inner skull boundary'
+    msg = ((((len(head) * '#') + '\n') + head) + '\n')
+    for (t, pos) in zip(times[numpy.logical_not(inuse)], pos[numpy.logical_not(inuse)]):
+        msg += '    t={:.0f} ms, pos=({:.0f}, {:.0f}, {:.0f}) mm\n'.format((t * 1000.0), (pos[0] * 1000.0), (pos[1] * 1000.0), (pos[2] * 1000.0))
+    msg += (len(head) * '#')
+    utils.logger.error(msg)
+    raise ValueError('One or more dipoles outside the inner skull.')
+timepoints = numpy.unique(times)
+if (len(timepoints) > 1):
+    tdiff = numpy.diff(timepoints)
+    if (not numpy.allclose(tdiff, tdiff[0])):
+        warn('Unique time points of dipoles unevenly spaced: returned stc will be a list, one for each time point.')
+        tstep = (- 1.0)
+    else:
+        tstep = tdiff[0]
+elif (len(timepoints) == 1):
+    tstep = 0.001
+data = numpy.zeros((len(amplitude), len(timepoints)))
+row = 0
+for (tpind, tp) in enumerate(timepoints):
+    tempResult = in1d(times, tp)
+	
+===================================================================	
+ToDataFrameMixin._get_check_picks: 33	
+----------------------------	
+
+'Get and check picks.'
+if (picks is None):
+    picks = list(range(self.info['nchan']))
+tempResult = in1d(picks, numpy.arange(len(picks_check)))
+	
+===================================================================	
+_conv_comp: 217	
+----------------------------	
+
+'Add a new converted compensation data item.'
+ch_names = [c['ch_name'] for c in chs]
+n_col = comp[first]['ncoeff']
+col_names = comp[first]['sensors'][:n_col]
+row_names = [comp[p]['sensor_name'] for p in range(first, (last + 1))]
+tempResult = in1d(col_names, ch_names)
+	
+===================================================================	
+_get_clusters_st_multistep: 95	
+----------------------------	
+
+'Directly calculate connectivity.\n\n    This uses knowledge that time points are\n    only connected to adjacent neighbors for data organized as time x space.\n\n    This algorithm time increases linearly with the number of time points,\n    compared to with the square for the standard (graph) algorithm.\n    '
+n_src = len(neighbors)
+n_times = len(keepers)
+t_border = list()
+t_border.append(0)
+for (ki, k) in enumerate(keepers):
+    keepers[ki] = (k + (ki * n_src))
+    t_border.append((t_border[ki] + len(k)))
+t_border = numpy.array(t_border)
+keepers = numpy.concatenate(keepers)
+v = keepers
+(t, s) = divmod(v, n_src)
+r = numpy.ones(t.shape, dtype=bool)
+clusters = list()
+next_ind = 0
+inds = numpy.arange(t_border[0], t_border[n_times])
+if (s.size > 0):
+    while (next_ind is not None):
+        t_inds = [next_ind]
+        r[next_ind] = False
+        icount = 1
+        while (icount <= len(t_inds)):
+            ind = t_inds[(icount - 1)]
+            selves = inds[t_border[max((t[ind] - max_step), 0)]:t_border[min(((t[ind] + max_step) + 1), n_times)]]
+            selves = selves[r[selves]]
+            selves = selves[(s[ind] == s[selves])]
+            buddies = inds[t_border[t[ind]]:t_border[(t[ind] + 1)]]
+            buddies = buddies[r[buddies]]
+            tempResult = in1d(s[buddies], neighbors[s[ind]], assume_unique=True)
+	
+===================================================================	
+_get_clusters_spatial: 22	
+----------------------------	
+
+'Form spatial clusters using neighbor lists.\n\n    This is equivalent to _get_components with n_times = 1, with a properly\n    reconfigured connectivity matrix (formed as "neighbors" list)\n    '
+r = numpy.ones(s.shape, dtype=bool)
+clusters = list()
+next_ind = (0 if (s.size > 0) else None)
+while (next_ind is not None):
+    t_inds = [next_ind]
+    r[next_ind] = False
+    icount = 1
+    while (icount <= len(t_inds)):
+        ind = t_inds[(icount - 1)]
+        buddies = numpy.where(r)[0]
+        tempResult = in1d(s[buddies], neighbors[s[ind]], assume_unique=True)
+	
+===================================================================	
+_prepare_rerp_preds: 152	
+----------------------------	
+
+'Build predictor matrix and metadata (e.g. condition time windows).'
+conds = list(event_id)
+if (covariates is not None):
+    conds += list(covariates)
+if isinstance(tmin, (float, int)):
+    tmin_s = dict(((cond, int((tmin * sfreq))) for cond in conds))
+else:
+    tmin_s = dict(((cond, int((tmin.get(cond, (- 0.1)) * sfreq))) for cond in conds))
+if isinstance(tmax, (float, int)):
+    tmax_s = dict(((cond, int(((tmax * sfreq) + 1.0))) for cond in conds))
+else:
+    tmax_s = dict(((cond, int(((tmax.get(cond, 1.0) * sfreq) + 1))) for cond in conds))
+cond_length = dict()
+xs = []
+for cond in conds:
+    (tmin_, tmax_) = (tmin_s[cond], tmax_s[cond])
+    n_lags = int((tmax_ - tmin_))
+    if (cond in event_id):
+        ids = ([event_id[cond]] if isinstance(event_id[cond], int) else event_id[cond])
+        tempResult = in1d(events[:, 2], ids)
+	
+===================================================================	
+test_label_in_src: 178	
+----------------------------	
+
+'Test label in src.'
+src = read_source_spaces(src_fname)
+label = read_label(v1_label_fname)
+vert_in_src = numpy.intersect1d(label.vertices, src[0]['vertno'], True)
+tempResult = in1d(label.vertices, vert_in_src)
+	
+===================================================================	
+test_label_in_src: 182	
+----------------------------	
+
+'Test label in src.'
+src = read_source_spaces(src_fname)
+label = read_label(v1_label_fname)
+vert_in_src = numpy.intersect1d(label.vertices, src[0]['vertno'], True)
+where = numpy.in1d(label.vertices, vert_in_src)
+pos_in_src = label.pos[where]
+values_in_src = label.values[where]
+label_src = Label(vert_in_src, pos_in_src, values_in_src, hemi='lh').fill(src)
+tempResult = in1d(src[0]['nearest'], label.vertices)
+	
+===================================================================	
+test_label_in_src: 186	
+----------------------------	
+
+'Test label in src.'
+src = read_source_spaces(src_fname)
+label = read_label(v1_label_fname)
+vert_in_src = numpy.intersect1d(label.vertices, src[0]['vertno'], True)
+where = numpy.in1d(label.vertices, vert_in_src)
+pos_in_src = label.pos[where]
+values_in_src = label.values[where]
+label_src = Label(vert_in_src, pos_in_src, values_in_src, hemi='lh').fill(src)
+vertices_status = numpy.in1d(src[0]['nearest'], label.vertices)
+vertices_in = numpy.nonzero(vertices_status)[0]
+vertices_out = numpy.nonzero(numpy.logical_not(vertices_status))[0]
+assert_array_equal(label_src.vertices, vertices_in)
+tempResult = in1d(vertices_out, label_src.vertices)
+	
+===================================================================	
+test_morph: 462	
+----------------------------	
+
+'Test inter-subject label morphing.'
+label_orig = read_label(real_label_fname)
+label_orig.subject = 'sample'
+vals = list()
+for grade in [5, [numpy.arange(10242), numpy.arange(10242)], numpy.arange(10242)]:
+    label = label_orig.copy()
+    assert_raises(ValueError, label.morph, 'sample', 'fsaverage')
+    label.values.fill(1)
+    label = label.morph(None, 'fsaverage', 5, grade, subjects_dir, 1)
+    label = label.morph('fsaverage', 'sample', 5, None, subjects_dir, 2)
+    tempResult = in1d(label_orig.vertices, label.vertices)
+	
+===================================================================	
+test_write_labels_to_annot: 374	
+----------------------------	
+
+'Test writing FreeSurfer parcellation from labels.'
+tempdir = _TempDir()
+labels = read_labels_from_annot('sample', subjects_dir=subjects_dir)
+surf_dir = os.path.join(subjects_dir, 'sample', 'surf')
+temp_surf_dir = os.path.join(tempdir, 'sample', 'surf')
+os.makedirs(temp_surf_dir)
+shutil.copy(os.path.join(surf_dir, 'lh.white'), temp_surf_dir)
+shutil.copy(os.path.join(surf_dir, 'rh.white'), temp_surf_dir)
+os.makedirs(os.path.join(tempdir, 'sample', 'label'))
+dst = os.path.join(tempdir, 'sample', 'label', '%s.%s.annot')
+write_labels_to_annot(labels, 'sample', 'test1', subjects_dir=tempdir)
+assert_true(os.path.exists((dst % ('lh', 'test1'))))
+assert_true(os.path.exists((dst % ('rh', 'test1'))))
+for label in labels:
+    if (label.hemi == 'lh'):
+        break
+write_labels_to_annot([label], 'sample', 'test2', subjects_dir=tempdir)
+assert_true(os.path.exists((dst % ('lh', 'test2'))))
+assert_true(os.path.exists((dst % ('rh', 'test2'))))
+for label in labels:
+    if (label.hemi == 'rh'):
+        break
+write_labels_to_annot([label], 'sample', 'test3', subjects_dir=tempdir)
+assert_true(os.path.exists((dst % ('lh', 'test3'))))
+assert_true(os.path.exists((dst % ('rh', 'test3'))))
+assert_raises(TypeError, write_labels_to_annot, labels[0], 'sample', 'test4', subjects_dir=tempdir)
+fnames = [os.path.join(tempdir, (hemi + '-myparc')) for hemi in ['lh', 'rh']]
+with warnings.catch_warnings(record=True):
+    for fname in fnames:
+        write_labels_to_annot(labels, annot_fname=fname)
+labels2 = read_labels_from_annot('sample', subjects_dir=subjects_dir, annot_fname=fnames[0])
+labels22 = read_labels_from_annot('sample', subjects_dir=subjects_dir, annot_fname=fnames[1])
+labels2.extend(labels22)
+names = [label.name for label in labels2]
+for label in labels:
+    idx = names.index(label.name)
+    assert_labels_equal(label, labels2[idx])
+for fname in fnames:
+    write_labels_to_annot(labels, 'sample', annot_fname=fname, overwrite=True, subjects_dir=subjects_dir)
+labels3 = read_labels_from_annot('sample', subjects_dir=subjects_dir, annot_fname=fnames[0])
+labels33 = read_labels_from_annot('sample', subjects_dir=subjects_dir, annot_fname=fnames[1])
+labels3.extend(labels33)
+names3 = [label.name for label in labels3]
+for label in labels:
+    idx = names3.index(label.name)
+    assert_labels_equal(label, labels3[idx])
+assert_raises(ValueError, write_labels_to_annot, labels, 'sample', annot_fname=fnames[0], subjects_dir=subjects_dir)
+write_labels_to_annot(labels, 'sample', annot_fname=fnames[0], overwrite=True, subjects_dir=subjects_dir)
+labels_ = labels[:]
+labels_[0] = labels_[0].copy()
+labels_[0].color = None
+write_labels_to_annot(labels_, 'sample', annot_fname=fnames[0], overwrite=True, subjects_dir=subjects_dir)
+labels_[0].color = labels_[2].color
+assert_raises(ValueError, write_labels_to_annot, labels_, 'sample', annot_fname=fnames[0], overwrite=True, subjects_dir=subjects_dir)
+labels_[0].color = (1.1, 1.0, 1.0, 1.0)
+assert_raises(ValueError, write_labels_to_annot, labels_, 'sample', annot_fname=fnames[0], overwrite=True, subjects_dir=subjects_dir)
+labels_ = labels[:]
+cuneus_lh = labels[6]
+precuneus_lh = labels[50]
+labels_.append((precuneus_lh + cuneus_lh))
+assert_raises(ValueError, write_labels_to_annot, labels_, 'sample', annot_fname=fnames[0], overwrite=True, subjects_dir=subjects_dir)
+labels_lh = [label for label in labels if label.name.endswith('lh')]
+write_labels_to_annot(labels_lh[1:], 'sample', annot_fname=fnames[0], overwrite=True, subjects_dir=subjects_dir)
+labels_reloaded = read_labels_from_annot('sample', annot_fname=fnames[0], subjects_dir=subjects_dir)
+assert_equal(len(labels_lh), len(labels_reloaded))
+label0 = labels_lh[0]
+label1 = labels_reloaded[(- 1)]
+assert_equal(label1.name, 'unknown-lh')
+tempResult = in1d(label0.vertices, label1.vertices)
+	
+===================================================================	
+test_grow_labels: 489	
+----------------------------	
+
+'Test generation of circular source labels.'
+seeds = [0, 50000]
+should_be_in = [[49, 227], [51207, 48794]]
+hemis = [0, 1]
+names = ['aneurism', 'tumor']
+labels = grow_labels('sample', seeds, 3, hemis, subjects_dir, names=names)
+tgt_names = ['aneurism-lh', 'tumor-rh']
+tgt_hemis = ['lh', 'rh']
+for (label, seed, hemi, sh, name) in zip(labels, seeds, tgt_hemis, should_be_in, tgt_names):
+    assert_true(numpy.any((label.vertices == seed)))
+    tempResult = in1d(sh, label.vertices)
+	
+===================================================================	
+test_spatial_inter_hemi_connectivity: 57	
+----------------------------	
+
+'Test spatial connectivity between hemispheres.'
+conn = spatial_inter_hemi_connectivity(fname_src_3, 5e-06)
+assert_equal(conn.data.size, 0)
+conn = spatial_inter_hemi_connectivity(fname_src_3, 5000000.0)
+assert_equal(conn.data.size, (numpy.prod(conn.shape) // 2))
+src = read_source_spaces(fname_src_3)
+conn = spatial_inter_hemi_connectivity(src, 0.01)
+conn = conn.tocsr()
+n_src = conn.shape[0]
+assert_true(((n_src * 0.02) < conn.data.size < (n_src * 0.1)))
+assert_equal(conn[:src[0]['nuse'], :src[0]['nuse']].data.size, 0)
+assert_equal(conn[(- src[1]['nuse']):, (- src[1]['nuse']):].data.size, 0)
+c = (((conn.T + conn) / 2.0) - conn)
+c.eliminate_zeros()
+assert_equal(c.data.size, 0)
+upper_right = conn[:src[0]['nuse'], src[0]['nuse']:].toarray()
+assert_equal(upper_right.sum(), (conn.sum() // 2))
+good_labels = ['S_pericallosal', 'Unknown', 'G_and_S_cingul-Mid-Post', 'G_cuneus']
+for (hi, hemi) in enumerate(('lh', 'rh')):
+    has_neighbors = src[hi]['vertno'][numpy.where(numpy.any(upper_right, axis=(1 - hi)))[0]]
+    labels = read_labels_from_annot('sample', 'aparc.a2009s', hemi, subjects_dir=subjects_dir)
+    tempResult = in1d(l.vertices, has_neighbors)
+	
+===================================================================	
+test_other_volume_source_spaces: 194	
+----------------------------	
+
+'Test setting up other volume source spaces.'
+tempdir = _TempDir()
+temp_name = os.path.join(tempdir, 'temp-src.fif')
+run_subprocess(['mne_volume_source_space', '--grid', '7.0', '--src', temp_name, '--mri', fname_mri])
+src = read_source_spaces(temp_name)
+src_new = setup_volume_source_space(None, pos=7.0, mri=fname_mri, subjects_dir=subjects_dir)
+assert_equal(len(src_new[0]['vertno']), 7497)
+assert_equal(len(src), 1)
+assert_equal(len(src_new), 1)
+tempResult = in1d(src[0]['vertno'], src_new[0]['vertno'])
+	
+===================================================================	
+_prepare_mne_browse_epochs: 460	
+----------------------------	
+
+'Set up the mne_browse_epochs window.'
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from matplotlib.collections import LineCollection
+from matplotlib.colors import colorConverter
+epochs = params['epochs']
+if (picks is None):
+    picks = _handle_picks(epochs)
+if (len(picks) < 1):
+    raise RuntimeError('No appropriate channels found. Please check your picks')
+picks = sorted(picks)
+inds = list()
+types = list()
+for t in ['grad', 'mag']:
+    idxs = pick_types(params['info'], meg=t, ref_meg=False, exclude=[])
+    if (len(idxs) < 1):
+        continue
+    tempResult = in1d(idxs, picks, assume_unique=True)
+	
+===================================================================	
+_prepare_mne_browse_epochs: 467	
+----------------------------	
+
+'Set up the mne_browse_epochs window.'
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from matplotlib.collections import LineCollection
+from matplotlib.colors import colorConverter
+epochs = params['epochs']
+if (picks is None):
+    picks = _handle_picks(epochs)
+if (len(picks) < 1):
+    raise RuntimeError('No appropriate channels found. Please check your picks')
+picks = sorted(picks)
+inds = list()
+types = list()
+for t in ['grad', 'mag']:
+    idxs = pick_types(params['info'], meg=t, ref_meg=False, exclude=[])
+    if (len(idxs) < 1):
+        continue
+    mask = numpy.in1d(idxs, picks, assume_unique=True)
+    inds.append(idxs[mask])
+    types += ([t] * len(inds[(- 1)]))
+for t in ['hbo', 'hbr']:
+    idxs = pick_types(params['info'], meg=False, ref_meg=False, fnirs=t, exclude=[])
+    if (len(idxs) < 1):
+        continue
+    tempResult = in1d(idxs, picks, assume_unique=True)
+	
+===================================================================	
+_prepare_mne_browse_epochs: 478	
+----------------------------	
+
+'Set up the mne_browse_epochs window.'
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from matplotlib.collections import LineCollection
+from matplotlib.colors import colorConverter
+epochs = params['epochs']
+if (picks is None):
+    picks = _handle_picks(epochs)
+if (len(picks) < 1):
+    raise RuntimeError('No appropriate channels found. Please check your picks')
+picks = sorted(picks)
+inds = list()
+types = list()
+for t in ['grad', 'mag']:
+    idxs = pick_types(params['info'], meg=t, ref_meg=False, exclude=[])
+    if (len(idxs) < 1):
+        continue
+    mask = numpy.in1d(idxs, picks, assume_unique=True)
+    inds.append(idxs[mask])
+    types += ([t] * len(inds[(- 1)]))
+for t in ['hbo', 'hbr']:
+    idxs = pick_types(params['info'], meg=False, ref_meg=False, fnirs=t, exclude=[])
+    if (len(idxs) < 1):
+        continue
+    mask = numpy.in1d(idxs, picks, assume_unique=True)
+    inds.append(idxs[mask])
+    types += ([t] * len(inds[(- 1)]))
+pick_kwargs = dict(meg=False, ref_meg=False, exclude=[])
+if (order is None):
+    order = ['eeg', 'seeg', 'ecog', 'eog', 'ecg', 'emg', 'ref_meg', 'stim', 'resp', 'misc', 'chpi', 'syst', 'ias', 'exci']
+for ch_type in order:
+    pick_kwargs[ch_type] = True
+    idxs = pick_types(params['info'], **pick_kwargs)
+    if (len(idxs) < 1):
+        continue
+    tempResult = in1d(idxs, picks, assume_unique=True)
+	
+===================================================================	
+_set_custom_selection: 642	
+----------------------------	
+
+'Set custom selection by lasso selector.'
+chs = params['fig_selection'].lasso.selection
+if (len(chs) == 0):
+    return
+labels = [l._text for l in params['fig_selection'].radio.labels]
+tempResult = in1d(params['raw'].ch_names, chs)
+	
+***************************************************	

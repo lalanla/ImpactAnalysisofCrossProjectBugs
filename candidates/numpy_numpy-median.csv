@@ -1,0 +1,7 @@
+project, module, line
+astropy_astropy,sigma_clipped_stats,70
+scipy_scipy,sen_seasonal_slopes,373
+scipy_scipy,sen_seasonal_slopes,374
+scipy_scipy,compare_medians_ms,155
+scipy_scipy,compare_medians_ms,155
+sklearn_sklearn,Imputer._dense_fit,127
